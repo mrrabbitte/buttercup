@@ -3,19 +3,18 @@ use strum_macros::AsRefStr;
 use crate::arguments::values::ValueHolder;
 
 pub mod extractors;
-pub mod transformers;
 pub mod values;
 
 pub struct ArgumentDescription {
 
     id: i32,
     name: String,
-    argument_type: ArgumentType
+    argument_type: ValueType
 
 }
 
 #[derive(AsRefStr)]
-pub enum ArgumentType {
+pub enum ValueType {
 
     Boolean,
     String,
@@ -24,11 +23,12 @@ pub enum ArgumentType {
     LocalDateTime,
     LocalDate,
     LocalTime,
-    LatLong
+    LatLong,
+    DayOfWeek
 
 }
 
-impl ArgumentType {
+impl ValueType {
 
     fn matches(&self,
                value_holder: &ValueHolder) -> bool {
@@ -37,3 +37,8 @@ impl ArgumentType {
 
 }
 
+pub struct ArgumentProcessor {
+
+
+
+}

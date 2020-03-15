@@ -1,36 +1,43 @@
 use std::slice::Split;
 use std::str::FromStr;
 
-use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime};
+use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, Weekday};
+use num::bigint::BigInt;
+use num::rational::BigRational;
 use strum_macros::AsRefStr;
 
-use crate::arguments::ArgumentType;
+use rust_decimal::Decimal;
+use serde::{Deserialize, Serialize};
+
+use crate::arguments::ValueType;
 
 #[derive(AsRefStr)]
 pub enum ValueHolder<'a> {
 
     Boolean(bool),
     String(&'a str),
-    Decimal(f64),
-    Integer(i64),
+    Decimal(BigRational),
+    Integer(BigInt),
     LocalDateTime(NaiveDateTime),
     LocalDate(NaiveDate),
     LocalTime(NaiveTime),
-    LatLong(GeoCoordinate)
+    LatLong(GeoCoordinates),
+    DayOfWeek(Weekday)
 
 }
 
-pub struct GeoCoordinate {
+#[derive(Serialize, Deserialize)]
+pub struct GeoCoordinates {
 
     latitude: f64,
     longitude: f64
 
 }
 
-impl GeoCoordinate {
+impl GeoCoordinates {
 
-    pub fn new(latitude: f64, longitude: f64) -> GeoCoordinate {
-        GeoCoordinate {
+    pub fn new(latitude: f64, longitude: f64) -> GeoCoordinates {
+        GeoCoordinates {
             latitude,
             longitude
         }
@@ -52,7 +59,7 @@ fn parse(opt: Option<&&str>) -> Option<f64> {
     }
 }
 
-impl FromStr for GeoCoordinate {
+impl FromStr for GeoCoordinates {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -68,7 +75,7 @@ impl FromStr for GeoCoordinate {
             return Result::Err(());
         }
         Result::Ok(
-            GeoCoordinate::new(
+            GeoCoordinates::new(
                 lat_opt.unwrap(), lon_opt.unwrap()))
     }
 
