@@ -48,11 +48,11 @@ pub struct ArgumentValueExtractor;
 
 impl ArgumentValueExtractor {
 
-    pub fn extract(input: &ValueExtractorInput) -> Result<ValueHolder, String> {
+    pub fn extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
         if input.value.is_null() {
-            return Result::Err(String::from("Got null value."));
+            return Result::Err(ValueExtractionPolicy::Lax);
         }
-        let extraction_result = match &input.argument_type {
+        return match &input.argument_type {
             ValueType::Boolean => BooleanExtractor::extract(input),
             ValueType::String => StringExtractor::extract(input),
             ValueType::Decimal => DecimalExtractor::extract(input),
@@ -62,12 +62,6 @@ impl ArgumentValueExtractor {
             ValueType::LocalTime => LocalTimeExtractor::extract(input),
             ValueType::DayOfWeek => DayOfWeekExtractor::extract(input),
             ValueType::LatLong => LatLongExtractor::extract(input)
-        };
-        return match extraction_result {
-            Ok(value) => Result::Ok(value),
-            Err(policy) => Result::Err(
-                format!("Could not extract value from: {:?} with: {:?} policy",
-                        input, policy)),
         };
     }
 

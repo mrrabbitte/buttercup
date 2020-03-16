@@ -47,6 +47,7 @@ impl ValueType {
 
 }
 
+#[derive(Debug)]
 pub struct ValuesPayload {
 
     values: HashMap<String, ValueHolder>

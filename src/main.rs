@@ -1,6 +1,13 @@
+use std::collections::HashMap;
+
 use actix_web::{App, HttpResponse, HttpServer, post, Responder, web};
 use actix_web::web::{Json, Path};
 use serde_json::Value;
+
+use crate::arguments::{ArgumentsProcessorInput, ArgumentValuesExtractor};
+use crate::arguments::definition::ArgumentDefinition;
+use crate::arguments::extractors::ValueExtractionPolicy;
+use crate::values::ValueType;
 
 mod arguments;
 mod content;
@@ -14,8 +21,22 @@ async fn index() -> impl Responder {
 async fn index2(path: Path<u32>,
                 body: Json<Value>) -> impl Responder {
     let values = body.into_inner();
-    HttpResponse::Ok().body(format!("Hello world again: {:?}, {:?}",
-                                    values, path.into_inner()))
+    let mut definitions = HashMap::new();
+    definitions.insert(String::from("dayOfWeekArg"),
+                       ArgumentDefinition::new(1,
+                                                String::from("dayOfWeekArg"),
+                                                ValueType::DayOfWeek,
+                        ValueExtractionPolicy::Lax));
+    definitions.insert(String::from("decimalArg"),
+                       ArgumentDefinition::new(1,
+                                               String::from("decimalArg"),
+                                               ValueType::Decimal,
+                                               ValueExtractionPolicy::Lax));
+    let input = ArgumentsProcessorInput::new(
+        definitions, &values);
+    let extracted = ArgumentValuesExtractor::process(input);
+    HttpResponse::Ok().body(format!("Request: {:?}, extracted {:?}",
+                                    values, extracted))
 }
 
 #[actix_rt::main]
