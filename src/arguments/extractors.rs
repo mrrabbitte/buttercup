@@ -22,17 +22,31 @@ pub enum ValueExtractionPolicy {
 }
 
 #[derive(Debug)]
-pub struct ValueExtractorInput {
+pub struct ValueExtractorInput<'a> {
 
-    value: Value,
-    argument_type: ValueType,
-    policy: ValueExtractionPolicy
+    value: &'a Value,
+    argument_type: &'a ValueType,
+    policy: &'a ValueExtractionPolicy
 
 }
 
-pub struct ValueExtractorFacade;
+impl<'a> ValueExtractorInput<'a> {
 
-impl ValueExtractorFacade {
+    pub fn new(value: &'a Value,
+               argument_type: &'a ValueType,
+               policy: &'a ValueExtractionPolicy) -> ValueExtractorInput<'a> {
+        ValueExtractorInput {
+            value,
+            argument_type,
+            policy
+        }
+    }
+
+}
+
+pub struct ArgumentValueExtractor;
+
+impl ArgumentValueExtractor {
 
     pub fn extract(input: &ValueExtractorInput) -> Result<ValueHolder, String> {
         if input.value.is_null() {

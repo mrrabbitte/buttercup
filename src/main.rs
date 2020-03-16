@@ -14,7 +14,7 @@ async fn index2(path: Path<u32>,
                 body: Json<Value>) -> impl Responder {
     let values = body.into_inner();
     HttpResponse::Ok().body(format!("Hello world again: {:?}, {:?}",
-                                    body.into_inner(), path.into_inner()))
+                                    values, path.into_inner()))
 }
 
 #[actix_rt::main]

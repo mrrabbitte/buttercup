@@ -17,7 +17,7 @@ impl ValueExtractor for LatLongExtractor {
     }
 
     fn lax_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
-        return match &input.value {
+        return match input.value {
             Value::String(str_value) => {
                 return match GeoCoordinates::from_str(str_value.as_str()) {
                     Ok(coordinates) => Result::Ok(ValueHolder::LatLong(coordinates)),

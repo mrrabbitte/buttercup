@@ -9,13 +9,13 @@ impl ValueExtractor for BooleanExtractor {
 
     fn strict_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
         match input.value {
-            Value::Bool(bool_val) => Result::Ok(ValueHolder::Boolean(bool_val)),
+            Value::Bool(bool_val) => Result::Ok(ValueHolder::Boolean(*bool_val)),
             _ => Result::Err(ValueExtractionPolicy::Strict)
         }
     }
 
     fn lax_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
-        match &input.value {
+        match input.value {
             Value::Bool(bool_val) => Result::Ok(ValueHolder::Boolean(*bool_val)),
             Value::String(str_val) => {
               match str_val.parse::<bool>() {

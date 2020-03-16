@@ -9,7 +9,7 @@ pub struct DecimalExtractor;
 impl ValueExtractor for DecimalExtractor {
 
     fn strict_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
-        let val = &input.value;
+        let val = input.value;
         if val.is_f64() {
             return match val.as_f64().and_then(BigRational::from_f64) {
                 Some(v) => Result::Ok(ValueHolder::Decimal(v)),
@@ -20,7 +20,7 @@ impl ValueExtractor for DecimalExtractor {
     }
 
     fn lax_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
-        return match &input.value {
+        return match input.value {
             Value::Number(num_val) => {
                 if num_val.is_u64() {
                     return match num_val.as_u64().and_then(BigRational::from_u64) {
@@ -55,7 +55,7 @@ pub struct IntegerExtractor;
 impl ValueExtractor for IntegerExtractor {
 
     fn strict_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
-        let val = &input.value;
+        let val = input.value;
         if val.is_i64() {
             return match val.as_i64().and_then(BigInt::from_i64) {
                 Some(v) => Result::Ok(ValueHolder::Integer(v)),
@@ -63,7 +63,7 @@ impl ValueExtractor for IntegerExtractor {
             };
         }
         if val.is_u64() {
-            return match  val.as_u64().and_then(BigInt::from_u64) {
+            return match val.as_u64().and_then(BigInt::from_u64) {
                 Some(v) => Result::Ok(ValueHolder::Integer(v)),
                 None => Result::Err(ValueExtractionPolicy::Strict)
             };
@@ -72,7 +72,7 @@ impl ValueExtractor for IntegerExtractor {
     }
 
     fn lax_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
-        let val = &input.value;
+        let val = input.value;
         return match val {
             Value::Number(num_val) => {
                 if val.is_f64() {

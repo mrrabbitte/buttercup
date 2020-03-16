@@ -1,17 +1,14 @@
+use crate::arguments::extractors::ValueExtractionPolicy;
 use crate::arguments::values::ValueType;
 
 pub struct ArgumentDescription {
 
     id: i32,
     name: String,
-    argument_type: ValueType
+    argument_type: ValueType,
+    extraction_policy: ValueExtractionPolicy
 
 }
 
-pub struct ArgumentDescriptionService;
 
-impl ArgumentDescriptionService {
 
-    pub fn get_argument_description()
-
-}
