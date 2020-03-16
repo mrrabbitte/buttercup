@@ -14,20 +14,20 @@ pub mod geolocation;
 pub mod number;
 pub mod string;
 
-#[derive(Display)]
-pub enum ExtractionPolicy {
+#[derive(Debug)]
+pub enum ValueExtractionPolicy {
 
     Strict,
     Lax
 
 }
 
-#[derive(Display)]
-pub struct ExtractorInput {
+#[derive(Debug)]
+pub struct ValueExtractorInput {
 
     value: Value,
     argument_type: ValueType,
-    policy: ExtractionPolicy
+    policy: ValueExtractionPolicy
 
 }
 
@@ -35,7 +35,7 @@ pub struct Extractor;
 
 impl Extractor {
 
-    pub fn extract(input: &ExtractorInput) -> Result<ValueHolder, String> {
+    pub fn extract(input: &ValueExtractorInput) -> Result<ValueHolder, String> {
         if input.value.is_null() {
             return Result::Err(String::from("Got null value."));
         }
@@ -62,10 +62,10 @@ impl Extractor {
 
 pub trait ValueExtractor {
 
-    fn extract(input: &ExtractorInput) -> Result<ValueHolder, ExtractionPolicy> {
+    fn extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
         return match &input.policy {
-            ExtractionPolicy::Strict => Self::strict_extract(input),
-            ExtractionPolicy::Lax => {
+            ValueExtractionPolicy::Strict => Self::strict_extract(input),
+            ValueExtractionPolicy::Lax => {
                 let strict_result = Self::strict_extract(input);
                 if strict_result.is_ok() {
                     return strict_result;
@@ -75,8 +75,8 @@ pub trait ValueExtractor {
         }
     }
 
-    fn strict_extract(input: &ExtractorInput) -> Result<ValueHolder, ExtractionPolicy>;
-    fn lax_extract(input: &ExtractorInput) -> Result<ValueHolder, ExtractionPolicy>;
+    fn strict_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy>;
+    fn lax_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy>;
 
 }
 

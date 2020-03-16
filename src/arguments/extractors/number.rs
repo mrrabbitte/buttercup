@@ -1,46 +1,50 @@
-use num::{BigInt, BigRational};
+use num::{BigInt, BigRational, FromPrimitive};
 use serde_json::Value;
 
-use crate::arguments::extractors::{ExtractionPolicy, ExtractorInput, ValueExtractor};
+use crate::arguments::extractors::{ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
 use crate::arguments::values::ValueHolder;
 
 pub struct DecimalExtractor;
 
 impl ValueExtractor for DecimalExtractor {
 
-    fn strict_extract(input: &ExtractorInput) -> Result<ValueHolder, ExtractionPolicy> {
+    fn strict_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
         let val = &input.value;
         if val.is_f64() {
-            let opt_f64 = val.as_f64();
-            return match opt_f64 {
-                Some(v) => Result::Ok(
-                    ValueHolder::Decimal(BigRational::from(v))),
-                None => Result::Err(ExtractionPolicy::Strict)
+            return match val.as_f64().and_then(BigRational::from_f64) {
+                Some(v) => Result::Ok(ValueHolder::Decimal(v)),
+                None => Result::Err(ValueExtractionPolicy::Strict)
             };
         }
-        Result::Err(ExtractionPolicy::Strict)
+        Result::Err(ValueExtractionPolicy::Strict)
     }
 
-    fn lax_extract(input: &ExtractorInput) -> Result<ValueHolder, ExtractionPolicy> {
+    fn lax_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
         return match &input.value {
             Value::Number(num_val) => {
                 if num_val.is_u64() {
-                    return Result::Ok(
-                        ValueHolder::Decimal(
-                            BigRational::from(num_val.as_u64().unwrap())));
+                    return match num_val.as_u64().and_then(BigRational::from_u64) {
+                        Some(v) => Result::Ok(ValueHolder::Decimal(v)),
+                        None => Result::Err(ValueExtractionPolicy::Lax)
+                    };
                 }
                 if num_val.is_i64() {
-                    return Result::Ok(
-                        ValueHolder::Decimal(
-                            BigRational::from(num_val.as_i64().unwrap())));
+                    return match num_val.as_i64().and_then(BigRational::from_i64) {
+                        Some(v) => Result::Ok(ValueHolder::Decimal(v)),
+                        None => Result::Err(ValueExtractionPolicy::Lax)
+                    };
                 }
-                Result::Err(ExtractionPolicy::Lax)
+                Result::Err(ValueExtractionPolicy::Lax)
             },
-            Value::String(str_val) =>
-                Result::Ok(
-                    ValueHolder::Decimal(
-                        BigRational::from(str_val))),
-            _ => Result::Err(ExtractionPolicy::Lax)
+            Value::String(str_val) => {
+                return match str_val.parse::<BigRational>() {
+                    Ok(big_rational) =>
+                        Result::Ok(
+                            ValueHolder::Decimal(big_rational)),
+                    Err(_) => Result::Err(ValueExtractionPolicy::Lax),
+                }
+            },
+            _ => Result::Err(ValueExtractionPolicy::Lax)
         };
     }
 
@@ -50,39 +54,41 @@ pub struct IntegerExtractor;
 
 impl ValueExtractor for IntegerExtractor {
 
-    fn strict_extract(input: &ExtractorInput) -> Result<ValueHolder, String> {
+    fn strict_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
         let val = &input.value;
         if val.is_i64() {
-            let opt_i64 = val.as_i64();
-            return match opt_i64 {
-                Some(v) => Result::Ok(
-                    ValueHolder::Integer(BigInt::from(v))),
-                None => Result::Err(String::from("Could not get i64 value."))
+            return match val.as_i64().and_then(BigInt::from_i64) {
+                Some(v) => Result::Ok(ValueHolder::Integer(v)),
+                None => Result::Err(ValueExtractionPolicy::Strict)
             };
         }
         if val.is_u64() {
-            let opt_u64 = val.as_u64();
-            return match opt_u64 {
-                Some(v) => Result::Ok(
-                    ValueHolder::Integer(BigInt::from(v))),
-                None => Result::Err(String::from("Could not get u64 value."))
+            return match  val.as_u64().and_then(BigInt::from_u64) {
+                Some(v) => Result::Ok(ValueHolder::Integer(v)),
+                None => Result::Err(ValueExtractionPolicy::Strict)
             };
         }
-        Result::Err(format!("Could not transform value: {:?} to Integer.", val))
+        Result::Err(ValueExtractionPolicy::Strict)
     }
 
-    fn lax_extract(input: &ExtractorInput) -> Result<ValueHolder, String> {
+    fn lax_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
         let val = &input.value;
         return match val {
             Value::Number(num_val) => {
                 if val.is_f64() {
-                    return Result::Ok(
-                        ValueHolder::Integer(BigInt::from(num_val.as_f64().unwrap())));
+                    return match num_val.as_f64().and_then(BigInt::from_f64) {
+                        Some(v) => Result::Ok(ValueHolder::Integer(v)),
+                        None => Result::Err(ValueExtractionPolicy::Lax)
+                    };
                 }
-                Result::Err(String::from("Could not extract Integer from value."))},
-            Value::String(_) => Result::Ok(
-                ValueHolder::Integer(BigInt::from(v))),
-            _ => Result::Err(String::from("Could not extract Integer from value."))
+                Result::Err(ValueExtractionPolicy::Lax)},
+            Value::String(str_val) => {
+                return match str_val.parse::<BigInt>() {
+                    Ok(v) => Result::Ok(ValueHolder::Integer(v)),
+                    Err(_) => Result::Err(ValueExtractionPolicy::Lax),
+                };
+            },
+            _ => Result::Err(ValueExtractionPolicy::Lax)
         };
     }
 

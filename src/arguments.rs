@@ -13,7 +13,7 @@ pub struct ArgumentDescription {
 
 }
 
-#[derive(AsRefStr)]
+#[derive(AsRefStr, Debug)]
 pub enum ValueType {
 
     Boolean,

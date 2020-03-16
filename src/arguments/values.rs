@@ -4,18 +4,16 @@ use std::str::FromStr;
 use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, Weekday};
 use num::bigint::BigInt;
 use num::rational::BigRational;
-use strum_macros::AsRefStr;
-
-use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use strum_macros::AsRefStr;
 
 use crate::arguments::ValueType;
 
-#[derive(AsRefStr)]
-pub enum ValueHolder<'a> {
+#[derive(AsRefStr, Debug)]
+pub enum ValueHolder {
 
     Boolean(bool),
-    String(&'a str),
+    String(String),
     Decimal(BigRational),
     Integer(BigInt),
     LocalDateTime(NaiveDateTime),
@@ -26,7 +24,7 @@ pub enum ValueHolder<'a> {
 
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GeoCoordinates {
 
     latitude: f64,
@@ -43,20 +41,18 @@ impl GeoCoordinates {
         }
     }
 
-
-
-}
-
-fn parse(opt: Option<&&str>) -> Option<f64> {
-    match opt {
-        Some(val) => {
-            match val.parse::<f64>() {
-                Ok(float_value) => Option::Some(float_value),
-                Err(_) => Option::None
-            }
-        },
-        None => Option::None
+    fn parse(opt: Option<&&str>) -> Option<f64> {
+        match opt {
+            Some(val) => {
+                match val.parse::<f64>() {
+                    Ok(float_value) => Option::Some(float_value),
+                    Err(_) => Option::None
+                }
+            },
+            None => Option::None
+        }
     }
+
 }
 
 impl FromStr for GeoCoordinates {
@@ -66,11 +62,11 @@ impl FromStr for GeoCoordinates {
         let lat_long: Vec<&str> = s
             .split(",")
             .collect();
-        let lat_opt = parse(lat_long.get(0));
+        let lat_opt = GeoCoordinates::parse(lat_long.get(0));
         if lat_opt.is_none() {
             return Result::Err(());
         }
-        let lon_opt = parse(lat_long.get(1));
+        let lon_opt = GeoCoordinates::parse(lat_long.get(1));
         if lon_opt.is_none() {
             return Result::Err(());
         }
