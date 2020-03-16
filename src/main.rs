@@ -32,8 +32,7 @@ async fn index2(path: Path<u32>,
                                                String::from("decimalArg"),
                                                ValueType::Decimal,
                                                ValueExtractionPolicy::Lax));
-    let input = ArgumentsProcessorInput::new(
-        definitions, &values);
+    let input = ArgumentsProcessorInput::new(definitions, &values);
     let extracted = ArgumentValuesExtractor::process(input);
     HttpResponse::Ok().body(format!("Request: {:?}, extracted {:?}",
                                     values, extracted))
