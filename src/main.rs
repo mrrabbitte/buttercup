@@ -4,6 +4,7 @@ use serde_json::Value;
 
 mod arguments;
 mod content;
+mod values;
 
 async fn index() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")

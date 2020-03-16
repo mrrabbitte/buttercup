@@ -5,7 +5,7 @@ use crate::arguments::extractors::date_time::{DayOfWeekExtractor, LocalDateExtra
 use crate::arguments::extractors::geolocation::LatLongExtractor;
 use crate::arguments::extractors::number::{DecimalExtractor, IntegerExtractor};
 use crate::arguments::extractors::string::StringExtractor;
-use crate::arguments::values::{ValueHolder, ValueType};
+use crate::values::{ValueHolder, ValueType};
 
 pub mod boolean;
 pub mod date_time;

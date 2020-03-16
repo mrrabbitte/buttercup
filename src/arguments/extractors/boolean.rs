@@ -1,7 +1,7 @@
 use serde_json::Value;
 
 use crate::arguments::extractors::{ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
-use crate::arguments::values::ValueHolder;
+use crate::values::ValueHolder;
 
 pub struct BooleanExtractor;
 

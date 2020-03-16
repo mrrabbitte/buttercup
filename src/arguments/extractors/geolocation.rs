@@ -3,7 +3,7 @@ use std::str::FromStr;
 use serde_json::{Error, Value};
 
 use crate::arguments::extractors::{ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
-use crate::arguments::values::{GeoCoordinates, ValueHolder};
+use crate::values::{GeoCoordinates, ValueHolder};
 
 pub struct LatLongExtractor;
 

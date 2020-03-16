@@ -5,16 +5,15 @@ use strum_macros::AsRefStr;
 
 use crate::arguments::description::ArgumentDescription;
 use crate::arguments::extractors::{ValueExtractionPolicy, ValueExtractorInput};
-use crate::arguments::values::ValueHolder;
+use crate::values::{ValueHolder, ValuesPayload};
 
 pub mod extractors;
-pub mod values;
 pub mod description;
 
-pub struct ArgumentsProcessorInput {
+pub struct ArgumentsProcessorInput<'a> {
 
     descriptions: HashMap<String, ArgumentDescription>,
-    payload: Value
+    payload: &'a Value
 
 }
 
@@ -31,17 +30,17 @@ pub struct ArgumentValuesExtractor;
 impl ArgumentValuesExtractor {
 
     pub fn process(input: ArgumentsProcessorInput)
-        -> Result<HashMap<String, ValueHolder>, ArgumentValueExtractorError> {
+        -> Result<ValuesPayload, ArgumentValueExtractorError> {
         return match input.payload {
             Value::Object(payload) =>
-                ArgumentValuesExtractor::do_process(&payload, &input.descriptions),
+                ArgumentValuesExtractor::do_process(payload, &input.descriptions),
             _ => Result::Err(ArgumentValueExtractorError::InvalidJsonInput)
         };
     }
 
     fn do_process(payload: &Map<String, Value>,
                   descriptions: &HashMap<String, ArgumentDescription>)
-        -> Result<HashMap<String, ValueHolder>, ArgumentValueExtractorError> {
+        -> Result<ValuesPayload, ArgumentValueExtractorError> {
         let mut response: HashMap<String, ValueHolder> = HashMap::new();
         for (name, description) in descriptions.iter() {
             println!("Here");
@@ -51,17 +50,20 @@ impl ArgumentValuesExtractor {
                     ArgumentValueExtractorError::MissingArgument(name.clone())),
                 Some(value) => {
                     match ArgumentValuesExtractor::handle(description, value) {
-                        Ok(holder) => response.insert(name.clone(), holder),
+                        Ok(holder) => {
+                            response.insert(name.clone(), holder);
+                        },
                         Err(policy) => return Result::Err(
                             ArgumentValueExtractorError::ExtractionFailure(name.clone(), policy)),
                     }
                 },
             }
         }
-        return Result::Ok(response);
+        return Result::Ok(ValuesPayload::new(response));
     }
 
-    fn handle(description: &ArgumentDescription, value: &Value)
+    fn handle(description: &ArgumentDescription,
+              value: &Value)
         -> Result<ValueHolder, ValueExtractionPolicy> {
         Result::Err(ValueExtractionPolicy::Strict)
     }

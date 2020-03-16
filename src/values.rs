@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::slice::Split;
 use std::str::FromStr;
 
@@ -45,6 +46,24 @@ impl ValueType {
     }
 
 }
+
+pub struct ValuesPayload {
+
+    values: HashMap<String, ValueHolder>
+
+}
+
+impl ValuesPayload {
+
+    pub fn new(values: HashMap<String, ValueHolder>) -> ValuesPayload {
+        ValuesPayload {
+            values
+        }
+    }
+
+}
+
+
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GeoCoordinates {
