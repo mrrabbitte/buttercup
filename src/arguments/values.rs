@@ -7,8 +7,6 @@ use num::rational::BigRational;
 use serde::{Deserialize, Serialize};
 use strum_macros::AsRefStr;
 
-use crate::arguments::ValueType;
-
 #[derive(AsRefStr, Debug)]
 pub enum ValueHolder {
 
@@ -21,6 +19,30 @@ pub enum ValueHolder {
     LocalTime(NaiveTime),
     LatLong(GeoCoordinates),
     DayOfWeek(Weekday)
+
+}
+
+#[derive(AsRefStr, Debug)]
+pub enum ValueType {
+
+    Boolean,
+    String,
+    Decimal,
+    Integer,
+    LocalDateTime,
+    LocalDate,
+    LocalTime,
+    LatLong,
+    DayOfWeek
+
+}
+
+impl ValueType {
+
+    fn matches(&self,
+               value_holder: &ValueHolder) -> bool {
+        self.as_ref() == value_holder.as_ref()
+    }
 
 }
 

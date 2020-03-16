@@ -5,8 +5,7 @@ use crate::arguments::extractors::date_time::{DayOfWeekExtractor, LocalDateExtra
 use crate::arguments::extractors::geolocation::LatLongExtractor;
 use crate::arguments::extractors::number::{DecimalExtractor, IntegerExtractor};
 use crate::arguments::extractors::string::StringExtractor;
-use crate::arguments::values::ValueHolder;
-use crate::arguments::ValueType;
+use crate::arguments::values::{ValueHolder, ValueType};
 
 pub mod boolean;
 pub mod date_time;
@@ -31,9 +30,9 @@ pub struct ValueExtractorInput {
 
 }
 
-pub struct Extractor;
+pub struct ValueExtractorFacade;
 
-impl Extractor {
+impl ValueExtractorFacade {
 
     pub fn extract(input: &ValueExtractorInput) -> Result<ValueHolder, String> {
         if input.value.is_null() {

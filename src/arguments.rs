@@ -1,44 +1,28 @@
+use std::iter::Map;
+
+use serde_json::Value;
 use strum_macros::AsRefStr;
 
+use crate::arguments::description::ArgumentDescription;
 use crate::arguments::values::ValueHolder;
 
 pub mod extractors;
 pub mod values;
+pub mod description;
 
-pub struct ArgumentDescription {
+pub struct ArgumentsProcessorInput {
 
-    id: i32,
-    name: String,
-    argument_type: ValueType
-
-}
-
-#[derive(AsRefStr, Debug)]
-pub enum ValueType {
-
-    Boolean,
-    String,
-    Decimal,
-    Integer,
-    LocalDateTime,
-    LocalDate,
-    LocalTime,
-    LatLong,
-    DayOfWeek
+    argument_descriptions: Vec<ArgumentDescription>,
+    payload: Value
 
 }
 
-impl ValueType {
+pub struct ArgumentValuesExtractor;
 
-    fn matches(&self,
-               value_holder: &ValueHolder) -> bool {
-        self.as_ref() == value_holder.as_ref()
+impl ArgumentValuesExtractor {
+
+    pub fn process(input: ArgumentsProcessorInput) -> Map<String, ValueHolder> {
+        
     }
-
-}
-
-pub struct ArgumentProcessor {
-
-
 
 }
