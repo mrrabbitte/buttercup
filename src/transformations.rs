@@ -3,9 +3,16 @@ use crate::values::{ValueHolder, ValueType};
 pub mod date_time;
 pub mod astro;
 
+pub enum InputOrder {
+
+    First,
+    Second
+
+}
+
 pub enum TransformationError {
 
-    InvalidInputType
+    InvalidInputType(ValueHolder, InputOrder)
 
 }
 

@@ -12,6 +12,7 @@ use crate::values::ValueType;
 mod arguments;
 mod content;
 mod values;
+mod transformations;
 
 async fn index() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")

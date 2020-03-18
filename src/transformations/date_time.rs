@@ -1,7 +1,7 @@
 use chrono::Datelike;
 
+use crate::transformations::{InputOrder, SingleValueTransformation, TransformationError};
 use crate::values::{ValueHolder, ValueType};
-use crate::values::transformations::{SingleValueTransformation, TransformationError};
 
 pub struct DayOfWeekFromDateTimeRetrieval;
 
@@ -15,7 +15,9 @@ impl SingleValueTransformation for DayOfWeekFromDateTimeRetrieval {
                 Result::Ok(ValueHolder::DayOfWeek(date_time.weekday())),
             ValueHolder::LocalDate(date) =>
                 Result::Ok(ValueHolder::DayOfWeek(date.weekday())),
-            _ => Result::Err(TransformationError::InvalidInputType)
+            ValueHolder::ZonedDateTime(zdt) =>
+                Result::Ok(ValueHolder::DayOfWeek(zdt.get_date_time().weekday())),
+            _ => Result::Err(TransformationError::InvalidInputType(value, InputOrder::First))
         }
     }
 

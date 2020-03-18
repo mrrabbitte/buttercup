@@ -23,6 +23,14 @@ impl ZonedDateTime {
         }
     }
 
+    pub fn get_date_time(&self) -> &NaiveDateTime {
+        &self.date_time
+    }
+
+    pub fn get_zone(&self) -> &Tz {
+        &self.zone
+    }
+
 }
 
 impl TryFrom<&Value> for ZonedDateTime {
