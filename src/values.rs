@@ -1,14 +1,16 @@
 use std::collections::HashMap;
 use std::slice::Split;
-use std::str::FromStr;
 
 use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, Weekday};
+use chrono_tz::Tz;
 use num::bigint::BigInt;
 use num::rational::BigRational;
-use serde::{Deserialize, Serialize};
 use strum_macros::AsRefStr;
 
+use crate::values::geolocation::GeoCoordinates;
+
 pub mod transformations;
+pub mod geolocation;
 
 #[derive(AsRefStr, Debug)]
 pub enum ValueHolder {
@@ -20,8 +22,9 @@ pub enum ValueHolder {
     LocalDateTime(NaiveDateTime),
     LocalDate(NaiveDate),
     LocalTime(NaiveTime),
-    LatLong(GeoCoordinates),
-    DayOfWeek(Weekday)
+    DayOfWeek(Weekday),
+    TimeZone(Tz),
+    GeoCoordinates(GeoCoordinates),
 
 }
 
@@ -35,8 +38,9 @@ pub enum ValueType {
     LocalDateTime,
     LocalDate,
     LocalTime,
-    LatLong,
-    DayOfWeek
+    DayOfWeek,
+    TimeZone,
+    GeoCoordinates
 
 }
 
@@ -62,61 +66,6 @@ impl ValuesPayload {
         ValuesPayload {
             values
         }
-    }
-
-}
-
-
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct GeoCoordinates {
-
-    latitude: f64,
-    longitude: f64
-
-}
-
-impl GeoCoordinates {
-
-    pub fn new(latitude: f64, longitude: f64) -> GeoCoordinates {
-        GeoCoordinates {
-            latitude,
-            longitude
-        }
-    }
-
-    fn parse(opt: Option<&&str>) -> Option<f64> {
-        match opt {
-            Some(val) => {
-                match val.parse::<f64>() {
-                    Ok(float_value) => Option::Some(float_value),
-                    Err(_) => Option::None
-                }
-            },
-            None => Option::None
-        }
-    }
-
-}
-
-impl FromStr for GeoCoordinates {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let lat_long: Vec<&str> = s
-            .split(",")
-            .collect();
-        let lat_opt = GeoCoordinates::parse(lat_long.get(0));
-        if lat_opt.is_none() {
-            return Result::Err(());
-        }
-        let lon_opt = GeoCoordinates::parse(lat_long.get(1));
-        if lon_opt.is_none() {
-            return Result::Err(());
-        }
-        Result::Ok(
-            GeoCoordinates::new(
-                lat_opt.unwrap(), lon_opt.unwrap()))
     }
 
 }

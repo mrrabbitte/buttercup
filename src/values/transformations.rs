@@ -1,7 +1,7 @@
 use crate::values::{ValueHolder, ValueType};
 
 pub mod date_time;
-pub mod sun_position;
+pub mod time_of_day;
 
 pub enum TransformationError {
 
