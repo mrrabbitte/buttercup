@@ -8,9 +8,11 @@ use num::rational::BigRational;
 use strum_macros::AsRefStr;
 
 use crate::values::geolocation::GeoCoordinates;
+use crate::values::zoned_date_time::ZonedDateTime;
 
 pub mod transformations;
 pub mod geolocation;
+pub mod zoned_date_time;
 
 #[derive(AsRefStr, Debug)]
 pub enum ValueHolder {
@@ -24,6 +26,7 @@ pub enum ValueHolder {
     LocalTime(NaiveTime),
     DayOfWeek(Weekday),
     TimeZone(Tz),
+    ZonedDateTime(ZonedDateTime),
     GeoCoordinates(GeoCoordinates),
 
 }
@@ -40,6 +43,7 @@ pub enum ValueType {
     LocalTime,
     DayOfWeek,
     TimeZone,
+    ZonedDateTime,
     GeoCoordinates
 
 }

@@ -3,7 +3,7 @@ use serde_json::{Number, Value};
 use crate::arguments::extractors::boolean::BooleanExtractor;
 use crate::arguments::extractors::date_time::day_of_week::DayOfWeekExtractor;
 use crate::arguments::extractors::date_time::local::{LocalDateExtractor, LocalDateTimeExtractor, LocalTimeExtractor};
-use crate::arguments::extractors::date_time::zoned::TimezoneExtractor;
+use crate::arguments::extractors::date_time::zoned::{TimezoneExtractor, ZonedDateTimeExtractor};
 use crate::arguments::extractors::geolocation::GeoCoordinatesExtractor;
 use crate::arguments::extractors::number::{DecimalExtractor, IntegerExtractor};
 use crate::arguments::extractors::string::StringExtractor;
@@ -64,6 +64,7 @@ impl ArgumentValueExtractor {
             ValueType::LocalTime => LocalTimeExtractor::extract(input),
             ValueType::DayOfWeek => DayOfWeekExtractor::extract(input),
             ValueType::TimeZone => TimezoneExtractor::extract(input),
+            ValueType::ZonedDateTime => ZonedDateTimeExtractor::extract(input),
             ValueType::GeoCoordinates => GeoCoordinatesExtractor::extract(input)
         };
     }

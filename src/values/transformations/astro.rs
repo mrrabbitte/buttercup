@@ -8,11 +8,9 @@ pub struct IsNight;
 
 mod sun_position;
 
-const SUN_POSITION_FIRST_INPUT: [ValueType; 1] = [ValueType::LocalDateTime];
+const SUN_POSITION_FIRST_INPUT: [ValueType; 1] = [ValueType::TimeZone];
 
-const SUN_POSITION_SECOND_INPUT: [ValueType; 1] = [ValueType::TimeZone];
-
-const SUN_POSITION_THIRD_INPUT: [ValueType; 1] = [ValueType::GeoCoordinates];
+const SUN_POSITION_SECOND_INPUT: [ValueType; 1] = [ValueType::GeoCoordinates];
 
 impl DoubleValueTransformation for IsNight {
 
