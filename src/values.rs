@@ -30,7 +30,7 @@ pub enum ValueHolder {
 
 }
 
-#[derive(AsRefStr, Debug)]
+#[derive(AsRefStr, Debug, PartialEq)]
 pub enum ValueType {
 
     Boolean,

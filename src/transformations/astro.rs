@@ -1,7 +1,7 @@
 use chrono::{Datelike, NaiveDateTime, TimeZone};
 use chrono_tz::Tz;
 
-use crate::transformations::{DoubleValueTransformation, InputOrder, TransformationError};
+use crate::transformations::{DoubleValueTransformer, InputOrder, TransformationError};
 use crate::transformations::astro::sun_position::SunPositionTimes;
 use crate::values::{ValueHolder, ValueType};
 
@@ -14,6 +14,14 @@ const SUN_POSITION_SECOND_INPUT: [ValueType; 1] = [ValueType::GeoCoordinates];
 struct Astro;
 
 impl Astro {
+
+    fn is_first_input_type_ok(value_type: &ValueType) -> bool {
+        ValueType::ZonedDateTime == value_type
+    }
+
+    fn is_second_input_type_ok(value_type: &ValueType) -> bool {
+        ValueType::GeoCoordinates == value_type
+    }
 
     fn transform(first: ValueHolder,
                  second: ValueHolder) -> Result<SunPositionTimes, TransformationError> {
@@ -37,7 +45,7 @@ impl Astro {
 
 pub struct IsAfterSunset;
 
-impl DoubleValueTransformation for IsAfterSunset {
+impl DoubleValueTransformer for IsAfterSunset {
 
     fn transform(first: ValueHolder,
                  second: ValueHolder)
@@ -49,23 +57,22 @@ impl DoubleValueTransformation for IsAfterSunset {
         }
     }
 
-    fn get_first_input_value_type() -> &'static [ValueType] {
-        &SUN_POSITION_FIRST_INPUT
+    fn is_first_input_value_type_ok(value_type: &ValueType) -> bool {
+        Astro::is_first_input_type_ok(value_type)
     }
 
-    fn get_second_input_value_type() -> &'static [ValueType] {
-        &SUN_POSITION_SECOND_INPUT
+    fn is_second_input_value_type_ok(value_type: &ValueType) -> bool {
+        Astro::is_second_input_type_ok(value_type)
     }
 
-    fn get_result_value_type() -> ValueType {
+    fn get_result_type() -> ValueType {
         ValueType::Boolean
     }
-
 }
 
 pub struct IsBeforeSunrise;
 
-impl DoubleValueTransformation for IsBeforeSunrise {
+impl DoubleValueTransformer for IsBeforeSunrise {
 
     fn transform(first: ValueHolder,
                  second: ValueHolder)
@@ -77,24 +84,22 @@ impl DoubleValueTransformation for IsBeforeSunrise {
         }
     }
 
-    fn get_first_input_value_type() -> &'static [ValueType] {
-        &SUN_POSITION_FIRST_INPUT
+    fn is_first_input_value_type_ok(value_type: &ValueType) -> bool {
+        Astro::is_first_input_type_ok(value_type)
     }
 
-    fn get_second_input_value_type() -> &'static [ValueType] {
-        &SUN_POSITION_SECOND_INPUT
+    fn is_second_input_value_type_ok(value_type: &ValueType) -> bool {
+        Astro::is_second_input_type_ok(value_type)
     }
 
-    fn get_result_value_type() -> ValueType {
+    fn get_result_type() -> ValueType {
         ValueType::Boolean
     }
-
 }
-
 
 pub struct IsDay;
 
-impl DoubleValueTransformation for IsDay {
+impl DoubleValueTransformer for IsDay {
 
     fn transform(first: ValueHolder,
                  second: ValueHolder)
@@ -106,16 +111,15 @@ impl DoubleValueTransformation for IsDay {
         }
     }
 
-    fn get_first_input_value_type() -> &'static [ValueType] {
-        &SUN_POSITION_FIRST_INPUT
+    fn is_first_input_value_type_ok(value_type: &ValueType) -> bool {
+        Astro::is_first_input_type_ok(value_type)
     }
 
-    fn get_second_input_value_type() -> &'static [ValueType] {
-        &SUN_POSITION_SECOND_INPUT
+    fn is_second_input_value_type_ok(value_type: &ValueType) -> bool {
+        Astro::is_second_input_type_ok(value_type)
     }
 
-    fn get_result_value_type() -> ValueType {
+    fn get_result_type() -> ValueType {
         ValueType::Boolean
     }
-
 }
