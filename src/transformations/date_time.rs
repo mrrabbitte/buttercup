@@ -1,13 +1,20 @@
-use chrono::Datelike;
+use chrono::{Datelike, TimeZone};
 
-use crate::transformations::{InputOrder, SingleValueTransformer, TransformationError};
+use crate::transformations::{DoubleInputTransformer, InputOrder, SingleInputTransformer, TransformationError};
 use crate::values::{ValueHolder, ValueType};
+use crate::values::zoned_date_time::ZonedDateTime;
 
 pub struct DayOfWeekFromDateTimeRetrieval;
 
-impl SingleValueTransformer for DayOfWeekFromDateTimeRetrieval {
+const DATELIKE_INPUT_TYPES: [ValueType; 3] =
+    [ValueType::LocalDateTime, ValueType::LocalDate, ValueType::ZonedDateTime];
 
-    pub fn transform(value: ValueHolder) -> Result<ValueHolder, TransformationError> {
+const DAY_OF_WEEK_RESULT_TYPE: ValueType = ValueType::DayOfWeek;
+
+impl SingleInputTransformer for DayOfWeekFromDateTimeRetrieval {
+
+    fn transform(&self,
+                 value: &ValueHolder) -> Result<ValueHolder, TransformationError> {
         return match value {
             ValueHolder::LocalDateTime(date_time) =>
                 Result::Ok(ValueHolder::DayOfWeek(date_time.weekday())),
@@ -15,19 +22,57 @@ impl SingleValueTransformer for DayOfWeekFromDateTimeRetrieval {
                 Result::Ok(ValueHolder::DayOfWeek(date.weekday())),
             ValueHolder::ZonedDateTime(zdt) =>
                 Result::Ok(ValueHolder::DayOfWeek(zdt.get_date_time().weekday())),
-            _ => Result::Err(TransformationError::InvalidInputType(value, InputOrder::First))
+            _ => Result::Err(
+                TransformationError::InvalidInputType(value.clone(), InputOrder::First))
         }
     }
 
-    pub fn is_input_value_type_ok(value_type: &ValueType) -> bool {
-        ValueType::LocalDateTime == *value_type
-            || ValueType::LocalDate == *value_type
-            || ValueType::ZonedDateTime == *value_type
+    fn get_input_types(&self) -> &'static [ValueType] {
+        &DATELIKE_INPUT_TYPES
     }
 
-    pub fn get_result_type() -> ValueType {
-        ValueType::DayOfWeek
+    fn get_result_type(&self) -> &'static ValueType {
+        &DAY_OF_WEEK_RESULT_TYPE
     }
 
 }
 
+pub struct LocalToZonedDateTime;
+
+const DATE_TIME_INPUT_TYPE: [ValueType; 1] = [ValueType::LocalDateTime];
+const TIMEZONE_INPUT_TYPE: [ValueType; 1] = [ValueType::TimeZone];
+
+const ZDT_RESULT_TYPE: ValueType = ValueType::DayOfWeek;
+
+impl DoubleInputTransformer for LocalToZonedDateTime {
+
+    fn transform(&self,
+                 first: &ValueHolder,
+                 second: &ValueHolder) -> Result<ValueHolder, TransformationError> {
+        return match first {
+            ValueHolder::LocalDateTime(date_time) => match second {
+                ValueHolder::TimeZone(time_zone) =>
+                    Result::Ok(
+                        ValueHolder::ZonedDateTime(
+                            ZonedDateTime::new(*date_time, *time_zone))
+                    ),
+                _ => Result::Err(
+                    TransformationError::InvalidInputType(first.clone(), InputOrder::Second))
+            },
+            _ => Result::Err(
+                TransformationError::InvalidInputType(first.clone(), InputOrder::First))
+        };
+    }
+
+    fn get_first_input_types(&self) -> &'static [ValueType] {
+        &DATE_TIME_INPUT_TYPE
+    }
+
+    fn get_second_input_types(&self) -> &'static [ValueType] {
+        &TIMEZONE_INPUT_TYPE
+    }
+
+    fn get_result_type(&self) -> &'static ValueType {
+        &ZDT_RESULT_TYPE
+    }
+}

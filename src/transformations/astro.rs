@@ -1,7 +1,7 @@
 use chrono::{Datelike, NaiveDateTime, TimeZone};
 use chrono_tz::Tz;
 
-use crate::transformations::{DoubleValueTransformer, InputOrder, TransformationError};
+use crate::transformations::{DoubleInputTransformer, InputOrder, TransformationError};
 use crate::transformations::astro::sun_position::SunPositionTimes;
 use crate::values::{ValueHolder, ValueType};
 
@@ -11,20 +11,22 @@ const SUN_POSITION_FIRST_INPUT: [ValueType; 1] = [ValueType::ZonedDateTime];
 
 const SUN_POSITION_SECOND_INPUT: [ValueType; 1] = [ValueType::GeoCoordinates];
 
+const BOOL_RESULT_TYPE: ValueType = ValueType::Boolean;
+
 struct Astro;
 
 impl Astro {
 
-    fn is_first_input_type_ok(value_type: &ValueType) -> bool {
-        ValueType::ZonedDateTime == value_type
+    fn get_first_input_types() -> &'static [ValueType] {
+        &SUN_POSITION_FIRST_INPUT
     }
 
-    fn is_second_input_type_ok(value_type: &ValueType) -> bool {
-        ValueType::GeoCoordinates == value_type
+    fn get_second_input_types() -> &'static [ValueType] {
+        &SUN_POSITION_SECOND_INPUT
     }
 
-    fn transform(first: ValueHolder,
-                 second: ValueHolder) -> Result<SunPositionTimes, TransformationError> {
+    fn transform(first: &ValueHolder,
+                 second: &ValueHolder) -> Result<SunPositionTimes, TransformationError> {
         return match first {
             ValueHolder::ZonedDateTime(zdt) =>
                 match second {
@@ -35,9 +37,10 @@ impl Astro {
                                 zdt.get_zone(),
                                 &coordinates)),
                     _ => Result::Err(
-                        TransformationError::InvalidInputType(second, InputOrder::Second))
+                        TransformationError::InvalidInputType(second.clone(), InputOrder::Second))
                 },
-            _ => Result::Err(TransformationError::InvalidInputType(first, InputOrder::First))
+            _ => Result::Err(
+                TransformationError::InvalidInputType(first.clone(), InputOrder::First))
         };
     }
 
@@ -45,11 +48,11 @@ impl Astro {
 
 pub struct IsAfterSunset;
 
-impl DoubleValueTransformer for IsAfterSunset {
+impl DoubleInputTransformer for IsAfterSunset {
 
-    fn transform(first: ValueHolder,
-                 second: ValueHolder)
-                 -> Result<ValueHolder, TransformationError> {
+    fn transform(&self,
+                 first: &ValueHolder,
+                 second: &ValueHolder) -> Result<ValueHolder, TransformationError> {
         return match Astro::transform(first, second) {
             Ok(sun_position) => Result::Ok(
                 ValueHolder::Boolean(sun_position.is_after_sunset())),
@@ -57,25 +60,26 @@ impl DoubleValueTransformer for IsAfterSunset {
         }
     }
 
-    fn is_first_input_value_type_ok(value_type: &ValueType) -> bool {
-        Astro::is_first_input_type_ok(value_type)
+    fn get_first_input_types(&self) -> &'static [ValueType] {
+        Astro::get_first_input_types()
     }
 
-    fn is_second_input_value_type_ok(value_type: &ValueType) -> bool {
-        Astro::is_second_input_type_ok(value_type)
+    fn get_second_input_types(&self) -> &'static [ValueType] {
+        Astro::get_second_input_types()
     }
 
-    fn get_result_type() -> ValueType {
-        ValueType::Boolean
+    fn get_result_type(&self) -> &'static ValueType {
+        &BOOL_RESULT_TYPE
     }
 }
 
 pub struct IsBeforeSunrise;
 
-impl DoubleValueTransformer for IsBeforeSunrise {
+impl DoubleInputTransformer for IsBeforeSunrise {
 
-    fn transform(first: ValueHolder,
-                 second: ValueHolder)
+    fn transform(&self,
+                 first: &ValueHolder,
+                 second: &ValueHolder)
                  -> Result<ValueHolder, TransformationError> {
         return match Astro::transform(first, second) {
             Ok(sun_position) => Result::Ok(
@@ -84,25 +88,27 @@ impl DoubleValueTransformer for IsBeforeSunrise {
         }
     }
 
-    fn is_first_input_value_type_ok(value_type: &ValueType) -> bool {
-        Astro::is_first_input_type_ok(value_type)
+    fn get_first_input_types(&self) -> &'static [ValueType] {
+        Astro::get_first_input_types()
     }
 
-    fn is_second_input_value_type_ok(value_type: &ValueType) -> bool {
-        Astro::is_second_input_type_ok(value_type)
+    fn get_second_input_types(&self) -> &'static [ValueType] {
+        Astro::get_second_input_types()
     }
 
-    fn get_result_type() -> ValueType {
-        ValueType::Boolean
+    fn get_result_type(&self) -> &'static ValueType {
+        &BOOL_RESULT_TYPE
     }
+
 }
 
 pub struct IsDay;
 
-impl DoubleValueTransformer for IsDay {
+impl DoubleInputTransformer for IsDay {
 
-    fn transform(first: ValueHolder,
-                 second: ValueHolder)
+    fn transform(&self,
+                 first: &ValueHolder,
+                 second: &ValueHolder)
                  -> Result<ValueHolder, TransformationError> {
         return match Astro::transform(first, second) {
             Ok(sun_position) => Result::Ok(
@@ -111,15 +117,16 @@ impl DoubleValueTransformer for IsDay {
         }
     }
 
-    fn is_first_input_value_type_ok(value_type: &ValueType) -> bool {
-        Astro::is_first_input_type_ok(value_type)
+    fn get_first_input_types(&self) -> &'static [ValueType] {
+        Astro::get_first_input_types()
     }
 
-    fn is_second_input_value_type_ok(value_type: &ValueType) -> bool {
-        Astro::is_second_input_type_ok(value_type)
+    fn get_second_input_types(&self) -> &'static [ValueType] {
+        Astro::get_second_input_types()
     }
 
-    fn get_result_type() -> ValueType {
-        ValueType::Boolean
+    fn get_result_type(&self) -> &'static ValueType {
+        &BOOL_RESULT_TYPE
     }
+
 }

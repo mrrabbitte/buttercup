@@ -13,7 +13,7 @@ use crate::values::zoned_date_time::ZonedDateTime;
 pub mod geolocation;
 pub mod zoned_date_time;
 
-#[derive(AsRefStr, Debug)]
+#[derive(AsRefStr, Debug, Clone)]
 pub enum ValueHolder {
 
     Boolean(bool),

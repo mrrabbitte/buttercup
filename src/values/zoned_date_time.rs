@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use serde::export::TryFrom;
 use serde_json::Value;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ZonedDateTime {
 
     date_time: NaiveDateTime,
@@ -16,7 +16,8 @@ pub struct ZonedDateTime {
 
 impl ZonedDateTime {
 
-    fn new(date_time: NaiveDateTime, zone: Tz) -> ZonedDateTime {
+    pub fn new(date_time: NaiveDateTime,
+               zone: Tz) -> ZonedDateTime {
         ZonedDateTime {
             date_time,
             zone

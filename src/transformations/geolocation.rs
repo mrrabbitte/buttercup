@@ -1,25 +1,32 @@
-use crate::transformations::{InputOrder, SingleValueTransformer, TransformationError};
+use chrono_tz::Tz;
+
+use crate::transformations::{InputOrder, SingleInputTransformer, TransformationError};
 use crate::values::{ValueHolder, ValueType};
 use crate::values::geolocation::GeoCoordinates;
 
 pub struct FindTimeZoneFromGeoCoordinates;
 
-impl SingleValueTransformer for FindTimeZoneFromGeoCoordinates {
+const INPUT_TYPE: [ValueType; 1] = [ValueType::GeoCoordinates];
+const RESULT_TYPE: ValueType = ValueType::TimeZone;
 
-    fn transform(value: ValueHolder) -> Result<ValueHolder, TransformationError> {
+impl SingleInputTransformer for FindTimeZoneFromGeoCoordinates {
+
+    fn transform(&self,
+                 value: &ValueHolder) -> Result<ValueHolder, TransformationError> {
         match value {
             ValueHolder::GeoCoordinates(coordinates) =>
                 FindTimeZoneFromGeoCoordinates::find_time_zone(&coordinates),
-            _ => Result::Err(TransformationError::InvalidInputType(value, InputOrder::First))
+            _ => Result::Err(
+                TransformationError::InvalidInputType(value.clone(), InputOrder::First))
         }
     }
 
-    fn get_input_value_type() -> &'static [ValueType] {
-        &[ValueType::GeoCoordinates]
+    fn get_input_types(&self) -> &'static [ValueType] {
+        &INPUT_TYPE
     }
 
-    fn get_result_value_type() -> ValueType {
-        ValueType::TimeZone
+    fn get_result_type(&self) -> &'static ValueType {
+        &RESULT_TYPE
     }
 
 }
@@ -29,9 +36,13 @@ impl FindTimeZoneFromGeoCoordinates {
     fn find_time_zone(coordinates: &GeoCoordinates) -> Result<ValueHolder, TransformationError> {
         return match tz_search::lookup(
             *coordinates.get_latitude(), *coordinates.get_longitude()) {
-            Some(_) => {},
-            None =>
-        }
+            Some(tz_str) =>
+                match tz_str.parse::<Tz>() {
+                    Ok(tz) => Result::Ok(ValueHolder::TimeZone(tz)),
+                    Err(_) => Result::Err(TransformationError::UnknownTimezone(tz_str)),
+                },
+            None => Result::Err(TransformationError::CouldNotFindTimezone(coordinates.clone()))
+        };
     }
 
 }
