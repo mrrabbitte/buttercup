@@ -1,6 +1,7 @@
 use chrono_tz::Tz;
 
-use crate::transformations::{InputOrder, SingleInputTransformer, TransformationError};
+use crate::transformations::{InputOrder, TransformationError};
+use crate::transformations::mono::MonoInputTransformer;
 use crate::values::{ValueHolder, ValueType};
 use crate::values::geolocation::GeoCoordinates;
 
@@ -9,7 +10,7 @@ pub struct FindTimeZoneFromGeoCoordinates;
 const INPUT_TYPE: [ValueType; 1] = [ValueType::GeoCoordinates];
 const RESULT_TYPE: ValueType = ValueType::TimeZone;
 
-impl SingleInputTransformer for FindTimeZoneFromGeoCoordinates {
+impl MonoInputTransformer for FindTimeZoneFromGeoCoordinates {
 
     fn transform(&self,
                  value: &ValueHolder) -> Result<ValueHolder, TransformationError> {

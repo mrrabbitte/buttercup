@@ -1,8 +1,9 @@
 use chrono::{Datelike, NaiveDateTime, TimeZone};
 use chrono_tz::Tz;
 
-use crate::transformations::{DoubleInputTransformer, InputOrder, TransformationError};
-use crate::transformations::astro::sun_position::SunPositionTimes;
+use crate::transformations::{InputOrder, TransformationError};
+use crate::transformations::bi::astro::sun_position::SunPositionTimes;
+use crate::transformations::bi::BiInputTransformer;
 use crate::values::{ValueHolder, ValueType};
 
 mod sun_position;
@@ -48,7 +49,7 @@ impl Astro {
 
 pub struct IsAfterSunset;
 
-impl DoubleInputTransformer for IsAfterSunset {
+impl BiInputTransformer for IsAfterSunset {
 
     fn transform(&self,
                  first: &ValueHolder,
@@ -75,7 +76,7 @@ impl DoubleInputTransformer for IsAfterSunset {
 
 pub struct IsBeforeSunrise;
 
-impl DoubleInputTransformer for IsBeforeSunrise {
+impl BiInputTransformer for IsBeforeSunrise {
 
     fn transform(&self,
                  first: &ValueHolder,
@@ -104,7 +105,7 @@ impl DoubleInputTransformer for IsBeforeSunrise {
 
 pub struct IsDay;
 
-impl DoubleInputTransformer for IsDay {
+impl BiInputTransformer for IsDay {
 
     fn transform(&self,
                  first: &ValueHolder,
