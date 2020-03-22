@@ -1,7 +1,7 @@
 use crate::transformations::bi::BiInputTransformation;
 use crate::transformations::mono::MonoInputTransformation;
+use crate::values::{ValueHolder, ValuesPayload};
 use crate::values::geolocation::GeoCoordinates;
-use crate::values::ValueHolder;
 
 pub mod mono;
 pub mod bi;
@@ -64,6 +64,19 @@ pub struct TransformationRequest {
 
     definition: TransformationDefinition,
     transformation: Transformation
+
+}
+
+pub struct Transformer;
+
+impl Transformer {
+
+    pub fn transform(payload: &ValuesPayload,
+                     transformations: &Vec<TransformationRequest>)
+        -> Result<ValuesPayload, TransformationError> {
+        let values = payload.get_values();
+        
+    }
 
 }
 

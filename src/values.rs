@@ -71,4 +71,8 @@ impl ValuesPayload {
         }
     }
 
+    pub fn get_values(&self) -> &HashMap<String, ValueHolder> {
+        &self.values
+    }
+
 }
