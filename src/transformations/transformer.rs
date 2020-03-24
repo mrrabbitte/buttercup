@@ -129,7 +129,7 @@ impl TransformationRequest {
         TransformationRequest::new(definition, Transformation::Mono(transformation))
     }
 
-    pub fn new_bi(definition: TransformationDefinition,
+    pub fn new_di(definition: TransformationDefinition,
                   transformation: DoubleInputTransformationDefinition)
                   -> TransformationRequest {
         TransformationRequest::new(definition, Transformation::Bi(transformation))
@@ -167,6 +167,11 @@ impl Transformer {
             };
         }
         return Result::Ok(ValuesPayload::new(new_values));
+    }
+
+    pub fn initialize() {
+        MonoInputTransformation::initialize();
+        DiInputTransformation::initialize();
     }
 
     fn handle_single(definition: &SingleInputTransformationDefinition,

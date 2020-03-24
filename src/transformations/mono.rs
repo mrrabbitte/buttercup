@@ -1,3 +1,6 @@
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
+
 use crate::transformations::mono::day_of_week::DayOfWeekFromDateTimeRetrieval;
 use crate::transformations::mono::geolocation::FindTimeZoneFromGeoCoordinates;
 use crate::transformations::transformer::TransformationError;
@@ -6,6 +9,7 @@ use crate::values::{ValueHolder, ValueType};
 pub mod day_of_week;
 pub mod geolocation;
 
+#[derive(EnumIter)]
 pub enum MonoInputTransformation {
 
     DayOfWeekFromDateTimeRetrieval,
@@ -29,6 +33,12 @@ impl MonoInputTransformation {
         self.get_input_types().contains(input_type)
     }
 
+    pub fn initialize() {
+        for transformation in MonoInputTransformation::iter() {
+            transformation.get_transformer().initialize();
+        }
+    }
+
     fn get_transformer(&self) -> &dyn MonoInputTransformer {
         return match self {
             MonoInputTransformation::DayOfWeekFromDateTimeRetrieval
@@ -42,9 +52,10 @@ impl MonoInputTransformation {
 
 pub trait MonoInputTransformer {
 
+    fn initialize(&self) {}
     fn transform(&self,
                  value: &ValueHolder) -> Result<ValueHolder, TransformationError>;
     fn get_input_types(&self) -> &'static [ValueType];
     fn get_result_type(&self) -> &'static ValueType;
-
+    
 }

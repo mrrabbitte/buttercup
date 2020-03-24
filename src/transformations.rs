@@ -24,6 +24,26 @@ impl TransformationService {
                 String::from("geoArg"),
                 MonoInputTransformation::FindTimeZoneFromGeoCoordinates)
         ));
+        requests.push(TransformationRequest::new_di(
+            TransformationDefinition::new(2,
+                                          TransformationType::DoubleInput,
+                                          String::from("zonedDateTimeValue")),
+            DoubleInputTransformationDefinition::new(
+                2,
+                String::from("dateTimeArg"),
+                String::from("foundTz"),
+                DiInputTransformation::LocalToZonedDateTime)
+        ));
+        requests.push(TransformationRequest::new_di(
+            TransformationDefinition::new(3,
+                                          TransformationType::DoubleInput,
+                                          String::from("isDay")),
+            DoubleInputTransformationDefinition::new(
+                3,
+                String::from("zonedDateTimeValue"),
+                String::from("geoArg"),
+                DiInputTransformation::IsDay)
+        ));
         Transformer::transform(payload, &requests)
     }
 

@@ -1,3 +1,6 @@
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
+
 use crate::transformations::di::astro::{IsAfterSunset, IsBeforeSunrise, IsDay};
 use crate::transformations::di::local_to_zoned::LocalToZonedDateTime;
 use crate::transformations::transformer::TransformationError;
@@ -6,6 +9,7 @@ use crate::values::{ValueHolder, ValueType};
 pub mod astro;
 pub mod local_to_zoned;
 
+#[derive(EnumIter)]
 pub enum DiInputTransformation {
 
     IsAfterSunset,
@@ -41,6 +45,12 @@ impl DiInputTransformation {
         self.get_second_input_types().contains(input_type)
     }
 
+    pub fn initialize() {
+        for transformation in DiInputTransformation::iter() {
+            transformation.get_transformer().initialize();
+        }
+    }
+
     fn get_transformer(&self) -> &dyn DiInputTransformer {
         return match self {
             DiInputTransformation::IsAfterSunset => IsAfterSunset::instance(),
@@ -54,12 +64,12 @@ impl DiInputTransformation {
 
 pub trait DiInputTransformer {
 
+    fn initialize(&self) {}
     fn transform(&self,
                  first: &ValueHolder,
                  second: &ValueHolder) -> Result<ValueHolder, TransformationError>;
     fn get_first_input_types(&self) -> &'static [ValueType];
     fn get_second_input_types(&self) -> &'static [ValueType];
     fn get_result_type(&self) -> &'static ValueType;
-
-
+    
 }

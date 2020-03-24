@@ -12,6 +12,13 @@ const RESULT_TYPE: ValueType = ValueType::TimeZone;
 
 impl MonoInputTransformer for FindTimeZoneFromGeoCoordinates {
 
+    fn initialize(&self) {
+        match tz_search::lookup(53.350140, -6.266155) {
+            None => panic!("Could not initialize time zone search."),
+            Some(found_zone) => assert_eq!("Europe/Dublin", found_zone),
+        }
+    }
+
     fn transform(&self,
                  value: &ValueHolder) -> Result<ValueHolder, TransformationError> {
         match value {

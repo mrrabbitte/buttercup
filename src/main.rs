@@ -8,6 +8,7 @@ use crate::arguments::{ArgumentsExtractionInput, ArgumentValueExtractorError, Ar
 use crate::arguments::definition::ArgumentDefinition;
 use crate::arguments::extractors::ValueExtractionPolicy;
 use crate::transformations::TransformationService;
+use crate::transformations::transformer::Transformer;
 use crate::values::{ValuesPayload, ValueType};
 
 mod arguments;
@@ -63,6 +64,7 @@ async fn index2(path: Path<u32>,
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+    Transformer::initialize();
     HttpServer::new(|| {
         App::new()
             .service(index2)
