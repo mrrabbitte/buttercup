@@ -1,82 +1,32 @@
-use crate::transformations::bi::BiInputTransformation;
+use crate::transformations::di::astro::IsDay;
+use crate::transformations::di::DiInputTransformation;
+use crate::transformations::transformer::{DoubleInputTransformationDefinition, TransformationDefinition, TransformationError, TransformationRequest, TransformationType, Transformer, SingleInputTransformationDefinition};
+use crate::values::ValuesPayload;
 use crate::transformations::mono::MonoInputTransformation;
-use crate::values::{ValueHolder, ValuesPayload};
-use crate::values::geolocation::GeoCoordinates;
 
+pub mod transformer;
 pub mod mono;
-pub mod bi;
+pub mod di;
 
-pub enum InputOrder {
+pub struct TransformationService;
 
-    First,
-    Second
+impl TransformationService {
 
-}
-
-pub enum TransformationError {
-
-    InvalidInputType(ValueHolder, InputOrder),
-    CouldNotFindTimezone(GeoCoordinates),
-    UnknownTimezone(String)
-
-}
-
-pub enum TransformationType {
-
-    SingleInput,
-    DoubleInput
-
-}
-
-pub struct TransformationDefinition {
-
-    id: i32,
-    transformation_type: TransformationType,
-    result_value_name: String
-
-}
-
-pub struct SingleInputTransformationDefinition {
-
-    transformation_definition_id: i32,
-    input_name: String,
-    transformation: MonoInputTransformation
-
-}
-
-pub struct DoubleInputTransformationDefinition {
-
-    transformation_definition_id: i32,
-    first_input_name: String,
-    second_input_name: String,
-    transformation: MonoInputTransformation
-
-}
-
-pub enum Transformation {
-
-    SingleInputTransformation(MonoInputTransformation),
-    DoubleInputTransformation(BiInputTransformation)
-
-}
-
-pub struct TransformationRequest {
-
-    definition: TransformationDefinition,
-    transformation: Transformation
-
-}
-
-pub struct Transformer;
-
-impl Transformer {
-
-    pub fn transform(payload: &ValuesPayload,
-                     transformations: &Vec<TransformationRequest>)
-        -> Result<ValuesPayload, TransformationError> {
-        let values = payload.get_values();
-        
+    pub fn transform(payload: &ValuesPayload)
+                     -> Result<ValuesPayload, TransformationError> {
+        let mut requests: Vec<TransformationRequest> = Vec::new();
+        requests.push(TransformationRequest::new_mono(
+            TransformationDefinition::new(1,
+                                          TransformationType::SingleInput,
+                                          String::from("foundTz")),
+            SingleInputTransformationDefinition::new(
+                1,
+                String::from("geoArg"),
+                MonoInputTransformation::FindTimeZoneFromGeoCoordinates)
+        ));
+        Transformer::transform(payload, &requests)
     }
 
 }
+
 

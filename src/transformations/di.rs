@@ -1,21 +1,21 @@
-use crate::transformations::bi::astro::{IsAfterSunset, IsBeforeSunrise, IsDay};
-use crate::transformations::bi::local_to_zoned::LocalToZonedDateTime;
-use crate::transformations::TransformationError;
+use crate::transformations::di::astro::{IsAfterSunset, IsBeforeSunrise, IsDay};
+use crate::transformations::di::local_to_zoned::LocalToZonedDateTime;
+use crate::transformations::transformer::TransformationError;
 use crate::values::{ValueHolder, ValueType};
 
 pub mod astro;
 pub mod local_to_zoned;
 
-pub enum BiInputTransformation {
+pub enum DiInputTransformation {
 
-    IsAfterSunset(IsAfterSunset),
-    IsBeforeSunrise(IsBeforeSunrise),
-    IsDay(IsDay),
-    LocalToZonedDateTime(LocalToZonedDateTime)
+    IsAfterSunset,
+    IsBeforeSunrise,
+    IsDay,
+    LocalToZonedDateTime
 
 }
 
-impl BiInputTransformation {
+impl DiInputTransformation {
 
     pub fn transform(&self,
                      first: &ValueHolder,
@@ -41,18 +41,18 @@ impl BiInputTransformation {
         self.get_second_input_types().contains(input_type)
     }
 
-    fn get_transformer(&self) -> &dyn BiInputTransformer {
+    fn get_transformer(&self) -> &dyn DiInputTransformer {
         return match self {
-            BiInputTransformation::IsAfterSunset(t) => t,
-            BiInputTransformation::IsBeforeSunrise(t) => t,
-            BiInputTransformation::IsDay(t) => t,
-            BiInputTransformation::LocalToZonedDateTime(t) => t
+            DiInputTransformation::IsAfterSunset => IsAfterSunset::instance(),
+            DiInputTransformation::IsBeforeSunrise => IsBeforeSunrise::instance(),
+            DiInputTransformation::IsDay => IsDay::instance(),
+            DiInputTransformation::LocalToZonedDateTime => LocalToZonedDateTime::instance()
         };
     }
 
 }
 
-pub trait BiInputTransformer {
+pub trait DiInputTransformer {
 
     fn transform(&self,
                  first: &ValueHolder,
@@ -60,5 +60,6 @@ pub trait BiInputTransformer {
     fn get_first_input_types(&self) -> &'static [ValueType];
     fn get_second_input_types(&self) -> &'static [ValueType];
     fn get_result_type(&self) -> &'static ValueType;
+
 
 }

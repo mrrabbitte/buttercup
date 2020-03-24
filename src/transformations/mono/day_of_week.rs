@@ -1,7 +1,7 @@
 use chrono::{Datelike, TimeZone};
 
-use crate::transformations::{InputOrder, TransformationError};
 use crate::transformations::mono::MonoInputTransformer;
+use crate::transformations::transformer::{InputOrder, TransformationError};
 use crate::values::{ValueHolder, ValueType};
 use crate::values::zoned_date_time::ZonedDateTime;
 
@@ -38,3 +38,12 @@ impl MonoInputTransformer for DayOfWeekFromDateTimeRetrieval {
 
 }
 
+impl DayOfWeekFromDateTimeRetrieval {
+
+    const INSTANCE: DayOfWeekFromDateTimeRetrieval = DayOfWeekFromDateTimeRetrieval{};
+
+    pub fn instance() -> &'static  DayOfWeekFromDateTimeRetrieval {
+        &DayOfWeekFromDateTimeRetrieval::INSTANCE
+    }
+
+}

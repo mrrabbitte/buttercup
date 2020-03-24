@@ -1,6 +1,6 @@
 use crate::transformations::mono::day_of_week::DayOfWeekFromDateTimeRetrieval;
 use crate::transformations::mono::geolocation::FindTimeZoneFromGeoCoordinates;
-use crate::transformations::TransformationError;
+use crate::transformations::transformer::TransformationError;
 use crate::values::{ValueHolder, ValueType};
 
 pub mod day_of_week;
@@ -8,15 +8,15 @@ pub mod geolocation;
 
 pub enum MonoInputTransformation {
 
-    DayOfWeekFromDateTimeRetrieval(DayOfWeekFromDateTimeRetrieval),
-    FindTimeZoneFromGeoCoordinates(FindTimeZoneFromGeoCoordinates)
+    DayOfWeekFromDateTimeRetrieval,
+    FindTimeZoneFromGeoCoordinates
 
 }
 
 impl MonoInputTransformation {
 
-    fn transform(&self,
-                 value: &ValueHolder) -> Result<ValueHolder, TransformationError> {
+    pub fn transform(&self,
+                     value: &ValueHolder) -> Result<ValueHolder, TransformationError> {
         self.get_transformer().transform(value)
     }
 
@@ -31,10 +31,10 @@ impl MonoInputTransformation {
 
     fn get_transformer(&self) -> &dyn MonoInputTransformer {
         return match self {
-            MonoInputTransformation::DayOfWeekFromDateTimeRetrieval(t)
-            => t,
-            MonoInputTransformation::FindTimeZoneFromGeoCoordinates(t)
-            => t
+            MonoInputTransformation::DayOfWeekFromDateTimeRetrieval
+            => DayOfWeekFromDateTimeRetrieval::instance(),
+            MonoInputTransformation::FindTimeZoneFromGeoCoordinates
+            => FindTimeZoneFromGeoCoordinates::instance()
         };
     }
 

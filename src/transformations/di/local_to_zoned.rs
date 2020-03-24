@@ -1,5 +1,5 @@
-use crate::transformations::{InputOrder, TransformationError};
-use crate::transformations::bi::BiInputTransformer;
+use crate::transformations::di::DiInputTransformer;
+use crate::transformations::transformer::{InputOrder, TransformationError};
 use crate::values::{ValueHolder, ValueType};
 use crate::values::zoned_date_time::ZonedDateTime;
 
@@ -10,7 +10,7 @@ const TIMEZONE_INPUT_TYPE: [ValueType; 1] = [ValueType::TimeZone];
 
 const ZDT_RESULT_TYPE: ValueType = ValueType::DayOfWeek;
 
-impl BiInputTransformer for LocalToZonedDateTime {
+impl DiInputTransformer for LocalToZonedDateTime {
 
     fn transform(&self,
                  first: &ValueHolder,
@@ -41,4 +41,15 @@ impl BiInputTransformer for LocalToZonedDateTime {
     fn get_result_type(&self) -> &'static ValueType {
         &ZDT_RESULT_TYPE
     }
+
+}
+
+impl LocalToZonedDateTime {
+
+    const INSTANCE: LocalToZonedDateTime = LocalToZonedDateTime{};
+
+    pub fn instance() -> &'static LocalToZonedDateTime {
+        &LocalToZonedDateTime::INSTANCE
+    }
+
 }

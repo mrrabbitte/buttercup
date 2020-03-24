@@ -1,7 +1,7 @@
 use chrono_tz::Tz;
 
-use crate::transformations::{InputOrder, TransformationError};
 use crate::transformations::mono::MonoInputTransformer;
+use crate::transformations::transformer::{InputOrder, TransformationError};
 use crate::values::{ValueHolder, ValueType};
 use crate::values::geolocation::GeoCoordinates;
 
@@ -33,6 +33,12 @@ impl MonoInputTransformer for FindTimeZoneFromGeoCoordinates {
 }
 
 impl FindTimeZoneFromGeoCoordinates {
+
+    const INSTANCE: FindTimeZoneFromGeoCoordinates = FindTimeZoneFromGeoCoordinates{};
+
+    pub fn instance() -> &'static FindTimeZoneFromGeoCoordinates {
+        &FindTimeZoneFromGeoCoordinates::INSTANCE
+    }
 
     fn find_time_zone(coordinates: &GeoCoordinates) -> Result<ValueHolder, TransformationError> {
         return match tz_search::lookup(

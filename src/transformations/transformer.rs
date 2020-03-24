@@ -1,0 +1,201 @@
+use std::collections::HashMap;
+
+use crate::transformations::di::DiInputTransformation;
+use crate::transformations::mono::MonoInputTransformation;
+use crate::values::{ValueHolder, ValuesPayload};
+use crate::values::geolocation::GeoCoordinates;
+
+#[derive(Debug)]
+pub enum InputOrder {
+
+    First,
+    Second
+
+}
+
+#[derive(Debug)]
+pub enum TransformationError {
+
+    InvalidInputType(ValueHolder, InputOrder),
+    CouldNotFindValue(String),
+    CouldNotFindTimezone(GeoCoordinates),
+    UnknownTimezone(String)
+
+}
+
+pub enum TransformationType {
+
+    SingleInput,
+    DoubleInput
+
+}
+
+pub struct TransformationDefinition {
+
+    id: i32,
+    transformation_type: TransformationType,
+    result_value_name: String
+
+}
+
+impl TransformationDefinition {
+
+    pub fn new(id: i32,
+               transformation_type: TransformationType,
+               result_value_name: String) -> TransformationDefinition {
+        TransformationDefinition {
+            id,
+            transformation_type,
+            result_value_name
+        }
+    }
+
+}
+
+pub struct SingleInputTransformationDefinition {
+
+    transformation_definition_id: i32,
+    input_name: String,
+    transformation: MonoInputTransformation
+
+}
+
+impl SingleInputTransformationDefinition {
+
+    pub fn new(transformation_definition_id: i32,
+               input_name: String,
+               transformation: MonoInputTransformation) -> SingleInputTransformationDefinition {
+        SingleInputTransformationDefinition {
+            transformation_definition_id,
+            input_name,
+            transformation
+        }
+    }
+
+}
+
+pub struct DoubleInputTransformationDefinition {
+
+    transformation_definition_id: i32,
+    first_input_name: String,
+    second_input_name: String,
+    transformation: DiInputTransformation
+
+}
+
+impl DoubleInputTransformationDefinition {
+
+    pub fn new(transformation_definition_id: i32,
+               first_input_name: String,
+               second_input_name: String,
+               transformation: DiInputTransformation) -> DoubleInputTransformationDefinition {
+        DoubleInputTransformationDefinition {
+            transformation_definition_id,
+            first_input_name,
+            second_input_name,
+            transformation
+        }
+    }
+
+}
+
+pub enum Transformation {
+
+    Mono(SingleInputTransformationDefinition),
+    Bi(DoubleInputTransformationDefinition)
+
+}
+
+pub struct TransformationRequest {
+
+    definition: TransformationDefinition,
+    transformation: Transformation
+
+}
+
+impl TransformationRequest {
+
+    pub fn new(definition: TransformationDefinition,
+               transformation: Transformation) -> TransformationRequest {
+        TransformationRequest {
+            definition,
+            transformation
+        }
+    }
+
+    pub fn new_mono(definition: TransformationDefinition,
+                    transformation: SingleInputTransformationDefinition)
+                    -> TransformationRequest {
+        TransformationRequest::new(definition, Transformation::Mono(transformation))
+    }
+
+    pub fn new_bi(definition: TransformationDefinition,
+                  transformation: DoubleInputTransformationDefinition)
+                  -> TransformationRequest {
+        TransformationRequest::new(definition, Transformation::Bi(transformation))
+    }
+
+}
+
+pub struct Transformer;
+
+impl Transformer {
+
+    pub fn transform(payload: &ValuesPayload,
+                     transformation_requests: &Vec<TransformationRequest>)
+                     -> Result<ValuesPayload, TransformationError> {
+        let values = payload.get_values();
+        let mut new_values: HashMap<String, ValueHolder> = values.clone();
+        for request in transformation_requests {
+            let result = match &request.transformation {
+                Transformation::Mono(def)
+                => Transformer::handle_single(def, &new_values),
+                Transformation::Bi(
+                    def)
+                => Transformer::handle_double(def, &new_values),
+            };
+            match result {
+                Ok(new_value) =>
+                    {
+                        new_values.insert(
+                            request.definition.result_value_name.clone(),
+                            new_value);
+                    },
+                Err(err) => {
+                    return Result::Err(err);
+                },
+            };
+        }
+        return Result::Ok(ValuesPayload::new(new_values));
+    }
+
+    fn handle_single(definition: &SingleInputTransformationDefinition,
+                     values: &HashMap<String, ValueHolder>)
+                     -> Result<ValueHolder, TransformationError> {
+        let value_name = &definition.input_name;
+        return match values.get(value_name) {
+            Some(value) => definition.transformation.transform(value),
+            None => Result::Err(
+                TransformationError::CouldNotFindValue(value_name.clone())),
+        };
+    }
+
+    fn handle_double(definition: &DoubleInputTransformationDefinition,
+                     values: &HashMap<String, ValueHolder>)
+                     -> Result<ValueHolder, TransformationError> {
+        let first_value_name = &definition.first_input_name;
+        return match values.get(first_value_name) {
+            Some(first_value) => {
+                let second_value_name = &definition.second_input_name;
+                return match values.get(second_value_name) {
+                    Some(second_value) =>
+                        definition.transformation.transform(first_value, second_value),
+                    None => Result::Err(
+                        TransformationError::CouldNotFindValue(second_value_name.clone()))
+                };
+            }
+            None => Result::Err(
+                TransformationError::CouldNotFindValue(first_value_name.clone())),
+        };
+    }
+}

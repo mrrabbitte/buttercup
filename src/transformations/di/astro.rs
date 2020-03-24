@@ -1,9 +1,9 @@
 use chrono::{Datelike, NaiveDateTime, TimeZone};
 use chrono_tz::Tz;
 
-use crate::transformations::{InputOrder, TransformationError};
-use crate::transformations::bi::astro::sun_position::SunPositionTimes;
-use crate::transformations::bi::BiInputTransformer;
+use crate::transformations::di::astro::sun_position::SunPositionTimes;
+use crate::transformations::di::DiInputTransformer;
+use crate::transformations::transformer::{InputOrder, TransformationError};
 use crate::values::{ValueHolder, ValueType};
 
 mod sun_position;
@@ -49,7 +49,17 @@ impl Astro {
 
 pub struct IsAfterSunset;
 
-impl BiInputTransformer for IsAfterSunset {
+impl IsAfterSunset {
+
+    const INSTANCE: IsAfterSunset = IsAfterSunset{};
+
+    pub fn instance() -> &'static IsAfterSunset {
+        &IsAfterSunset::INSTANCE
+    }
+
+}
+
+impl DiInputTransformer for IsAfterSunset {
 
     fn transform(&self,
                  first: &ValueHolder,
@@ -72,11 +82,22 @@ impl BiInputTransformer for IsAfterSunset {
     fn get_result_type(&self) -> &'static ValueType {
         &BOOL_RESULT_TYPE
     }
+
 }
 
 pub struct IsBeforeSunrise;
 
-impl BiInputTransformer for IsBeforeSunrise {
+impl IsBeforeSunrise {
+
+    const INSTANCE: IsBeforeSunrise = IsBeforeSunrise{};
+
+    pub fn instance() -> &'static IsBeforeSunrise {
+        &IsBeforeSunrise::INSTANCE
+    }
+
+}
+
+impl DiInputTransformer for IsBeforeSunrise {
 
     fn transform(&self,
                  first: &ValueHolder,
@@ -105,7 +126,17 @@ impl BiInputTransformer for IsBeforeSunrise {
 
 pub struct IsDay;
 
-impl BiInputTransformer for IsDay {
+impl IsDay {
+
+    const INSTANCE: IsDay = IsDay{};
+
+    pub fn instance() -> &'static IsDay {
+        &IsDay::INSTANCE
+    }
+
+}
+
+impl DiInputTransformer for IsDay {
 
     fn transform(&self,
                  first: &ValueHolder,

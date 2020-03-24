@@ -4,10 +4,11 @@ use actix_web::{App, HttpResponse, HttpServer, post, Responder, web};
 use actix_web::web::{Json, Path};
 use serde_json::Value;
 
-use crate::arguments::{ArgumentsProcessorInput, ArgumentValuesExtractor};
+use crate::arguments::{ArgumentsExtractionInput, ArgumentValueExtractorError, ArgumentValuesExtractionService};
 use crate::arguments::definition::ArgumentDefinition;
 use crate::arguments::extractors::ValueExtractionPolicy;
-use crate::values::ValueType;
+use crate::transformations::TransformationService;
+use crate::values::{ValuesPayload, ValueType};
 
 mod arguments;
 mod content;
@@ -29,14 +30,35 @@ async fn index2(path: Path<u32>,
                                                 ValueType::DayOfWeek,
                         ValueExtractionPolicy::Lax));
     definitions.insert(String::from("decimalArg"),
-                       ArgumentDefinition::new(1,
+                       ArgumentDefinition::new(2,
                                                String::from("decimalArg"),
                                                ValueType::Decimal,
                                                ValueExtractionPolicy::Lax));
-    let input = ArgumentsProcessorInput::new(definitions, &values);
-    let extracted = ArgumentValuesExtractor::process(input);
-    HttpResponse::Ok().body(format!("Request: {:?}, extracted {:?}",
-                                    values, extracted))
+    definitions.insert(String::from("geoArg"),
+                       ArgumentDefinition::new(3,
+                                               String::from("geoArg"),
+                                               ValueType::GeoCoordinates,
+                                               ValueExtractionPolicy::Lax));
+    definitions.insert(String::from("dateTimeArg"),
+                       ArgumentDefinition::new(3,
+                                               String::from("dateTimeArg"),
+                                               ValueType::LocalDateTime,
+                                               ValueExtractionPolicy::Lax));
+    definitions.insert(String::from("zoneArg"),
+                       ArgumentDefinition::new(3,
+                                               String::from("zoneArg"),
+                                               ValueType::TimeZone,
+                                               ValueExtractionPolicy::Lax));
+    let input = ArgumentsExtractionInput::new(definitions, &values);
+    let extracted =
+        ArgumentValuesExtractionService::process(input);
+    match extracted {
+        Ok(payload) =>
+            HttpResponse::Ok().body(
+                format!("OK: {:?}", TransformationService::transform(&payload))),
+        Err(err) => HttpResponse::BadRequest().body(
+            format!("Request: {:?}, extracted {:?}", values, err)),
+    }
 }
 
 #[actix_rt::main]

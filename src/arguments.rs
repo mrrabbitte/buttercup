@@ -10,18 +10,18 @@ use crate::values::{ValueHolder, ValuesPayload};
 pub mod extractors;
 pub mod definition;
 
-pub struct ArgumentsProcessorInput<'a> {
+pub struct ArgumentsExtractionInput<'a> {
 
     definitions: HashMap<String, ArgumentDefinition>,
     payload: &'a Value
 
 }
 
-impl ArgumentsProcessorInput<'_> {
+impl ArgumentsExtractionInput<'_> {
 
     pub fn new(definitions: HashMap<String, ArgumentDefinition>,
-               payload: &Value) -> ArgumentsProcessorInput {
-        ArgumentsProcessorInput {
+               payload: &Value) -> ArgumentsExtractionInput {
+        ArgumentsExtractionInput {
             definitions,
             payload
         }
@@ -38,15 +38,15 @@ pub enum ArgumentValueExtractorError {
 
 }
 
-pub struct ArgumentValuesExtractor;
+pub struct ArgumentValuesExtractionService;
 
-impl ArgumentValuesExtractor {
+impl ArgumentValuesExtractionService {
 
-    pub fn process(input: ArgumentsProcessorInput)
+    pub fn process(input: ArgumentsExtractionInput)
         -> Result<ValuesPayload, ArgumentValueExtractorError> {
         return match input.payload {
             Value::Object(payload) =>
-                ArgumentValuesExtractor::do_process(payload, &input.definitions),
+                ArgumentValuesExtractionService::do_process(payload, &input.definitions),
             _ => Result::Err(ArgumentValueExtractorError::InvalidJsonInput)
         };
     }
@@ -61,7 +61,7 @@ impl ArgumentValuesExtractor {
                 None => return Result::Err(
                     ArgumentValueExtractorError::MissingArgument(name.clone())),
                 Some(value) => {
-                    match ArgumentValuesExtractor::handle(description, value) {
+                    match ArgumentValuesExtractionService::handle(description, value) {
                         Ok(holder) => {
                             response.insert(name.clone(), holder);
                         },
