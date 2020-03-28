@@ -1,7 +1,7 @@
 use chrono::{Datelike, NaiveDateTime, TimeZone};
 use chrono_tz::Tz;
 
-use crate::values::geolocation::GeoCoordinates;
+use crate::app::values::geolocation::GeoCoordinates;
 
 #[derive(Debug)]
 pub struct SunPositionTimes {

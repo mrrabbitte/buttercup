@@ -2,9 +2,9 @@ use std::str::FromStr;
 
 use serde_json::{Error, Value};
 
-use crate::arguments::extractors::{ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
-use crate::values::geolocation::GeoCoordinates;
-use crate::values::ValueHolder;
+use crate::app::arguments::extractors::{ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
+use crate::app::values::geolocation::GeoCoordinates;
+use crate::app::values::ValueHolder;
 
 pub struct GeoCoordinatesExtractor;
 

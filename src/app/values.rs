@@ -7,8 +7,8 @@ use num::bigint::BigInt;
 use num::rational::BigRational;
 use strum_macros::AsRefStr;
 
-use crate::values::geolocation::GeoCoordinates;
-use crate::values::zoned_date_time::ZonedDateTime;
+use crate::app::values::geolocation::GeoCoordinates;
+use crate::app::values::zoned_date_time::ZonedDateTime;
 
 pub mod geolocation;
 pub mod zoned_date_time;

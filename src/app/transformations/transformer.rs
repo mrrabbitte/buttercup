@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
-use crate::transformations::di::DiInputTransformation;
-use crate::transformations::mono::MonoInputTransformation;
-use crate::values::{ValueHolder, ValuesPayload};
-use crate::values::geolocation::GeoCoordinates;
+use crate::app::transformations::di::DiInputTransformation;
+use crate::app::transformations::mono::MonoInputTransformation;
+use crate::app::values::{ValueHolder, ValuesPayload};
+use crate::app::values::geolocation::GeoCoordinates;
 
 #[derive(Debug)]
 pub enum InputOrder {

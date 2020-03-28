@@ -1,13 +1,13 @@
 use serde_json::{Number, Value};
 
-use crate::arguments::extractors::boolean::BooleanExtractor;
-use crate::arguments::extractors::date_time::day_of_week::DayOfWeekExtractor;
-use crate::arguments::extractors::date_time::local::{LocalDateExtractor, LocalDateTimeExtractor, LocalTimeExtractor};
-use crate::arguments::extractors::date_time::zoned::{TimezoneExtractor, ZonedDateTimeExtractor};
-use crate::arguments::extractors::geolocation::GeoCoordinatesExtractor;
-use crate::arguments::extractors::number::{DecimalExtractor, IntegerExtractor};
-use crate::arguments::extractors::string::StringExtractor;
-use crate::values::{ValueHolder, ValueType};
+use crate::app::arguments::extractors::boolean::BooleanExtractor;
+use crate::app::arguments::extractors::date_time::day_of_week::DayOfWeekExtractor;
+use crate::app::arguments::extractors::date_time::local::{LocalDateExtractor, LocalDateTimeExtractor, LocalTimeExtractor};
+use crate::app::arguments::extractors::date_time::zoned::{TimezoneExtractor, ZonedDateTimeExtractor};
+use crate::app::arguments::extractors::geolocation::GeoCoordinatesExtractor;
+use crate::app::arguments::extractors::number::{DecimalExtractor, IntegerExtractor};
+use crate::app::arguments::extractors::string::StringExtractor;
+use crate::app::values::{ValueHolder, ValueType};
 
 pub mod boolean;
 pub mod date_time;

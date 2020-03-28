@@ -3,9 +3,9 @@ use std::collections::HashMap;
 use serde_json::{Map, Value};
 use strum_macros::AsRefStr;
 
-use crate::arguments::definition::ArgumentDefinition;
-use crate::arguments::extractors::{ArgumentValueExtractor, ValueExtractionPolicy, ValueExtractorInput};
-use crate::values::{ValueHolder, ValuesPayload};
+use crate::app::arguments::definition::ArgumentDefinition;
+use crate::app::arguments::extractors::{ArgumentValueExtractor, ValueExtractionPolicy, ValueExtractorInput};
+use crate::app::values::{ValueHolder, ValuesPayload};
 
 pub mod extractors;
 pub mod definition;

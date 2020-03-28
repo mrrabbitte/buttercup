@@ -4,17 +4,14 @@ use actix_web::{App, HttpResponse, HttpServer, post, Responder, web};
 use actix_web::web::{Json, Path};
 use serde_json::Value;
 
-use crate::arguments::{ArgumentsExtractionInput, ArgumentValueExtractorError, ArgumentValuesExtractionService};
-use crate::arguments::definition::ArgumentDefinition;
-use crate::arguments::extractors::ValueExtractionPolicy;
-use crate::transformations::TransformationService;
-use crate::transformations::transformer::Transformer;
-use crate::values::{ValuesPayload, ValueType};
+use crate::app::arguments::{ArgumentsExtractionInput, ArgumentValueExtractorError, ArgumentValuesExtractionService};
+use crate::app::arguments::definition::ArgumentDefinition;
+use crate::app::arguments::extractors::ValueExtractionPolicy;
+use crate::app::transformations::TransformationService;
+use crate::app::transformations::transformer::Transformer;
+use crate::app::values::{ValuesPayload, ValueType};
 
-mod arguments;
-mod content;
-mod values;
-mod transformations;
+mod app;
 
 async fn index() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
