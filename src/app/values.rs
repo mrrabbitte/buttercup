@@ -12,6 +12,7 @@ use crate::app::values::zoned_date_time::ZonedDateTime;
 
 pub mod geolocation;
 pub mod zoned_date_time;
+pub mod extractors;
 
 #[derive(AsRefStr, Debug, Clone)]
 pub enum ValueHolder {
@@ -73,6 +74,11 @@ impl ValuesPayload {
 
     pub fn get_values(&self) -> &HashMap<String, ValueHolder> {
         &self.values
+    }
+
+    pub fn get(&self,
+               key: &String) -> Option<&ValueHolder> {
+        self.values.get(key)
     }
 
 }

@@ -1,12 +1,12 @@
 use serde_json::{Number, Value};
 
-use crate::app::arguments::extractors::boolean::BooleanExtractor;
-use crate::app::arguments::extractors::date_time::day_of_week::DayOfWeekExtractor;
-use crate::app::arguments::extractors::date_time::local::{LocalDateExtractor, LocalDateTimeExtractor, LocalTimeExtractor};
-use crate::app::arguments::extractors::date_time::zoned::{TimezoneExtractor, ZonedDateTimeExtractor};
-use crate::app::arguments::extractors::geolocation::GeoCoordinatesExtractor;
-use crate::app::arguments::extractors::number::{DecimalExtractor, IntegerExtractor};
-use crate::app::arguments::extractors::string::StringExtractor;
+use crate::app::values::extractors::boolean::BooleanExtractor;
+use crate::app::values::extractors::date_time::day_of_week::DayOfWeekExtractor;
+use crate::app::values::extractors::date_time::local::{LocalDateExtractor, LocalDateTimeExtractor, LocalTimeExtractor};
+use crate::app::values::extractors::date_time::zoned::{TimezoneExtractor, ZonedDateTimeExtractor};
+use crate::app::values::extractors::geolocation::GeoCoordinatesExtractor;
+use crate::app::values::extractors::number::{DecimalExtractor, IntegerExtractor};
+use crate::app::values::extractors::string::StringExtractor;
 use crate::app::values::{ValueHolder, ValueType};
 
 pub mod boolean;
@@ -46,9 +46,9 @@ impl<'a> ValueExtractorInput<'a> {
 
 }
 
-pub struct ArgumentValueExtractor;
+pub struct ValueExtractorService;
 
-impl ArgumentValueExtractor {
+impl ValueExtractorService {
 
     pub fn extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
         if input.value.is_null() {

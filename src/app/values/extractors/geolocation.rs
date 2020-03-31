@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use serde_json::{Error, Value};
 
-use crate::app::arguments::extractors::{ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
+use crate::app::values::extractors::{ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
 use crate::app::values::geolocation::GeoCoordinates;
 use crate::app::values::ValueHolder;
 

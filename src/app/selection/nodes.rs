@@ -3,7 +3,7 @@ use crate::app::values::ValuesPayload;
 pub trait SelectionNode {
 
     fn get_id(&self) -> &i32;
-    fn get_outgoing_edge_ids() -> &Vec<i32>;
+    fn get_outgoing_edge_ids(&self) -> &Vec<i32>;
     fn select_content_command_id(&self, payload: &ValuesPayload) -> &i32;
 
 }
@@ -35,7 +35,7 @@ impl SelectionNode for SimpleSelectionNode {
         &self.definition.id
     }
 
-    fn get_outgoing_edge_ids() -> &Vec<i32> {
+    fn get_outgoing_edge_ids(&self) -> &Vec<i32> {
         unimplemented!()
     }
 

@@ -4,10 +4,9 @@ use serde_json::{Map, Value};
 use strum_macros::AsRefStr;
 
 use crate::app::arguments::definition::ArgumentDefinition;
-use crate::app::arguments::extractors::{ArgumentValueExtractor, ValueExtractionPolicy, ValueExtractorInput};
+use crate::app::values::extractors::{ValueExtractorService, ValueExtractionPolicy, ValueExtractorInput};
 use crate::app::values::{ValueHolder, ValuesPayload};
 
-pub mod extractors;
 pub mod definition;
 
 pub struct ArgumentsExtractionInput<'a> {
@@ -79,7 +78,7 @@ impl ArgumentValuesExtractionService {
     fn handle(definition: &ArgumentDefinition,
               value: &Value)
               -> Result<ValueHolder, ValueExtractionPolicy> {
-        ArgumentValueExtractor::extract(
+        ValueExtractorService::extract(
             &ValueExtractorInput::new(
                 value,
                 definition.get_argument_type(),

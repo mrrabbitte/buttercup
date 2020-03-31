@@ -6,7 +6,7 @@ use serde_json::Value;
 
 use crate::app::arguments::{ArgumentsExtractionInput, ArgumentValueExtractorError, ArgumentValuesExtractionService};
 use crate::app::arguments::definition::ArgumentDefinition;
-use crate::app::arguments::extractors::ValueExtractionPolicy;
+use crate::app::values::extractors::ValueExtractionPolicy;
 use crate::app::transformations::TransformationService;
 use crate::app::transformations::transformer::Transformer;
 use crate::app::values::{ValuesPayload, ValueType};

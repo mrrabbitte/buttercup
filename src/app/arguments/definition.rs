@@ -1,4 +1,4 @@
-use crate::app::arguments::extractors::ValueExtractionPolicy;
+use crate::app::values::extractors::ValueExtractionPolicy;
 use crate::app::values::ValueType;
 
 pub struct ArgumentDefinition {
