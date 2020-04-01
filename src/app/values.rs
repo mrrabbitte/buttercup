@@ -15,7 +15,7 @@ pub mod geolocation;
 pub mod zoned_date_time;
 pub mod extractors;
 
-#[derive(AsRefStr, EnumVariantNames, PartialEq, Debug, Clone)]
+#[derive(AsRefStr, EnumVariantNames, PartialEq, PartialOrd, Debug, Clone)]
 pub enum ValueHolder {
 
     Boolean(bool),
