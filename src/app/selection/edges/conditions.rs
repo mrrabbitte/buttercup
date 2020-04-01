@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use predicates::ord::le;
 use serde_json::Value;
 
 use crate::app::selection::edges::operators::{RelationalOperator, RelationalOperatorError};
