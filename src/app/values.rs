@@ -5,7 +5,7 @@ use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, Weekday
 use chrono_tz::Tz;
 use num::bigint::BigInt;
 use num::rational::BigRational;
-use strum_macros::AsRefStr;
+use strum_macros::{AsRefStr, EnumVariantNames};
 
 use crate::app::values::geolocation::GeoCoordinates;
 use crate::app::values::zoned_date_time::ZonedDateTime;
@@ -14,7 +14,7 @@ pub mod geolocation;
 pub mod zoned_date_time;
 pub mod extractors;
 
-#[derive(AsRefStr, Debug, Clone)]
+#[derive(AsRefStr, EnumVariantNames, PartialEq, Debug, Clone)]
 pub enum ValueHolder {
 
     Boolean(bool),
@@ -31,7 +31,7 @@ pub enum ValueHolder {
 
 }
 
-#[derive(AsRefStr, Debug, PartialEq)]
+#[derive(AsRefStr, EnumVariantNames, Debug, PartialEq)]
 pub enum ValueType {
 
     Boolean,
@@ -79,6 +79,19 @@ impl ValuesPayload {
     pub fn get(&self,
                key: &String) -> Option<&ValueHolder> {
         self.values.get(key)
+    }
+
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashSet;
+
+    use super::*;
+
+    #[test]
+    fn test_consistency() {
+        assert_eq!(ValueHolder::VARIANTS, ValueType::VARIANTS);
     }
 
 }
