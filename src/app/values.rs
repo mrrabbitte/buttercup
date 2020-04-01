@@ -6,6 +6,7 @@ use chrono_tz::Tz;
 use num::bigint::BigInt;
 use num::rational::BigRational;
 use strum_macros::{AsRefStr, EnumVariantNames};
+use strum::VariantNames;
 
 use crate::app::values::geolocation::GeoCoordinates;
 use crate::app::values::zoned_date_time::ZonedDateTime;
@@ -44,7 +45,7 @@ pub enum ValueType {
     DayOfWeek,
     TimeZone,
     ZonedDateTime,
-    GeoCoordinates
+    GeoCoordinates,
 
 }
 
