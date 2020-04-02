@@ -5,8 +5,8 @@ use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, Weekday
 use chrono_tz::Tz;
 use num::bigint::BigInt;
 use num::rational::BigRational;
-use strum_macros::{AsRefStr, EnumVariantNames};
 use strum::VariantNames;
+use strum_macros::{AsRefStr, EnumVariantNames};
 
 use crate::app::values::geolocation::GeoCoordinates;
 use crate::app::values::zoned_date_time::ZonedDateTime;

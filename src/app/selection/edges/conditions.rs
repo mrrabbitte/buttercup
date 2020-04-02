@@ -9,6 +9,7 @@ use crate::app::values::{ValueHolder, ValuesPayload, ValueType};
 pub struct ConditionDefinition {
 
     id: i32,
+    expression_definition_id: i32,
     left_value_name: String,
     operator_type: RelationalOperator,
     is_negation: bool,
@@ -67,6 +68,16 @@ impl Condition {
         }
     }
 
+    fn do_evaluate(&self,
+                   payload: &ValuesPayload) -> Result<bool, ConditionEvaluationError> {
+        let left_value_name = &self.left_value_name;
+        return match payload.get(left_value_name){
+            Some(left_value) => self.handle(left_value, payload),
+            None => Result::Err(
+                ConditionEvaluationError::DidNotFindLeftValue(left_value_name.clone())),
+        }
+    }
+
     fn handle(&self,
               left_value: &ValueHolder,
               payload: &ValuesPayload) -> Result<bool, ConditionEvaluationError> {
@@ -80,7 +91,7 @@ impl Condition {
                     None => Result::Err(
                         ConditionEvaluationError::DidNotFindRightValue(
                             right_value_name.clone())),
-            },
+                },
         };
     }
 

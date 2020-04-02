@@ -47,7 +47,7 @@ async fn index2(path: Path<u32>,
                                                String::from("zoneArg"),
                                                ValueType::TimeZone,
                                                ValueExtractionPolicy::Lax));
-    let input = ArgumentsExtractionInput::new(definitions, &values);
+    let input = ArgumentsExtractionInput::new(&definitions, &values);
     let extracted =
         ArgumentValuesExtractionService::process(input);
     match extracted {
