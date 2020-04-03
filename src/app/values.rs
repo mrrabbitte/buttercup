@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::slice::Split;
 
 use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, Weekday};
-use chrono_tz::Tz;
 use num::bigint::BigInt;
 use num::rational::BigRational;
 use strum::VariantNames;
@@ -10,10 +9,13 @@ use strum_macros::{AsRefStr, EnumVariantNames};
 
 use crate::app::values::geolocation::GeoCoordinates;
 use crate::app::values::zoned_date_time::ZonedDateTime;
+use std::cmp::Ordering;
+use crate::app::values::wrappers::{WeekdayWrapper, TzWrapper};
 
 pub mod geolocation;
 pub mod zoned_date_time;
 pub mod extractors;
+pub mod wrappers;
 
 #[derive(AsRefStr, EnumVariantNames, PartialEq, PartialOrd, Debug, Clone)]
 pub enum ValueHolder {
@@ -25,8 +27,8 @@ pub enum ValueHolder {
     LocalDateTime(NaiveDateTime),
     LocalDate(NaiveDate),
     LocalTime(NaiveTime),
-    DayOfWeek(Weekday),
-    TimeZone(Tz),
+    DayOfWeek(WeekdayWrapper),
+    TimeZone(TzWrapper),
     ZonedDateTime(ZonedDateTime),
     GeoCoordinates(GeoCoordinates),
 

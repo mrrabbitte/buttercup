@@ -2,6 +2,7 @@ use crate::app::transformations::di::DiInputTransformer;
 use crate::app::transformations::transformer::{InputOrder, TransformationError};
 use crate::app::values::{ValueHolder, ValueType};
 use crate::app::values::zoned_date_time::ZonedDateTime;
+use crate::app::values::wrappers::Wrapper;
 
 pub struct LocalToZonedDateTime;
 
@@ -20,7 +21,7 @@ impl DiInputTransformer for LocalToZonedDateTime {
                 ValueHolder::TimeZone(time_zone) =>
                     Result::Ok(
                         ValueHolder::ZonedDateTime(
-                            ZonedDateTime::new(*date_time, *time_zone))
+                            ZonedDateTime::new(*date_time, *time_zone.get()))
                     ),
                 _ => Result::Err(
                     TransformationError::InvalidInputType(first.clone(), InputOrder::Second))

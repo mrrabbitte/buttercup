@@ -27,8 +27,6 @@ pub enum ContentSelectionError {
 
 impl ContentSelectionPipelineService {
 
-    pub fn handle(request: ContentSelectionRequest) -> {
 
-    }
 
 }

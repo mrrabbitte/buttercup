@@ -14,10 +14,10 @@ pub struct ArgumentsExtractionInput<'a> {
 
 }
 
-impl ArgumentsExtractionInput<'_> {
+impl<'a> ArgumentsExtractionInput<'a> {
 
-    pub fn new(definitions: &HashMap<String, ArgumentDefinition>,
-               payload: &Value) -> ArgumentsExtractionInput {
+    pub fn new(definitions: &'a HashMap<String, ArgumentDefinition>,
+               payload: &'a Value) -> ArgumentsExtractionInput<'a> {
         ArgumentsExtractionInput {
             definitions,
             payload

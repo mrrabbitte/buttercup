@@ -6,11 +6,13 @@ use serde::{Deserialize, Serialize};
 use serde::export::TryFrom;
 use serde_json::Value;
 
-#[derive(Debug, Clone, PartialEq)]
+use crate::app::values::wrappers::{TzWrapper, Wrapper};
+
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct ZonedDateTime {
 
     date_time: NaiveDateTime,
-    zone: Tz
+    zone: TzWrapper
 
 }
 
@@ -20,7 +22,7 @@ impl ZonedDateTime {
                zone: Tz) -> ZonedDateTime {
         ZonedDateTime {
             date_time,
-            zone
+            zone: TzWrapper::new(zone)
         }
     }
 
@@ -29,7 +31,7 @@ impl ZonedDateTime {
     }
 
     pub fn get_zone(&self) -> &Tz {
-        &self.zone
+        &self.zone.get()
     }
 
 }

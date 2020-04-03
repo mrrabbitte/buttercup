@@ -22,5 +22,5 @@ pub struct SelectionEdgeDefinition {
 pub struct ExpressionSelectionEdgeDetails {
 
     selection_edge_definition_id: i32,
-    
+
 }

@@ -4,6 +4,7 @@ use crate::app::transformations::mono::MonoInputTransformer;
 use crate::app::transformations::transformer::{InputOrder, TransformationError};
 use crate::app::values::{ValueHolder, ValueType};
 use crate::app::values::geolocation::GeoCoordinates;
+use crate::app::values::wrappers::{TzWrapper, Wrapper};
 
 pub struct FindTimeZoneFromGeoCoordinates;
 
@@ -52,7 +53,10 @@ impl FindTimeZoneFromGeoCoordinates {
             *coordinates.get_latitude(), *coordinates.get_longitude()) {
             Some(tz_str) =>
                 match tz_str.parse::<Tz>() {
-                    Ok(tz) => Result::Ok(ValueHolder::TimeZone(tz)),
+                    Ok(tz) =>
+                        Result::Ok(
+                            ValueHolder::TimeZone(
+                                TzWrapper::new(tz))),
                     Err(_) => Result::Err(TransformationError::UnknownTimezone(tz_str)),
                 },
             None => Result::Err(TransformationError::CouldNotFindTimezone(coordinates.clone()))

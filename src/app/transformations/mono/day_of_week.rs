@@ -1,8 +1,9 @@
-use chrono::{Datelike, TimeZone};
+use chrono::{Datelike, TimeZone, Weekday};
 
 use crate::app::transformations::mono::MonoInputTransformer;
 use crate::app::transformations::transformer::{InputOrder, TransformationError};
 use crate::app::values::{ValueHolder, ValueType};
+use crate::app::values::wrappers::{WeekdayWrapper, Wrapper};
 use crate::app::values::zoned_date_time::ZonedDateTime;
 
 pub struct DayOfWeekFromDateTimeRetrieval;
@@ -12,17 +13,25 @@ const DATELIKE_INPUT_TYPES: [ValueType; 3] =
 
 const DAY_OF_WEEK_RESULT_TYPE: ValueType = ValueType::DayOfWeek;
 
+impl DayOfWeekFromDateTimeRetrieval {
+
+    fn ok(weekday: Weekday) -> Result<ValueHolder, TransformationError> {
+        Result::Ok(ValueHolder::DayOfWeek(WeekdayWrapper::new(weekday)))
+    }
+
+}
+
 impl MonoInputTransformer for DayOfWeekFromDateTimeRetrieval {
 
     fn transform(&self,
                  value: &ValueHolder) -> Result<ValueHolder, TransformationError> {
         return match value {
             ValueHolder::LocalDateTime(date_time) =>
-                Result::Ok(ValueHolder::DayOfWeek(date_time.weekday())),
+                DayOfWeekFromDateTimeRetrieval::ok(date_time.weekday()),
             ValueHolder::LocalDate(date) =>
-                Result::Ok(ValueHolder::DayOfWeek(date.weekday())),
+                DayOfWeekFromDateTimeRetrieval::ok(date.weekday()),
             ValueHolder::ZonedDateTime(zdt) =>
-                Result::Ok(ValueHolder::DayOfWeek(zdt.get_date_time().weekday())),
+                DayOfWeekFromDateTimeRetrieval::ok(zdt.get_date_time().weekday()),
             _ => Result::Err(
                 TransformationError::InvalidInputType(value.clone(), InputOrder::First))
         }

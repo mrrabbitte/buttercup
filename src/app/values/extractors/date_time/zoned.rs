@@ -7,6 +7,7 @@ use serde_json::{Number, Value};
 
 use crate::app::values::extractors::{ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
 use crate::app::values::ValueHolder;
+use crate::app::values::wrappers::{TzWrapper, Wrapper};
 use crate::app::values::zoned_date_time::{ZonedDateTime, ZonedDateTimeParsingError};
 
 pub struct TimezoneExtractor;
@@ -16,7 +17,7 @@ impl ValueExtractor for TimezoneExtractor {
     fn strict_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
         return match input.value {
             Value::String(str_val) => return match str_val.parse::<Tz>() {
-                Ok(tz) => Result::Ok(ValueHolder::TimeZone(tz)),
+                Ok(tz) => Result::Ok(ValueHolder::TimeZone(TzWrapper::new(tz))),
                 Err(_) => Result::Err(ValueExtractionPolicy::Strict),
             },
             _ => Result::Err(ValueExtractionPolicy::Strict)
