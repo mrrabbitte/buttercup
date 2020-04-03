@@ -8,9 +8,8 @@ pub struct RecommendationSelectionNodeDetails {
 
 }
 
-pub struct RecommendationSelectionNode<'a> {
-
-    service: &'a RecommendationService,
+pub struct RecommendationSelectionNode {
+    
     tenant_id: String,
     definition: SelectionNodeDefinition,
     outgoing_edge_ids: Vec<i32>,

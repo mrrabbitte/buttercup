@@ -23,11 +23,11 @@ pub struct SelectionNodeDefinition {
 
 }
 
-pub enum SelectionNode<'a> {
+pub enum SelectionNode {
 
     Simple(SimpleSelectionNode),
     Dictionary(DictionarySelectionNode),
-    Recommendation(RecommendationSelectionNode<'a>)
+    Recommendation(RecommendationSelectionNode)
 
 }
 

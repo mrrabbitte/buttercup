@@ -132,7 +132,7 @@ mod tests {
             NaiveDate::from_ymd(2020, 3, 18),
             NaiveTime::from_hms(12, 33, 34)),
                    zdt.date_time);
-        assert_eq!(Tz::Europe__Paris, zdt.zone);
+        assert_eq!(Tz::Europe__Paris, *zdt.zone.get());
     }
 
     #[test]
@@ -151,7 +151,7 @@ mod tests {
             NaiveDate::from_ymd(2020, 3, 18),
             NaiveTime::from_hms(12, 33, 35)),
                    zdt.date_time);
-        assert_eq!(Tz::Africa__Cairo, zdt.zone);
+        assert_eq!(Tz::Africa__Cairo, *zdt.zone.get());
     }
 
 }

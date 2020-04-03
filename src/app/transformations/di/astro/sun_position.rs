@@ -55,27 +55,41 @@ mod tests {
 
     use super::*;
 
-    #[test]
-    fn test_simple() {
+    fn sun_position_times(dt_at_local: &NaiveDateTime) -> SunPositionTimes {
         let tz: Tz = "Europe/Warsaw".parse().unwrap();
+        let coordinates = "53.01375,18.59814".parse::<GeoCoordinates>().unwrap();
+        SunPositionTimes::new(&dt_at_local, &tz, &coordinates)
+    }
+
+    #[test]
+    fn test_simple_day() {
         let day_at_local = NaiveDateTime::new(
             NaiveDate::from_ymd(2020, 3, 18),
             NaiveTime::from_hms(15, 28, 33));
-        let coordinates = "53.01375,18.59814".parse::<GeoCoordinates>().unwrap();
-        let sun_position_times =
-            SunPositionTimes::new(&day_at_local, &tz, &coordinates);
+        let sun_position_times = sun_position_times(&day_at_local);
         assert_eq!(false, sun_position_times.is_after_sunset());
         assert_eq!(false, sun_position_times.is_before_sunrise());
         assert_eq!(true, sun_position_times.is_day());
+    }
+
+    #[test]
+    fn test_simple_night() {
         let night_at_local = NaiveDateTime::new(
             NaiveDate::from_ymd(2020, 3, 18),
             NaiveTime::from_hms(20, 28, 33));
+        let sun_position_times = sun_position_times(&night_at_local);
         assert_eq!(true, sun_position_times.is_after_sunset());
         assert_eq!(false, sun_position_times.is_before_sunrise());
         assert_eq!(false, sun_position_times.is_day());
+    }
+
+    #[test]
+    fn test_simple_before_sunrise() {
         let before_sunrise_at_local = NaiveDateTime::new(
             NaiveDate::from_ymd(2020, 3, 18),
             NaiveTime::from_hms(3, 28, 33));
+        let sun_position_times =
+            sun_position_times(&before_sunrise_at_local);
         assert_eq!(false,
                    sun_position_times.is_after_sunset());
         assert_eq!(true,
