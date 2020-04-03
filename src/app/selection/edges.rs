@@ -1,14 +1,32 @@
 use crate::app::values::ValuesPayload;
+use crate::app::selection::nodes::SelectionNodeAddress;
+use crate::app::selection::edges::always::AlwaysTrueSelectionEdge;
 
-pub mod conditions;
-pub mod operators;
-pub mod expressions;
+pub mod always;
+pub mod logical;
 
-pub trait SelectionEdge {
+pub enum SelectionEdge {
 
-    fn get_id(&self) -> i32;
-    fn get_next_selection_node_id(&self) -> i32;
+    AlwaysTrueSelectionEdge(AlwaysTrueSelectionEdge),
+    LogicalExpressionSelectionEdge
+
+}
+
+pub trait SelectionEdgeDelegate {
+
+    fn get_id(&self) -> &i32;
+    fn get_next_selection_node(&self) -> &SelectionNodeAddress;
     fn can_pass(&self, payload: &ValuesPayload) -> bool;
+    fn is_always_true(&self) -> bool {
+        false
+    }
+
+}
+
+pub struct SelectionEdgeAddress {
+
+    id: i32,
+    idx: i32
 
 }
 

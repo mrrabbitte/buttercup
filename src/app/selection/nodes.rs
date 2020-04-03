@@ -3,6 +3,7 @@ use crate::app::values::ValuesPayload;
 use crate::app::selection::nodes::simple::SimpleSelectionNode;
 use crate::app::selection::nodes::recommendation::RecommendationSelectionNode;
 use crate::app::selection::nodes::dictionary::{DictionarySelectionError, DictionarySelectionNode};
+use crate::app::selection::edges::SelectionEdgeAddress;
 
 pub mod simple;
 pub mod dictionary;
@@ -11,7 +12,7 @@ pub mod recommendation;
 pub trait SelectionNodeDelegate {
 
     fn get_id(&self) -> &i32;
-    fn get_outgoing_edge_ids(&self) -> &Vec<i32>;
+    fn get_outgoing_edges(&self) -> &Vec<SelectionEdgeAddress>;
     fn select_content_command_id(&self, payload: &ValuesPayload) -> Result<&i32, SelectionError>;
 
 }
@@ -51,14 +52,21 @@ impl SelectionNode {
 
 }
 
+pub struct SelectionNodeAddress {
+
+    id: i32,
+    idx: i32
+
+}
+
 impl SelectionNodeDelegate for SelectionNode {
 
     fn get_id(&self) -> &i32 {
         self.get_delegate().get_id()
     }
 
-    fn get_outgoing_edge_ids(&self) -> &Vec<i32> {
-        self.get_delegate().get_outgoing_edge_ids()
+    fn get_outgoing_edges(&self) -> &Vec<SelectionEdgeAddress> {
+        self.get_delegate().get_outgoing_edges()
     }
 
     fn select_content_command_id(&self, payload: &ValuesPayload) -> Result<&i32, SelectionError> {

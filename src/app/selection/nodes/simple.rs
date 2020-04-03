@@ -1,4 +1,5 @@
-use crate::app::selection::nodes::{SelectionNodeDefinition, SelectionNodeDelegate, SelectionError};
+use crate::app::selection::edges::SelectionEdgeAddress;
+use crate::app::selection::nodes::{SelectionError, SelectionNodeDefinition, SelectionNodeDelegate};
 use crate::app::values::ValuesPayload;
 
 pub struct SimpleSelectionNodeDetails {
@@ -11,7 +12,7 @@ pub struct SimpleSelectionNodeDetails {
 pub struct SimpleSelectionNode {
 
     definition: SelectionNodeDefinition,
-    outgoing_edge_ids: Vec<i32>,
+    outgoing_edges: Vec<SelectionEdgeAddress>,
     details: SimpleSelectionNodeDetails
 
 }
@@ -22,8 +23,8 @@ impl SelectionNodeDelegate for SimpleSelectionNode {
         &self.definition.id
     }
 
-    fn get_outgoing_edge_ids(&self) -> &Vec<i32> {
-        &self.outgoing_edge_ids
+    fn get_outgoing_edges(&self) -> &Vec<SelectionEdgeAddress> {
+        &self.outgoing_edges
     }
 
     fn select_content_command_id(&self,

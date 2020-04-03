@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 use crate::app::arguments::ArgumentDefinition;
-use crate::app::selection::nodes::{SelectionNode, SelectionNodeDelegate};
+use crate::app::selection::edges::{SelectionEdge, SelectionEdgeDelegate};
+use crate::app::selection::nodes::SelectionNode;
 use crate::app::transformations::transformer::TransformationRequest;
 
 pub struct SelectionTreeDefinition {
@@ -15,8 +16,10 @@ pub struct SelectionTreeDefinition {
 pub struct SelectionTree {
 
     tenant_id: String,
+    definition: SelectionTreeDefinition,
     argument_definitions: HashMap<String, ArgumentDefinition>,
     transformation_requests: Vec<TransformationRequest>,
-    selection_nodes: HashMap<i32, SelectionNode>
+    selection_nodes: Vec<SelectionNode>,
+    selection_edges: Vec<SelectionEdge>
 
 }

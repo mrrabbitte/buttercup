@@ -1,4 +1,4 @@
-use crate::app::selection::edges::operators::{RelationalOperator, RelationalOperatorError};
+use crate::app::selection::edges::logical::operators::{RelationalOperator, RelationalOperatorError};
 use crate::app::values::ValueHolder;
 
 pub struct StringOperators;

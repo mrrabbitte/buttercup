@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::app::selection::nodes::{SelectionError, SelectionNodeDefinition, SelectionNodeDelegate};
 use crate::app::values::{ValueHolder, ValuesPayload};
+use crate::app::selection::edges::SelectionEdgeAddress;
 
 pub struct DictionarySelectionNodeDetails {
 
@@ -14,7 +15,7 @@ pub struct DictionarySelectionNodeDetails {
 pub struct DictionarySelectionNode {
 
     definition: SelectionNodeDefinition,
-    outgoing_edge_ids: Vec<i32>,
+    outgoing_edges: Vec<SelectionEdgeAddress>,
     details: DictionarySelectionNodeDetails,
     mapping: DictionaryNodeMapping
 
@@ -26,8 +27,8 @@ impl SelectionNodeDelegate for DictionarySelectionNode {
         &self.definition.id
     }
 
-    fn get_outgoing_edge_ids(&self) -> &Vec<i32> {
-        &self.outgoing_edge_ids
+    fn get_outgoing_edges(&self) -> &Vec<SelectionEdgeAddress> {
+        &self.outgoing_edges
     }
 
     fn select_content_command_id(&self, payload: &ValuesPayload) -> Result<&i32, SelectionError> {

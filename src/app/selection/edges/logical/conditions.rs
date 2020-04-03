@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde_json::Value;
 
-use crate::app::selection::edges::operators::{RelationalOperator, RelationalOperatorError};
+use crate::app::selection::edges::logical::operators::{RelationalOperator, RelationalOperatorError};
 use crate::app::selection::SelectionEvaluationError;
 use crate::app::values::{ValueHolder, ValuesPayload, ValueType};
 

@@ -1,4 +1,4 @@
-use crate::app::selection::edges::operators::strings::StringOperators;
+use crate::app::selection::edges::logical::operators::strings::StringOperators;
 use crate::app::values::ValueHolder;
 
 pub mod strings;
