@@ -1,4 +1,4 @@
-use crate::app::selection::nodes::{SelectionNodeDefinition, SelectionNodeDelegate};
+use crate::app::selection::nodes::{SelectionError, SelectionNodeDefinition, SelectionNodeDelegate};
 use crate::app::values::ValuesPayload;
 
 pub struct RecommendationSelectionNodeDetails {
@@ -31,7 +31,7 @@ impl SelectionNodeDelegate for RecommendationSelectionNode {
     }
 
     fn select_content_command_id(&self,
-                                 payload: &ValuesPayload) -> &i32 {
+                                 payload: &ValuesPayload) -> Result<&i32, SelectionError> {
         unimplemented!()
     }
 

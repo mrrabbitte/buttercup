@@ -1,4 +1,4 @@
-use crate::app::selection::nodes::{SelectionNodeDefinition, SelectionNodeDelegate};
+use crate::app::selection::nodes::{SelectionNodeDefinition, SelectionNodeDelegate, SelectionError};
 use crate::app::values::ValuesPayload;
 
 pub struct SimpleSelectionNodeDetails {
@@ -27,8 +27,8 @@ impl SelectionNodeDelegate for SimpleSelectionNode {
     }
 
     fn select_content_command_id(&self,
-                                 payload: &ValuesPayload) -> &i32 {
-        &self.details.content_command_definition_id
+                                 payload: &ValuesPayload) -> Result<&i32, SelectionError> {
+        Result::Ok(&self.details.content_command_definition_id)
     }
 
 }

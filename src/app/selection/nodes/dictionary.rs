@@ -1,5 +1,6 @@
-use crate::app::selection::nodes::{SelectionNodeDefinition, SelectionNodeDelegate};
 use std::collections::HashMap;
+
+use crate::app::selection::nodes::{SelectionError, SelectionNodeDefinition, SelectionNodeDelegate};
 use crate::app::values::{ValueHolder, ValuesPayload};
 
 pub struct DictionarySelectionNodeDetails {
@@ -15,7 +16,7 @@ pub struct DictionarySelectionNode {
     definition: SelectionNodeDefinition,
     outgoing_edge_ids: Vec<i32>,
     details: DictionarySelectionNodeDetails,
-    mapping: HashMap<ValueHolder, i32>
+    mapping: DictionaryNodeMapping
 
 }
 
@@ -29,8 +30,50 @@ impl SelectionNodeDelegate for DictionarySelectionNode {
         &self.outgoing_edge_ids
     }
 
-    fn select_content_command_id(&self, payload: &ValuesPayload) -> &i32 {
+    fn select_content_command_id(&self, payload: &ValuesPayload) -> Result<&i32, SelectionError> {
+        let target_value_name = &self.details.target_value_name;
+        return match payload.get(&self.details.target_value_name) {
+            None => Result::Err(
+                SelectionError::DictionarySelectionError(
+                    DictionarySelectionError::ValueOfTargetNameNotFound(
+                        target_value_name.clone()))),
+            Some(value_holder) => match value_holder {
+                _ => Result::Err(
+                    SelectionError::DictionarySelectionError(
+                        DictionarySelectionError::ValueIsNotString(
+                            target_value_name.clone()))),
+                ValueHolder::String(key) => self.mapping.get(key)
+            }
+        };
+    }
 
+}
+
+pub enum DictionarySelectionError {
+
+    ValueOfTargetNameNotFound(String),
+    MappingForValueNotFound(String),
+    ValueIsNotString(String),
+
+}
+
+struct DictionaryNodeMapping {
+
+    default_command_id: i32,
+    values: HashMap<String, i32>
+
+}
+
+impl DictionaryNodeMapping {
+
+    fn get(&self, key: &String) -> Result<&i32, SelectionError> {
+        return match &self.values.get(key) {
+            None => Result::Err(
+                SelectionError::DictionarySelectionError(
+                    DictionarySelectionError::MappingForValueNotFound(
+                        key.clone()))),
+            Some(command_id) => Result::Ok(command_id),
+        };
     }
 
 }
