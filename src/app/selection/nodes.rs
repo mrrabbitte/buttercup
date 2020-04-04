@@ -1,9 +1,10 @@
 use crate::app::content::ContentCommandId;
-use crate::app::values::ValuesPayload;
-use crate::app::selection::nodes::simple::SimpleSelectionNode;
-use crate::app::selection::nodes::recommendation::RecommendationSelectionNode;
-use crate::app::selection::nodes::dictionary::{DictionarySelectionError, DictionarySelectionNode};
+use crate::app::selection::addressable::Address;
 use crate::app::selection::edges::SelectionEdgeAddress;
+use crate::app::selection::nodes::dictionary::{DictionarySelectionError, DictionarySelectionNode};
+use crate::app::selection::nodes::recommendation::RecommendationSelectionNode;
+use crate::app::selection::nodes::simple::SimpleSelectionNode;
+use crate::app::values::ValuesPayload;
 
 pub mod simple;
 pub mod dictionary;
@@ -12,8 +13,14 @@ pub mod recommendation;
 pub trait SelectionNodeDelegate {
 
     fn get_id(&self) -> &i32;
+
     fn get_outgoing_edges(&self) -> &Vec<SelectionEdgeAddress>;
+
     fn select_content_command_id(&self, payload: &ValuesPayload) -> Result<&i32, SelectionError>;
+
+    fn matches(&self, address: &SelectionNodeAddress) -> bool {
+        address.get_id() == self.get_id()
+    }
 
 }
 
@@ -52,10 +59,11 @@ impl SelectionNode {
 
 }
 
+#[derive(Debug, Copy, Clone)]
 pub struct SelectionNodeAddress {
 
     id: i32,
-    idx: i32
+    index: usize
 
 }
 
@@ -75,6 +83,21 @@ impl SelectionNodeDelegate for SelectionNode {
 
 }
 
+impl Address for SelectionNodeAddress {
 
+    fn new(id: i32, index: usize) -> Self {
+        SelectionNodeAddress{
+            id,
+            index
+        }
+    }
 
+    fn get_id(&self) -> &i32 {
+        &self.id
+    }
 
+    fn get_index(&self) -> &usize {
+        &self.index
+    }
+
+}

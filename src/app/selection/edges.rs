@@ -1,6 +1,8 @@
-use crate::app::values::ValuesPayload;
-use crate::app::selection::nodes::SelectionNodeAddress;
+use crate::app::selection::addressable::Address;
 use crate::app::selection::edges::always::AlwaysTrueSelectionEdge;
+use crate::app::selection::nodes::SelectionNodeAddress;
+use crate::app::values::ValuesPayload;
+use crate::app::selection::edges::logical::LogicalExpressionSelectionEdge;
 
 pub mod always;
 pub mod logical;
@@ -8,37 +10,93 @@ pub mod logical;
 pub enum SelectionEdge {
 
     AlwaysTrueSelectionEdge(AlwaysTrueSelectionEdge),
-    LogicalExpressionSelectionEdge
+    LogicalExpressionSelectionEdge(LogicalExpressionSelectionEdge)
 
 }
 
 pub trait SelectionEdgeDelegate {
 
     fn get_id(&self) -> &i32;
+
     fn get_next_selection_node(&self) -> &SelectionNodeAddress;
+
     fn can_pass(&self, payload: &ValuesPayload) -> bool;
+
     fn is_always_true(&self) -> bool {
         false
     }
 
+    fn matches(&self, address: &SelectionEdgeAddress) -> bool {
+        address.get_id() == self.get_id()
+    }
+
 }
 
+impl SelectionEdgeDelegate for SelectionEdge {
+
+    fn get_id(&self) -> &i32 {
+        self.get_delegate().get_id()
+    }
+
+    fn get_next_selection_node(&self) -> &SelectionNodeAddress {
+        self.get_delegate().get_next_selection_node()
+    }
+
+    fn can_pass(&self, payload: &ValuesPayload) -> bool {
+        self.get_delegate().can_pass(payload)
+    }
+}
+
+impl SelectionEdge {
+
+    fn get_delegate(&self) -> &dyn SelectionEdgeDelegate {
+        return match self {
+            SelectionEdge::AlwaysTrueSelectionEdge(edge) => edge,
+            SelectionEdge::LogicalExpressionSelectionEdge(edge) => edge
+        }
+    }
+
+}
+
+#[derive(Debug, Copy, Clone)]
 pub struct SelectionEdgeAddress {
 
     id: i32,
-    idx: i32
+    index: usize
+
+}
+
+impl Address for SelectionEdgeAddress {
+
+    fn new(id: i32, index: usize) -> Self {
+        SelectionEdgeAddress{
+            id,
+            index
+        }
+    }
+
+    fn get_id(&self) -> &i32 {
+        &self.id
+    }
+
+    fn get_index(&self) -> &usize {
+        &self.index
+    }
+
+}
+
+pub enum SelectionEdgeType {
+
+    AlwaysTrueSelectionEdge,
+    LogicalExpressionSelectionEdge
 
 }
 
 pub struct SelectionEdgeDefinition {
 
     id: i32,
-    selection_node_definition_id: i32
+    selection_node_definition_id: i32,
+    selection_edge_type: SelectionEdgeType
 
 }
 
-pub struct ExpressionSelectionEdgeDetails {
-
-    selection_edge_definition_id: i32,
-
-}

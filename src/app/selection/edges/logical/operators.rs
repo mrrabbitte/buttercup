@@ -42,6 +42,11 @@ impl RelationalOperator {
         };
     }
 
+}
 
+pub enum LogicalOperator {
+
+    And,
+    Or
 
 }
