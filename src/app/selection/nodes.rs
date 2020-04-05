@@ -16,7 +16,8 @@ pub trait SelectionNodeDelegate {
 
     fn get_outgoing_edges(&self) -> &Vec<SelectionEdgeAddress>;
 
-    fn select_content_command_id(&self, payload: &ValuesPayload) -> Result<&i32, SelectionError>;
+    fn select_content_command_id(&self, payload: &ValuesPayload)
+        -> Result<&i32, SelectionNodeError>;
 
     fn matches(&self, address: &SelectionNodeAddress) -> bool {
         address.get_id() == self.get_id()
@@ -39,7 +40,7 @@ pub enum SelectionNode {
 
 }
 
-pub enum SelectionError {
+pub enum SelectionNodeError {
 
     SimpleSelectionError,
     RecommendationSelectionError,
@@ -77,7 +78,8 @@ impl SelectionNodeDelegate for SelectionNode {
         self.get_delegate().get_outgoing_edges()
     }
 
-    fn select_content_command_id(&self, payload: &ValuesPayload) -> Result<&i32, SelectionError> {
+    fn select_content_command_id(&self,
+                                 payload: &ValuesPayload) -> Result<&i32, SelectionNodeError> {
         self.get_delegate().select_content_command_id(payload)
     }
 

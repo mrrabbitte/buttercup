@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::app::selection::nodes::{SelectionError, SelectionNodeDefinition, SelectionNodeDelegate};
+use crate::app::selection::nodes::{SelectionNodeError, SelectionNodeDefinition, SelectionNodeDelegate};
 use crate::app::values::{ValueHolder, ValuesPayload};
 use crate::app::selection::edges::SelectionEdgeAddress;
 
@@ -31,16 +31,16 @@ impl SelectionNodeDelegate for DictionarySelectionNode {
         &self.outgoing_edges
     }
 
-    fn select_content_command_id(&self, payload: &ValuesPayload) -> Result<&i32, SelectionError> {
+    fn select_content_command_id(&self, payload: &ValuesPayload) -> Result<&i32, SelectionNodeError> {
         let target_value_name = &self.details.target_value_name;
         return match payload.get(&self.details.target_value_name) {
             None => Result::Err(
-                SelectionError::DictionarySelectionError(
+                SelectionNodeError::DictionarySelectionError(
                     DictionarySelectionError::ValueOfTargetNameNotFound(
                         target_value_name.clone()))),
             Some(value_holder) => match value_holder {
                 _ => Result::Err(
-                    SelectionError::DictionarySelectionError(
+                    SelectionNodeError::DictionarySelectionError(
                         DictionarySelectionError::ValueIsNotString(
                             target_value_name.clone()))),
                 ValueHolder::String(key) => self.mapping.get(key)
@@ -67,10 +67,10 @@ struct DictionaryNodeMapping {
 
 impl DictionaryNodeMapping {
 
-    fn get(&self, key: &String) -> Result<&i32, SelectionError> {
+    fn get(&self, key: &String) -> Result<&i32, SelectionNodeError> {
         return match &self.values.get(key) {
             None => Result::Err(
-                SelectionError::DictionarySelectionError(
+                SelectionNodeError::DictionarySelectionError(
                     DictionarySelectionError::MappingForValueNotFound(
                         key.clone()))),
             Some(command_id) => Result::Ok(command_id),

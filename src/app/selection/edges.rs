@@ -14,13 +14,19 @@ pub enum SelectionEdge {
 
 }
 
+pub enum SelectionEdgeError {
+
+    LogicalExpressionSelectionEdgeError
+
+}
+
 pub trait SelectionEdgeDelegate {
 
     fn get_id(&self) -> &i32;
 
     fn get_next_selection_node(&self) -> &SelectionNodeAddress;
 
-    fn can_pass(&self, payload: &ValuesPayload) -> bool;
+    fn can_pass(&self, payload: &ValuesPayload) -> Result<bool, SelectionEdgeError>;
 
     fn is_always_true(&self) -> bool {
         false

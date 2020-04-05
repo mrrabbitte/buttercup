@@ -7,7 +7,7 @@ use serde_json::Value;
 
 use crate::app::values::extractors::ValueExtractionPolicy;
 use crate::app::transformations::TransformationService;
-use crate::app::transformations::transformer::Transformer;
+use crate::app::transformations::transformer::TransformationService;
 use crate::app::values::{ValuesPayload, ValueType};
 use crate::app::arguments::ArgumentDefinition;
 use crate::app::arguments::extraction::{ArgumentsExtractionInput, ArgumentValuesExtractionService};
@@ -62,7 +62,7 @@ async fn index2(path: Path<u32>,
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    Transformer::initialize();
+    TransformationService::initialize();
     HttpServer::new(|| {
         App::new()
             .service(index2)

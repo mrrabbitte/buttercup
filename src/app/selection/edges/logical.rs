@@ -1,4 +1,4 @@
-use crate::app::selection::edges::{SelectionEdgeDelegate, SelectionEdgeDefinition};
+use crate::app::selection::edges::{SelectionEdgeDelegate, SelectionEdgeDefinition, SelectionEdgeError};
 use crate::app::values::ValuesPayload;
 use crate::app::selection::nodes::SelectionNodeAddress;
 
@@ -30,7 +30,7 @@ impl SelectionEdgeDelegate for LogicalExpressionSelectionEdge {
         &self.next_selection_node
     }
 
-    fn can_pass(&self, payload: &ValuesPayload) -> bool {
+    fn can_pass(&self, payload: &ValuesPayload) -> Result<bool, SelectionEdgeError> {
         unimplemented!()
     }
 

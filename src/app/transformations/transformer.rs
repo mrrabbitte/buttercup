@@ -137,9 +137,9 @@ impl TransformationRequest {
 
 }
 
-pub struct Transformer;
+pub struct TransformationService;
 
-impl Transformer {
+impl TransformationService {
 
     pub fn transform(payload: &ValuesPayload,
                      transformation_requests: &Vec<TransformationRequest>)
@@ -149,10 +149,10 @@ impl Transformer {
         for request in transformation_requests {
             let result = match &request.transformation {
                 Transformation::Mono(def)
-                => Transformer::handle_single(def, &new_values),
+                => TransformationService::handle_single(def, &new_values),
                 Transformation::Bi(
                     def)
-                => Transformer::handle_double(def, &new_values),
+                => TransformationService::handle_double(def, &new_values),
             };
             match result {
                 Ok(new_value) =>

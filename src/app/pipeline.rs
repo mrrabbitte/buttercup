@@ -1,7 +1,7 @@
 use crate::app::content::ContentType;
 use serde_json::Value;
 
-pub struct ContentSelectionPipelineService;
+
 
 pub struct SelectionTreeArguments {
 
@@ -10,7 +10,7 @@ pub struct SelectionTreeArguments {
 
 }
 
-pub struct ContentSelectionRequest<'a> {
+pub struct ContentPipelineRequest<'a> {
 
     tenant_id: String,
     selection_tree_id: i32,
@@ -19,13 +19,22 @@ pub struct ContentSelectionRequest<'a> {
 
 }
 
-pub enum ContentSelectionError {
+pub struct ContentPipelineResponse {
+
+    selection_tree_id: i32,
+    url: Url,
+
+}
+
+pub enum ContentPipelineError {
 
 
 
 }
 
-impl ContentSelectionPipelineService {
+pub struct ContentPipelineService;
+
+impl ContentPipelineService {
 
 
 

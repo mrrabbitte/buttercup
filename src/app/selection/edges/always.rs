@@ -1,4 +1,4 @@
-use crate::app::selection::edges::{SelectionEdgeDefinition, SelectionEdgeDelegate};
+use crate::app::selection::edges::{SelectionEdgeDefinition, SelectionEdgeDelegate, SelectionEdgeError};
 use crate::app::selection::nodes::SelectionNodeAddress;
 use crate::app::values::ValuesPayload;
 
@@ -19,8 +19,8 @@ impl SelectionEdgeDelegate for AlwaysTrueSelectionEdge {
         &self.next_selection_node
     }
 
-    fn can_pass(&self, payload: &ValuesPayload) -> bool {
-        true
+    fn can_pass(&self, payload: &ValuesPayload) -> Result<bool, SelectionEdgeError> {
+        Result::Ok(true)
     }
 
     fn is_always_true(&self) -> bool {
