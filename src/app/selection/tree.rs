@@ -36,6 +36,10 @@ pub enum SelectionTreeError {
 
 impl SelectionTree {
 
+    pub fn select(&self) -> Result<Vec<i32>, SelectionTreeError> {
+
+    }
+
     fn get_node(&self,
                 address: &SelectionNodeAddress) -> Result<&SelectionNode, SelectionTreeError> {
         return match self.nodes.get(*address.get_index()) {

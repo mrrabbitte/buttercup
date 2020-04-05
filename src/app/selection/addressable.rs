@@ -7,8 +7,4 @@ pub trait Address {
 
     fn get_index(&self) -> &usize;
 
-    fn matches(&self, other: &Self) -> bool {
-        self.get_id() == other.get_id()
-    }
-
 }
