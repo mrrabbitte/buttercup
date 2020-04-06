@@ -48,7 +48,7 @@ impl SelectionEdgeDelegate for SelectionEdge {
         self.get_delegate().get_next_selection_node()
     }
 
-    fn can_pass(&self, payload: &ValuesPayload) -> bool {
+    fn can_pass(&self, payload: &ValuesPayload) -> Result<bool, SelectionEdgeError> {
         self.get_delegate().can_pass(payload)
     }
 

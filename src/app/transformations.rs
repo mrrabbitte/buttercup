@@ -11,7 +11,7 @@ pub mod di;
 
 pub struct Transformer {
 
-    requests: Vec<TransformationRequests>
+    requests: Vec<TransformationRequest>
 
 }
 
