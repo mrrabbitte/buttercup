@@ -32,6 +32,17 @@ pub struct SelectionNodeDefinition {
 
 }
 
+impl SelectionNodeDefinition {
+
+    pub fn new(id: i32, name: String) -> SelectionNodeDefinition {
+        SelectionNodeDefinition {
+            id,
+            name
+        }
+    }
+
+}
+
 pub enum SelectionNode {
 
     Simple(SimpleSelectionNode),

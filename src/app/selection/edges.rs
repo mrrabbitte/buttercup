@@ -3,6 +3,7 @@ use crate::app::selection::edges::always::AlwaysTrueSelectionEdge;
 use crate::app::selection::nodes::SelectionNodeAddress;
 use crate::app::values::ValuesPayload;
 use crate::app::selection::edges::logical::LogicalExpressionSelectionEdge;
+use crate::app::selection::edges::logical::expressions::ExpressionEvaluationError;
 
 pub mod always;
 pub mod logical;
@@ -16,7 +17,7 @@ pub enum SelectionEdge {
 
 pub enum SelectionEdgeError {
 
-    LogicalExpressionSelectionEdgeError
+    LogicalExpressionSelectionEdgeError(ExpressionEvaluationError)
 
 }
 
@@ -107,3 +108,16 @@ pub struct SelectionEdgeDefinition {
 
 }
 
+impl SelectionEdgeDefinition {
+
+    pub fn new(id: i32,
+               selection_node_definition_id: i32,
+               selection_edge_type: SelectionEdgeType) -> SelectionEdgeDefinition {
+        SelectionEdgeDefinition {
+            id,
+            selection_node_definition_id,
+            selection_edge_type
+        }
+    }
+
+}

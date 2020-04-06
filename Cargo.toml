@@ -17,3 +17,6 @@ strum_macros = "0.18.0"
 num = "0.2.*"
 sunrise = "1.0.0"
 url = "2"
+
+[dev-dependencies]
+maplit = "1"

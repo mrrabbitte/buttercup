@@ -1,6 +1,7 @@
-use crate::app::selection::edges::{SelectionEdgeDelegate, SelectionEdgeDefinition, SelectionEdgeError};
-use crate::app::values::ValuesPayload;
+use crate::app::selection::edges::{SelectionEdgeDefinition, SelectionEdgeDelegate, SelectionEdgeError};
+use crate::app::selection::edges::logical::expressions::{Expression, ExpressionEvaluationError};
 use crate::app::selection::nodes::SelectionNodeAddress;
+use crate::app::values::ValuesPayload;
 
 pub mod conditions;
 pub mod expressions;
@@ -8,7 +9,20 @@ pub mod operators;
 
 pub struct LogicalExpressionSelectionEdgeDetails {
 
-    id: i32
+    id: i32,
+    selection_edge_definition_id: i32
+
+}
+
+impl LogicalExpressionSelectionEdgeDetails {
+
+    pub fn new(id: i32,
+               selection_edge_definition_id: i32) -> LogicalExpressionSelectionEdgeDetails {
+        LogicalExpressionSelectionEdgeDetails {
+            id,
+            selection_edge_definition_id
+        }
+    }
 
 }
 
@@ -16,7 +30,27 @@ pub struct LogicalExpressionSelectionEdge {
 
     definition: SelectionEdgeDefinition,
     next_selection_node: SelectionNodeAddress,
-    details: LogicalExpressionSelectionEdgeDetails
+    details: LogicalExpressionSelectionEdgeDetails,
+    expressions: Vec<Expression>,
+    first_expression: Expression
+
+}
+
+impl LogicalExpressionSelectionEdge {
+
+    pub fn new(definition: SelectionEdgeDefinition,
+               next_selection_node: SelectionNodeAddress,
+               details: LogicalExpressionSelectionEdgeDetails,
+               expressions: Vec<Expression>,
+               first_expression: Expression) -> LogicalExpressionSelectionEdge {
+        LogicalExpressionSelectionEdge {
+            definition,
+            next_selection_node,
+            details,
+            expressions,
+            first_expression
+        }
+    }
 
 }
 
@@ -31,7 +65,11 @@ impl SelectionEdgeDelegate for LogicalExpressionSelectionEdge {
     }
 
     fn can_pass(&self, payload: &ValuesPayload) -> Result<bool, SelectionEdgeError> {
-        unimplemented!()
+        return match self.first_expression.evaluate(&self.expressions, payload) {
+            Ok(result) => Result::Ok(result),
+            Err(error) =>
+                Result::Err(SelectionEdgeError::LogicalExpressionSelectionEdgeError(error)),
+        };
     }
 
 }

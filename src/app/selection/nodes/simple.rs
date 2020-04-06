@@ -9,11 +9,37 @@ pub struct SimpleSelectionNodeDetails {
 
 }
 
+impl SimpleSelectionNodeDetails {
+
+    pub fn new(selection_node_definition_id: i32,
+               content_command_definition_id: i32) -> SimpleSelectionNodeDetails {
+        SimpleSelectionNodeDetails {
+            selection_node_definition_id,
+            content_command_definition_id
+        }
+    }
+
+}
+
 pub struct SimpleSelectionNode {
 
     definition: SelectionNodeDefinition,
     outgoing_edges: Vec<SelectionEdgeAddress>,
     details: SimpleSelectionNodeDetails
+
+}
+
+impl SimpleSelectionNode {
+
+    pub fn new(definition: SelectionNodeDefinition,
+               outgoing_edges: Vec<SelectionEdgeAddress>,
+               details: SimpleSelectionNodeDetails) -> SimpleSelectionNode {
+        SimpleSelectionNode {
+            definition,
+            outgoing_edges,
+            details
+        }
+    }
 
 }
 

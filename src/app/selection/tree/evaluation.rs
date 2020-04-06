@@ -14,6 +14,16 @@ pub struct SelectionTreeEvaluator {
 
 impl SelectionTreeEvaluator {
 
+    pub fn new(start_node: SelectionNode,
+               nodes: Vec<SelectionNode>,
+               edges: Vec<SelectionEdge>) -> SelectionTreeEvaluator {
+        SelectionTreeEvaluator {
+            start_node,
+            nodes,
+            edges
+        }
+    }
+
     pub fn select_commands(&self,
                            payload: &ValuesPayload) -> Result<Vec<i32>, SelectionTreeError> {
         let mut selected_command_ids: Vec<i32> = Vec::new();
@@ -89,6 +99,115 @@ impl SelectionTreeEvaluator {
             }
         }
         Result::Ok(())
+    }
+
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use crate::app::selection::nodes::simple::{SimpleSelectionNode, SimpleSelectionNodeDetails};
+    use crate::app::selection::nodes::SelectionNodeDefinition;
+    use crate::app::selection::nodes::dictionary::{DictionaryNodeMapping,
+                                                   DictionarySelectionNode,
+                                                   DictionarySelectionNodeDetails};
+    use crate::app::values::ValueHolder;
+    use crate::app::values::wrappers::{WeekdayWrapper, Wrapper};
+    use chrono::Weekday;
+    use crate::app::selection::edges::logical::{LogicalExpressionSelectionEdge, LogicalExpressionSelectionEdgeDetails};
+    use crate::app::selection::edges::{SelectionEdgeDefinition, SelectionEdgeType};
+
+    const FIRST_DICT_VALUE_NAME: &str = "FirstValueName";
+
+    #[test]
+    fn test_first_path() {
+        let evaluator = build_evaluator();
+        evaluator.select_commands();
+    }
+
+    #[test]
+    fn test_second_path() {
+        let evaluator = build_evaluator();
+        evaluator.select_commands();
+    }
+
+    #[test]
+    fn test_nothing_when_no_edge_matches() {
+        let evaluator = build_evaluator();
+        evaluator.select_commands();
+    }
+
+    fn build_evaluator() -> SelectionTreeEvaluator {
+        let start_node: SelectionNode =
+            SelectionNode::Simple(
+                SimpleSelectionNode::new(
+                    SelectionNodeDefinition::new(0,
+                                                 "Starting Node".to_string()),
+                    vec![],
+                    SimpleSelectionNodeDetails::new(0, 0)
+                ));
+        let nodes: Vec<SelectionNode> = vec![
+            SelectionNode::Simple(
+                SimpleSelectionNode::new(
+                    SelectionNodeDefinition::new(
+                        1, "First After Condition Node".to_string()),
+                    vec![],
+                    SimpleSelectionNodeDetails::new(1, 1)
+                )),
+            SelectionNode::Simple(
+                SimpleSelectionNode::new(
+                    SelectionNodeDefinition::new(
+                        2, "Second Default Node".to_string()),
+                    vec![],
+                    SimpleSelectionNodeDetails::new(2, 2)
+                )),
+            SelectionNode::Dictionary(
+                DictionarySelectionNode::new(
+                    SelectionNodeDefinition::new(
+                        3, "Second Default Node".to_string()),
+                    vec![],
+                    DictionarySelectionNodeDetails::new(
+                        3, 3,
+                        FIRST_DICT_VALUE_NAME.to_string()),
+                    DictionaryNodeMapping::new(3,
+                                               hashmap!{
+                                               ValueHolder::DayOfWeek(WeekdayWrapper::new(Weekday::Sat)) => 4,
+                                               ValueHolder::DayOfWeek(WeekdayWrapper::new(Weekday::Sun)) => 5
+                                               })
+                )),
+            SelectionNode::Dictionary(
+                DictionarySelectionNode::new(
+                    SelectionNodeDefinition::new(
+                        4, "Second Default Node".to_string()),
+                    vec![],
+                    DictionarySelectionNodeDetails::new(
+                        4, 6,
+                        FIRST_DICT_VALUE_NAME.to_string()),
+                    DictionaryNodeMapping::new(6,
+                                               hashmap!{
+                                               ValueHolder::String("FirstVal".to_string()) => 7,
+                                               ValueHolder::String("FirstVal".to_string()) => 8,
+                                               ValueHolder::String("FirstVal".to_string()) => 9
+                                               })
+                ))
+        ];
+        let edges: Vec<SelectionEdge> = vec![
+            SelectionEdge::LogicalExpressionSelectionEdge(
+                LogicalExpressionSelectionEdge::new(
+                    SelectionEdgeDefinition::new(
+                        1,
+                        1,
+                        SelectionEdgeType::LogicalExpressionSelectionEdge),
+                    SelectionNodeAddress::new(1, 0),
+                    LogicalExpressionSelectionEdgeDetails::new()
+                ))
+        ];
+        SelectionTreeEvaluator {
+            start_node,
+            nodes,
+            edges
+        }
     }
 
 }
