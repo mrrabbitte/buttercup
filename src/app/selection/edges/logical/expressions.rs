@@ -3,6 +3,7 @@ use crate::app::selection::edges::logical::conditions::{Condition, ConditionEval
 use crate::app::selection::edges::logical::operators::LogicalOperator;
 use crate::app::values::ValuesPayload;
 
+#[derive(Debug)]
 pub struct ExpressionDefinition {
 
     id: i32,
@@ -10,12 +11,58 @@ pub struct ExpressionDefinition {
 
 }
 
+impl ExpressionDefinition {
+
+    pub fn new(id: i32,
+               internal_logical_operator: LogicalOperator) -> ExpressionDefinition {
+        ExpressionDefinition {
+            id,
+            internal_logical_operator
+        }
+    }
+
+}
+
+#[derive(Debug)]
 pub struct Expression {
 
     definition: ExpressionDefinition,
     conditions: Vec<Condition>,
-    next_expression_address: Option<ExpressionAddress>,
+    next_expression: Option<NextExpressionAddressWithOperator>
+
+}
+
+impl Expression {
+
+    pub fn new(definition: ExpressionDefinition,
+               conditions: Vec<Condition>,
+               next_expression: Option<NextExpressionAddressWithOperator>) -> Expression {
+        Expression {
+            definition,
+            conditions,
+            next_expression
+        }
+    }
+
+}
+
+#[derive(Debug)]
+pub struct NextExpressionAddressWithOperator {
+
+    address: ExpressionAddress,
     operator_between_expressions: LogicalOperator
+
+}
+
+impl NextExpressionAddressWithOperator {
+
+    pub fn new(address: ExpressionAddress,
+               operator_between_expressions: LogicalOperator) -> NextExpressionAddressWithOperator {
+        NextExpressionAddressWithOperator {
+            address,
+            operator_between_expressions
+        }
+    }
 
 }
 
@@ -60,10 +107,11 @@ impl Expression {
                     expressions: &Vec<Expression>,
                     payload: &ValuesPayload) -> Result<bool, ExpressionEvaluationError> {
         return match self.evaluate_conditions(payload) {
-            Ok(result) => match self.next_expression_address {
+            Ok(result) => match &self.next_expression {
                 None => Result::Ok(result),
-                Some(address) =>
-                    match expressions.get(address.index) {
+                Some(address_with_operator) => {
+                    let address = address_with_operator.address;
+                    match expressions.get(address_with_operator.address.index) {
                         None => Result::Err(
                             ExpressionEvaluationError::MissingExpression(address.clone())),
                         Some(next_expression) =>
@@ -75,7 +123,7 @@ impl Expression {
                                 }
                                 return match next_expression.evaluate(expressions, payload) {
                                     Ok(next_expression_result) =>
-                                        match self.operator_between_expressions {
+                                        match address_with_operator.operator_between_expressions {
                                             LogicalOperator::And =>
                                                 Result::Ok(result && next_expression_result),
                                             LogicalOperator::Or =>
@@ -85,7 +133,8 @@ impl Expression {
                                         Result::Err(error),
                                 };
                             },
-                    },
+                    }
+                },
             },
             Err(error) =>
                 Result::Err(ExpressionEvaluationError::ConditionEvaluationError(error)),
@@ -128,7 +177,6 @@ impl Expression {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]

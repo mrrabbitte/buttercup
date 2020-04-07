@@ -7,6 +7,7 @@ use crate::app::values::geolocation::GeoCoordinates;
 use crate::app::values::wrappers::{TzWrapper, Wrapper};
 
 pub struct FindTimeZoneFromGeoCoordinates;
+use num::traits::ToPrimitive;
 
 const INPUT_TYPE: [ValueType; 1] = [ValueType::GeoCoordinates];
 const RESULT_TYPE: ValueType = ValueType::TimeZone;
@@ -50,7 +51,7 @@ impl FindTimeZoneFromGeoCoordinates {
 
     fn find_time_zone(coordinates: &GeoCoordinates) -> Result<ValueHolder, TransformationError> {
         return match tz_search::lookup(
-            *coordinates.get_latitude(), *coordinates.get_longitude()) {
+            coordinates.get_latitude(), coordinates.get_longitude().to_f64()) {
             Some(tz_str) =>
                 match tz_str.parse::<Tz>() {
                     Ok(tz) =>

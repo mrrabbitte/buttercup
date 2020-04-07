@@ -93,13 +93,14 @@ impl Address for SelectionEdgeAddress {
 
 }
 
+#[derive(Debug)]
 pub enum SelectionEdgeType {
 
     AlwaysTrueSelectionEdge,
     LogicalExpressionSelectionEdge
 
 }
-
+#[derive(Debug)]
 pub struct SelectionEdgeDefinition {
 
     id: i32,

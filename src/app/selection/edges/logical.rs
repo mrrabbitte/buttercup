@@ -7,6 +7,7 @@ pub mod conditions;
 pub mod expressions;
 pub mod operators;
 
+#[derive(Debug)]
 pub struct LogicalExpressionSelectionEdgeDetails {
 
     id: i32,
@@ -26,6 +27,7 @@ impl LogicalExpressionSelectionEdgeDetails {
 
 }
 
+#[derive(Debug)]
 pub struct LogicalExpressionSelectionEdge {
 
     definition: SelectionEdgeDefinition,

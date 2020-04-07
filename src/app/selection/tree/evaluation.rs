@@ -117,8 +117,14 @@ mod tests {
     use chrono::Weekday;
     use crate::app::selection::edges::logical::{LogicalExpressionSelectionEdge, LogicalExpressionSelectionEdgeDetails};
     use crate::app::selection::edges::{SelectionEdgeDefinition, SelectionEdgeType};
+    use crate::app::selection::edges::logical::expressions::{Expression, ExpressionDefinition};
+    use crate::app::selection::edges::logical::conditions::{Condition, ConditionValue};
+    use crate::app::selection::edges::logical::operators::{LogicalOperator, RelationalOperator};
+    use num::BigInt;
 
     const FIRST_DICT_VALUE_NAME: &str = "FirstValueName";
+    const SECOND_VALUE_NAME: &str = "SecondValueName";
+    const THIRD_VALUE_NAME: &str = "ThirdValueName";
 
     #[test]
     fn test_first_path() {
@@ -187,8 +193,8 @@ mod tests {
                     DictionaryNodeMapping::new(6,
                                                hashmap!{
                                                ValueHolder::String("FirstVal".to_string()) => 7,
-                                               ValueHolder::String("FirstVal".to_string()) => 8,
-                                               ValueHolder::String("FirstVal".to_string()) => 9
+                                               ValueHolder::String("SecondVal".to_string()) => 8,
+                                               ValueHolder::String("ThirdVal".to_string()) => 9
                                                })
                 ))
         ];
@@ -200,7 +206,49 @@ mod tests {
                         1,
                         SelectionEdgeType::LogicalExpressionSelectionEdge),
                     SelectionNodeAddress::new(1, 0),
-                    LogicalExpressionSelectionEdgeDetails::new()
+                    LogicalExpressionSelectionEdgeDetails::new(0, 1),
+                    vec![
+                        Expression::new(
+                            ExpressionDefinition::new(
+                                0,  LogicalOperator::And),
+                            vec![
+                                Condition::new(0,
+                                               SECOND_VALUE_NAME.to_string(),
+                                               RelationalOperator::Equals,
+                                               false,
+                                               ConditionValue::Runtime(
+                                                   THIRD_VALUE_NAME.to_string())),
+                                Condition::new(0,
+                                               THIRD_VALUE_NAME.to_string(),
+                                               RelationalOperator::LessThan,
+                                               false,
+                                               ConditionValue::Static(
+                                                   ValueHolder::Integer(
+                                                       "10".parse::<BigInt>().unwrap())))
+                            ],
+                            Option::None
+                        )
+                    ],
+                    Expression::new(
+                        ExpressionDefinition::new(
+                            0,  LogicalOperator::And),
+                        vec![
+                            Condition::new(0,
+                                           SECOND_VALUE_NAME.to_string(),
+                                           RelationalOperator::Equals,
+                                           false,
+                                           ConditionValue::Runtime(
+                                               THIRD_VALUE_NAME.to_string())),
+                            Condition::new(0,
+                                           THIRD_VALUE_NAME.to_string(),
+                                           RelationalOperator::LessThan,
+                                           false,
+                                           ConditionValue::Static(
+                                               ValueHolder::Integer(
+                                                   "10".parse::<BigInt>().unwrap())))
+                        ],
+                        Option::Some()
+                    )
                 ))
         ];
         SelectionTreeEvaluator {

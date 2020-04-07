@@ -11,13 +11,14 @@ use crate::app::values::geolocation::GeoCoordinates;
 use crate::app::values::zoned_date_time::ZonedDateTime;
 use std::cmp::Ordering;
 use crate::app::values::wrappers::{WeekdayWrapper, TzWrapper};
-
+use serde::{Deserialize, Serialize};
 pub mod geolocation;
 pub mod zoned_date_time;
 pub mod extractors;
 pub mod wrappers;
 
-#[derive(AsRefStr, EnumVariantNames, PartialEq, PartialOrd, Debug, Clone)]
+#[derive(Serialize, Deserialize, AsRefStr, EnumVariantNames, Eq, Hash, PartialEq, PartialOrd,
+    Debug, Clone)]
 pub enum ValueHolder {
 
     Boolean(bool),

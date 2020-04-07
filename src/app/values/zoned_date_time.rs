@@ -8,7 +8,7 @@ use serde_json::Value;
 
 use crate::app::values::wrappers::{TzWrapper, Wrapper};
 
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Debug, Clone, Eq, Hash, PartialEq, PartialOrd)]
 pub struct ZonedDateTime {
 
     date_time: NaiveDateTime,

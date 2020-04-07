@@ -44,6 +44,7 @@ impl RelationalOperator {
 
 }
 
+#[derive(Debug)]
 pub enum LogicalOperator {
 
     And,

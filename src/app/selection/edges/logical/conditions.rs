@@ -6,6 +6,7 @@ use crate::app::selection::edges::logical::operators::{RelationalOperator, Relat
 use crate::app::selection::SelectionEvaluationError;
 use crate::app::values::{ValueHolder, ValuesPayload, ValueType};
 
+#[derive(Debug)]
 pub struct ConditionDefinition {
 
     id: i32,
@@ -16,6 +17,7 @@ pub struct ConditionDefinition {
 
 }
 
+#[derive(Debug)]
 pub struct StaticValueConditionDefinition {
 
     condition_definition_id: i32,
@@ -24,6 +26,7 @@ pub struct StaticValueConditionDefinition {
 
 }
 
+#[derive(Debug)]
 pub struct RuntimeValueConditionDefinition {
 
     condition_definition_id: i32,
@@ -31,6 +34,7 @@ pub struct RuntimeValueConditionDefinition {
 
 }
 
+#[derive(Debug)]
 pub struct Condition {
 
     id: i32,
@@ -41,6 +45,7 @@ pub struct Condition {
 
 }
 
+#[derive(Debug)]
 pub enum ConditionValue {
 
     Static(ValueHolder),
@@ -48,6 +53,7 @@ pub enum ConditionValue {
 
 }
 
+#[derive(Debug)]
 pub enum ConditionEvaluationError {
 
     DidNotFindLeftValue(String),
@@ -57,6 +63,20 @@ pub enum ConditionEvaluationError {
 }
 
 impl Condition {
+
+    pub fn new(id: i32,
+               left_value_name: String,
+               operator: RelationalOperator,
+               is_negation: bool,
+               value: ConditionValue) -> Condition {
+        Condition {
+            id,
+            left_value_name,
+            operator,
+            is_negation,
+            value
+        }
+    }
 
     pub fn evaluate(&self,
                     payload: &ValuesPayload) -> Result<bool, ConditionEvaluationError> {

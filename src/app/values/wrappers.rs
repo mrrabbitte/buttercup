@@ -2,6 +2,7 @@ use std::cmp::Ordering;
 
 use chrono::Weekday;
 use chrono_tz::Tz;
+use serde::{Deserialize, Serialize};
 
 pub trait Wrapper<T> {
 
@@ -10,7 +11,7 @@ pub trait Wrapper<T> {
 
 }
 
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Eq, Hash)]
 pub struct WeekdayWrapper {
 
     value: Weekday,
@@ -49,7 +50,7 @@ impl PartialEq for WeekdayWrapper {
 
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Eq, Hash, PartialEq)]
 pub struct TzWrapper {
 
     value: Tz

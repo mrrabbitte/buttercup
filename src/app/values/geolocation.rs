@@ -1,33 +1,36 @@
+use std::collections::HashMap;
 use std::str::FromStr;
 
+use num::{BigInt, BigRational, FromPrimitive};
 use serde::{Deserialize, Serialize};
+use std::ops::Div;
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Eq, Hash, Debug, Clone, PartialEq, PartialOrd)]
 pub struct GeoCoordinates {
 
-    latitude: f64,
-    longitude: f64
+    latitude: BigRational,
+    longitude: BigRational
 
 }
 
 impl GeoCoordinates {
 
-    pub fn get_latitude(&self) -> &f64 {
-        &self.latitude
+    pub fn get_latitude_as_f64(&self) -> &BigRational {
+        &self.latitude.numer().div(&self.latitude.denom()).as_f64()
     }
 
-    pub fn get_longitude(&self) -> &f64 {
+    pub fn get_longitude_as_f64(&self) -> &BigRational {
         &self.longitude
     }
 
     pub fn is_valid(&self) -> bool {
-        GeoCoordinates::is_valid_latitude(self.latitude)
-            && GeoCoordinates::is_valid_longitude(self.longitude)
+        GeoCoordinates::is_valid_longitude(self.get_longitude())
+            && GeoCoordinates::is_valid_latitude(self.get_latitude())
     }
 
-    fn new(latitude: f64, longitude: f64) -> Result<GeoCoordinates, ()> {
-        if !GeoCoordinates::is_valid_latitude(latitude)
-            || !GeoCoordinates::is_valid_longitude(longitude) {
+    fn new(latitude: BigRational, longitude: BigRational) -> Result<GeoCoordinates, ()> {
+        if !GeoCoordinates::is_valid_latitude(&latitude)
+            || !GeoCoordinates::is_valid_longitude(&longitude) {
             return Result::Err(());
         }
         Result::Ok(GeoCoordinates {
@@ -36,10 +39,10 @@ impl GeoCoordinates {
         })
     }
 
-    fn parse(opt: Option<&&str>) -> Result<f64, ()> {
+    fn parse(opt: Option<&&str>) -> Result<BigRational, ()> {
         match opt {
             Some(val) => {
-                match val.parse::<f64>() {
+                match val.parse::<BigRational>() {
                     Ok(float_value) => Result::Ok(float_value),
                     Err(_) => Result::Err(())
                 }
@@ -48,12 +51,14 @@ impl GeoCoordinates {
         }
     }
 
-    fn is_valid_latitude(latitude: f64) -> bool {
-        latitude >= -90.0 && latitude <= 90.0
+    fn is_valid_latitude(latitude: &BigRational) -> bool {
+        *latitude >= BigRational::from_integer(BigInt::from(-90))
+            && *latitude <= BigRational::from_integer(BigInt::from(90))
     }
 
-    fn is_valid_longitude(longitude: f64) -> bool {
-        longitude >= -180.0 && longitude <= 180.0
+    fn is_valid_longitude(longitude: &BigRational) -> bool {
+        *longitude >= BigRational::from_integer(BigInt::from(-180))
+            && *longitude <= BigRational::from_integer(BigInt::from(180))
     }
 
 }
