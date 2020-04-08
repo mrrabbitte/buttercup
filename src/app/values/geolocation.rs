@@ -33,7 +33,7 @@ impl GeoCoordinates {
             && GeoCoordinates::is_valid_latitude(&self.longitude)
     }
 
-    fn new(latitude: BigRational, longitude: BigRational) -> Result<GeoCoordinates, ()> {
+    pub(crate) fn new(latitude: BigRational, longitude: BigRational) -> Result<GeoCoordinates, ()> {
         if !GeoCoordinates::is_valid_latitude(&latitude)
             || !GeoCoordinates::is_valid_longitude(&longitude) {
             return Result::Err(());

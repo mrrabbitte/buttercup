@@ -58,7 +58,7 @@ impl TryFrom<&Value> for ZonedDateTime {
                             Err(err) =>
                                 Result::Err(
                                     ZonedDateTimeParsingError::InvalidDateTime(
-                                        String::from(str_val), err)),
+                                        String::from(str_val), format!("{:?}", err))),
                         }
                     },
                     None => Result::Err(ZonedDateTimeParsingError::InvalidFormat)
@@ -70,11 +70,11 @@ impl TryFrom<&Value> for ZonedDateTime {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum ZonedDateTimeParsingError {
 
     InvalidFormat,
-    InvalidDateTime(String, ParseError),
+    InvalidDateTime(String, String),
     InvalidTimeZone(String)
 
 }
@@ -107,7 +107,7 @@ impl FromStr for ZonedDateTime {
                         },
                     Err(err) =>
                         Result::Err(ZonedDateTimeParsingError::InvalidDateTime(
-                            String::from(*date_time_str_val), err)),
+                            String::from(*date_time_str_val), format!("{:?}", err))),
                 },
             None => Result::Err(ZonedDateTimeParsingError::InvalidFormat),
         };

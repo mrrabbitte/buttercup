@@ -3,9 +3,9 @@ use std::collections::HashMap;
 use serde_json::{Map, Value};
 use strum_macros::AsRefStr;
 
-use crate::app::values::extractors::{ValueExtractorService, ValueExtractionPolicy, ValueExtractorInput};
-use crate::app::values::{ValueHolder, ValuesPayload};
 use crate::app::arguments::ArgumentDefinition;
+use crate::app::values::{ValueHolder, ValuesPayload};
+use crate::app::values::extractors::{ValueExtractionError, ValueExtractorInput, ValueExtractorService};
 
 pub struct ArgumentsExtractionInput<'a> {
 
@@ -30,7 +30,7 @@ impl<'a> ArgumentsExtractionInput<'a> {
 pub enum ArgumentValueExtractorError {
 
     MissingArgument(String),
-    ExtractionFailure(String, Value, ValueExtractionPolicy),
+    ExtractionFailure(String, Value, ValueExtractionError),
     InvalidJsonInput
 
 }
@@ -62,10 +62,10 @@ impl ArgumentValuesExtractionService {
                         Ok(holder) => {
                             response.insert(name.clone(), holder);
                         },
-                        Err(policy) =>
+                        Err(error) =>
                             return Result::Err(
                                 ArgumentValueExtractorError::ExtractionFailure(
-                                    name.clone(), value.clone(), policy)),
+                                    name.clone(), value.clone(), error)),
                     }
                 },
             }
@@ -75,7 +75,7 @@ impl ArgumentValuesExtractionService {
 
     fn handle(definition: &ArgumentDefinition,
               value: &Value)
-              -> Result<ValueHolder, ValueExtractionPolicy> {
+              -> Result<ValueHolder, ValueExtractionError> {
         ValueExtractorService::extract(
             &ValueExtractorInput::new(
                 value,

@@ -1,5 +1,7 @@
+use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
 
+use crate::app::values::{ValueHolder, ValueType};
 use crate::app::values::extractors::boolean::BooleanExtractor;
 use crate::app::values::extractors::date_time::day_of_week::DayOfWeekExtractor;
 use crate::app::values::extractors::date_time::local::{LocalDateExtractor, LocalDateTimeExtractor, LocalTimeExtractor};
@@ -7,7 +9,7 @@ use crate::app::values::extractors::date_time::zoned::{TimezoneExtractor, ZonedD
 use crate::app::values::extractors::geolocation::GeoCoordinatesExtractor;
 use crate::app::values::extractors::number::{DecimalExtractor, IntegerExtractor};
 use crate::app::values::extractors::string::StringExtractor;
-use crate::app::values::{ValueHolder, ValueType};
+use crate::app::values::zoned_date_time::ZonedDateTimeParsingError;
 
 pub mod boolean;
 pub mod date_time;
@@ -15,11 +17,34 @@ pub mod geolocation;
 pub mod number;
 pub mod string;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum ValueExtractionPolicy {
 
     Strict,
     Lax
+
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum ValueExtractionError {
+
+    InvalidValueTypeError(ValueExtractionPolicy),
+    InvalidValueError(ValueExtractionPolicy, String),
+    ParsingError(ValueExtractionPolicy, ParsingValueSource),
+    PolicyNotSupported(ValueExtractionPolicy),
+    ZonedDateTimeParsingError(ValueExtractionPolicy, ZonedDateTimeParsingError),
+    ValueIsNull
+
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum ParsingValueSource {
+
+    String,
+    I64,
+    U64,
+    F64,
+    Json
 
 }
 
@@ -50,9 +75,9 @@ pub struct ValueExtractorService;
 
 impl ValueExtractorService {
 
-    pub fn extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
+    pub fn extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionError> {
         if input.value.is_null() {
-            return Result::Err(ValueExtractionPolicy::Lax);
+            return Result::Err(ValueExtractionError::ValueIsNull);
         }
         return match &input.argument_type {
             ValueType::Boolean => BooleanExtractor::extract(input),
@@ -73,7 +98,7 @@ impl ValueExtractorService {
 
 pub trait ValueExtractor {
 
-    fn extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy> {
+    fn extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionError> {
         return match &input.policy {
             ValueExtractionPolicy::Strict => Self::strict_extract(input),
             ValueExtractionPolicy::Lax => {
@@ -86,8 +111,8 @@ pub trait ValueExtractor {
         }
     }
 
-    fn strict_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy>;
-    fn lax_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionPolicy>;
+    fn strict_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionError>;
+    fn lax_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionError>;
 
 }
 
