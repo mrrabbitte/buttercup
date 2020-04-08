@@ -9,8 +9,7 @@ use crate::app::arguments::extraction::{ArgumentsExtractionInput, ArgumentValues
 use crate::app::transformations::transformer::TransformationService;
 use crate::app::values::{ValuesPayload, ValueType};
 use crate::app::values::extractors::ValueExtractionPolicy;
-#[macro_use]
-extern crate derive_new;
+
 
 mod app;
 

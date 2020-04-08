@@ -18,8 +18,8 @@ impl SunPositionTimes {
                time_zone: &Tz,
                coordinates: &GeoCoordinates) -> SunPositionTimes {
         let (sunrise_ts, sunset_ts) = sunrise::sunrise_sunset(
-            *coordinates.get_latitude(),
-            *coordinates.get_longitude(),
+            coordinates.get_latitude_as_f64(),
+            coordinates.get_longitude_as_f64(),
             date_time_at_local.year(),
             date_time_at_local.month(),
             date_time_at_local.day(),

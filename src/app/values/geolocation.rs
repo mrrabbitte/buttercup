@@ -1,11 +1,16 @@
 use std::collections::HashMap;
+use std::ops::Div;
 use std::str::FromStr;
 
-use num::{BigInt, BigRational, FromPrimitive};
+use num::{BigInt, BigRational, FromPrimitive, ToPrimitive};
 use serde::{Deserialize, Serialize};
-use std::ops::Div;
 
-#[derive(Serialize, Deserialize, Eq, Hash, Debug, Clone, PartialEq, PartialOrd)]
+
+
+// Note: this implementation can have consistency issues as Eq and Hash are
+// based on big rational implementation and actual use, e.g. geo location to
+// time zone is based on a crude f64 approximation.
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub struct GeoCoordinates {
 
     latitude: BigRational,
@@ -15,17 +20,17 @@ pub struct GeoCoordinates {
 
 impl GeoCoordinates {
 
-    pub fn get_latitude_as_f64(&self) -> &BigRational {
-        &self.latitude.numer().div(&self.latitude.denom()).as_f64()
+    pub fn get_latitude_as_f64(&self) -> f64 {
+        GeoCoordinates::rational_to_f64(&self.latitude).unwrap()
     }
 
-    pub fn get_longitude_as_f64(&self) -> &BigRational {
-        &self.longitude
+    pub fn get_longitude_as_f64(&self) -> f64 {
+        GeoCoordinates::rational_to_f64(&self.longitude).unwrap()
     }
 
     pub fn is_valid(&self) -> bool {
-        GeoCoordinates::is_valid_longitude(self.get_longitude())
-            && GeoCoordinates::is_valid_latitude(self.get_latitude())
+        GeoCoordinates::is_valid_longitude(&self.latitude)
+            && GeoCoordinates::is_valid_latitude(&self.longitude)
     }
 
     fn new(latitude: BigRational, longitude: BigRational) -> Result<GeoCoordinates, ()> {
@@ -43,7 +48,7 @@ impl GeoCoordinates {
         match opt {
             Some(val) => {
                 match val.parse::<BigRational>() {
-                    Ok(float_value) => Result::Ok(float_value),
+                    Ok(parsed) => Result::Ok(parsed),
                     Err(_) => Result::Err(())
                 }
             },
@@ -52,14 +57,28 @@ impl GeoCoordinates {
     }
 
     fn is_valid_latitude(latitude: &BigRational) -> bool {
-        *latitude >= BigRational::from_integer(BigInt::from(-90))
+        GeoCoordinates::rational_to_f64(&latitude).is_ok()
+            && *latitude >= BigRational::from_integer(BigInt::from(-90))
             && *latitude <= BigRational::from_integer(BigInt::from(90))
     }
 
     fn is_valid_longitude(longitude: &BigRational) -> bool {
-        *longitude >= BigRational::from_integer(BigInt::from(-180))
-            && *longitude <= BigRational::from_integer(BigInt::from(180))
+        GeoCoordinates::rational_to_f64(&longitude).is_ok()
+            && *longitude >= BigRational::from_integer(BigInt::from(-180))
+            && *longitude <=  BigRational::from_integer(BigInt::from(180))
     }
+
+    fn rational_to_f64(rational: &BigRational) -> Result<f64, ()> {
+        return match rational.numer().to_i64() {
+            None => Result::Err(()),
+            Some(numerator) => match rational.denom().to_i64() {
+                None => Result::Err(()),
+                Some(denominator) =>
+                    Result::Ok((numerator as f64) / (denominator as f64)),
+            },
+        }
+    }
+
 
 }
 

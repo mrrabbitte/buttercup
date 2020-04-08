@@ -51,7 +51,7 @@ impl FindTimeZoneFromGeoCoordinates {
 
     fn find_time_zone(coordinates: &GeoCoordinates) -> Result<ValueHolder, TransformationError> {
         return match tz_search::lookup(
-            coordinates.get_latitude(), coordinates.get_longitude().to_f64()) {
+            coordinates.get_latitude_as_f64(), coordinates.get_longitude_as_f64()) {
             Some(tz_str) =>
                 match tz_str.parse::<Tz>() {
                     Ok(tz) =>

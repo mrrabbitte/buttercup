@@ -99,7 +99,7 @@ impl DictionaryNodeMapping {
 
     fn get(&self, key: &ValueHolder) -> Result<&i32, SelectionNodeError> {
         return match self.values.get(key) {
-            None => Result::Ok(*self.default_command_id),
+            None => Result::Ok(&self.default_command_id),
             Some(command_id) => Result::Ok(command_id),
         };
     }
