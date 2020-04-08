@@ -70,7 +70,7 @@ impl TryFrom<&Value> for ZonedDateTime {
 }
 
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum ZonedDateTimeParsingError {
 
     InvalidFormat,

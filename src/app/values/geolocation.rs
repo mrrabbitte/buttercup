@@ -19,10 +19,9 @@ pub struct GeoCoordinates {
 
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub enum GeoCoordinatesValueError {
 
-    InvalidJsonStructure,
     InvalidCommaSeparatedStructure,
     InvalidLongitude,
     InvalidLatitude,

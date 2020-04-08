@@ -18,7 +18,7 @@ pub mod geolocation;
 pub mod number;
 pub mod string;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum ValueExtractionPolicy {
 
     Strict,
@@ -26,7 +26,7 @@ pub enum ValueExtractionPolicy {
 
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum ValueExtractionError {
 
     InvalidValueTypeError(ValueExtractionPolicy),
@@ -40,7 +40,7 @@ pub enum ValueExtractionError {
 
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum ParsingValueSource {
 
     String,
