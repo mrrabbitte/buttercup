@@ -1,4 +1,5 @@
 use num::{BigInt, BigRational, FromPrimitive};
+use num_rational::Ratio;
 use serde_json::Value;
 
 use crate::app::values::extractors::{ParsingValueSource, ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
@@ -43,11 +44,16 @@ impl ValueExtractor for DecimalExtractor {
                 Result::Err(ValueExtractionError::InvalidValueTypeError(ValueExtractionPolicy::Lax))
             },
             Value::String(str_val) => {
-                return match str_val.parse::<BigRational>() {
-                    Ok(big_rational) =>
-                        Result::Ok(
+                return match str_val
+                    .parse::<f64>() {
+                    Ok(f64_val) => match BigRational::from_f64(f64_val) {
+                        None =>  Result::Err(
+                            ValueExtractionError::ParsingError(
+                                ValueExtractionPolicy::Lax, ParsingValueSource::String)),
+                        Some(big_rational) => Result::Ok(
                             ValueHolder::Decimal(big_rational)),
-                    Err(_) => Result::Err(
+                    },
+                    Err(_) =>  Result::Err(
                         ValueExtractionError::ParsingError(
                             ValueExtractionPolicy::Lax, ParsingValueSource::String)),
                 }

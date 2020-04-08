@@ -1,9 +1,10 @@
+use std::convert::{TryFrom, TryInto};
 use std::str::FromStr;
 
 use serde_json::{Error, Value};
 
 use crate::app::values::extractors::{ParsingValueSource, ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
-use crate::app::values::geolocation::GeoCoordinates;
+use crate::app::values::geolocation::{GeoCoordinates, GeoCoordinatesValueError};
 use crate::app::values::ValueHolder;
 
 pub struct GeoCoordinatesExtractor;
@@ -14,19 +15,19 @@ const GIVEN_LAT_LONG_NOT_VALID: &str =
 impl ValueExtractor for GeoCoordinatesExtractor {
 
     fn strict_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionError> {
-        return match serde_json::from_value::<GeoCoordinates>(input.value.clone()) {
-            Ok(coordinates) => {
-                if !coordinates.is_valid() {
-                    return Result::Err(
-                        ValueExtractionError::InvalidValueError(
-                            ValueExtractionPolicy::Strict,
-                            GIVEN_LAT_LONG_NOT_VALID.to_string()));
-                }
-                Result::Ok(ValueHolder::GeoCoordinates(coordinates))
+        return match input.value {
+            Value::Object(map) => match GeoCoordinates::try_from(map) {
+                Ok(coordinates) =>
+                    Result::Ok(
+                        ValueHolder::GeoCoordinates(coordinates)),
+                Err(err) =>
+                    Result::Err(
+                        ValueExtractionError::GeoCoordinatesValueError(
+                            ValueExtractionPolicy::Strict, err)),
             },
-            Err(_) => Result::Err(
-                ValueExtractionError::ParsingError(
-                    ValueExtractionPolicy::Strict, ParsingValueSource::Json)),
+            _ => Result::Err(
+                ValueExtractionError::InvalidValueTypeError(
+                    ValueExtractionPolicy::Strict))
         }
     }
 
@@ -36,8 +37,9 @@ impl ValueExtractor for GeoCoordinatesExtractor {
                 return match GeoCoordinates::from_str(str_value.as_str()) {
                     Ok(coordinates) =>
                         Result::Ok(ValueHolder::GeoCoordinates(coordinates)),
-                    Err(_) => Result::Err(ValueExtractionError::ParsingError(
-                        ValueExtractionPolicy::Lax, ParsingValueSource::String)),
+                    Err(err) => Result::Err(
+                        ValueExtractionError::GeoCoordinatesValueError(
+                            ValueExtractionPolicy::Lax, err)),
                 };
             },
             _ => Result::Err(
@@ -58,11 +60,20 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_serde() {
+        let coordinates = GeoCoordinates::new(
+            BigRational::from_f64(89.9999999).unwrap(),
+            BigRational::from_f64(179.999999).unwrap())
+            .unwrap();
+        println!("{}", serde_json::to_string(&coordinates).unwrap());
+    }
+
+    #[test]
     fn test_strict() {
         let input_value = Value::from_str(r#"
                 {
-                "latitude" : 89.9999999,
-                "longitude" : 179.999999
+                "latitude" : "10.2",
+                "longitude" : "23.3"
                 }
                 "#)
             .unwrap();
@@ -75,8 +86,8 @@ mod tests {
         let value = result.unwrap();
         let expected =
             GeoCoordinates::new(
-                BigRational::from_f64(89.9999999).unwrap(),
-                BigRational::from_f64(179.999999).unwrap())
+                BigRational::from_f64(10.2).unwrap(),
+                BigRational::from_f64(23.3).unwrap())
                 .unwrap();
         match value {
             ValueHolder::GeoCoordinates(coordinates) =>
@@ -87,7 +98,27 @@ mod tests {
 
     #[test]
     fn test_lax() {
-
+        let input_value = Value::from_str(r#"
+                "89.9999999,179.999999"
+                "#)
+            .unwrap();
+        let input = ValueExtractorInput::new(
+            &input_value,
+            &ValueType::GeoCoordinates,
+            &ValueExtractionPolicy::Lax);
+        let result =
+            GeoCoordinatesExtractor::lax_extract(&input);
+        let value = result.unwrap();
+        let expected =
+            GeoCoordinates::new(
+                BigRational::from_f64(89.9999999).unwrap(),
+                BigRational::from_f64(179.999999).unwrap())
+                .unwrap();
+        match value {
+            ValueHolder::GeoCoordinates(coordinates) =>
+                assert_eq!(expected, coordinates),
+            _ => panic!("Invalid value type.")
+        };
     }
 
     #[test]

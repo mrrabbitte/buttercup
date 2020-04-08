@@ -10,6 +10,7 @@ use crate::app::values::extractors::geolocation::GeoCoordinatesExtractor;
 use crate::app::values::extractors::number::{DecimalExtractor, IntegerExtractor};
 use crate::app::values::extractors::string::StringExtractor;
 use crate::app::values::zoned_date_time::ZonedDateTimeParsingError;
+use crate::app::values::geolocation::GeoCoordinatesValueError;
 
 pub mod boolean;
 pub mod date_time;
@@ -31,6 +32,8 @@ pub enum ValueExtractionError {
     InvalidValueTypeError(ValueExtractionPolicy),
     InvalidValueError(ValueExtractionPolicy, String),
     ParsingError(ValueExtractionPolicy, ParsingValueSource),
+    GeoCoordinatesValueError(ValueExtractionPolicy, GeoCoordinatesValueError),
+    JsonDeserializationError(ValueExtractionPolicy, String),
     PolicyNotSupported(ValueExtractionPolicy),
     ZonedDateTimeParsingError(ValueExtractionPolicy, ZonedDateTimeParsingError),
     ValueIsNull
@@ -43,8 +46,7 @@ pub enum ParsingValueSource {
     String,
     I64,
     U64,
-    F64,
-    Json
+    F64
 
 }
 
