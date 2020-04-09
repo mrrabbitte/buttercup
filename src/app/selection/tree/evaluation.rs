@@ -123,9 +123,10 @@ mod tests {
 
     use super::*;
 
-    const FIRST_DICT_VALUE_NAME: &str = "FirstValueName";
-    const SECOND_VALUE_NAME: &str = "SecondValueName";
-    const THIRD_VALUE_NAME: &str = "ThirdValueName";
+    const FIRST_DICT_VALUE_NAME: &str = "firstValueName";
+    const SECOND_VALUE_NAME: &str = "secondValueName";
+    const THIRD_VALUE_NAME: &str = "thirdValueName";
+    const FOURTH_VALUE_NAME: &str = "fourthValueName";
 
     // #[test]
     // fn test_first_path() {
@@ -244,6 +245,13 @@ mod tests {
     //                                        THIRD_VALUE_NAME.to_string(),
     //                                        RelationalOperator::LessThan,
     //                                        false,
+    //                                        ConditionValue::Static(
+    //                                            ValueHolder::Integer(
+    //                                                "10".parse::<BigInt>().unwrap()))),
+    //                         Condition::new(0,
+    //                                        FOURTH_VALUE_NAME.to_string(),
+    //                                        RelationalOperator::GreaterThanOrEquals,
+    //                                        true,
     //                                        ConditionValue::Static(
     //                                            ValueHolder::Integer(
     //                                                "10".parse::<BigInt>().unwrap())))

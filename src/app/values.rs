@@ -1,17 +1,18 @@
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::slice::Split;
 
 use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, Weekday};
 use num::bigint::BigInt;
 use num::rational::BigRational;
+use serde::{Deserialize, Serialize};
 use strum::VariantNames;
 use strum_macros::{AsRefStr, EnumVariantNames};
 
 use crate::app::values::geolocation::GeoCoordinates;
+use crate::app::values::wrappers::{TzWrapper, WeekdayWrapper};
 use crate::app::values::zoned_date_time::ZonedDateTime;
-use std::cmp::Ordering;
-use crate::app::values::wrappers::{WeekdayWrapper, TzWrapper};
-use serde::{Deserialize, Serialize};
+
 pub mod geolocation;
 pub mod zoned_date_time;
 pub mod extractors;
@@ -91,11 +92,22 @@ impl ValuesPayload {
 mod tests {
     use std::collections::HashSet;
 
+    use num::FromPrimitive;
+
     use super::*;
 
     #[test]
     fn test_consistency() {
         assert_eq!(ValueHolder::VARIANTS, ValueType::VARIANTS);
+    }
+
+    #[test]
+    fn test_eq() {
+        assert_ne!(ValueHolder::Decimal(BigRational::from_f64(0.321421).unwrap()),
+                   ValueHolder::Decimal(BigRational::from_f64(0.321422).unwrap()));
+        assert_ne!(ValueHolder::Decimal(BigRational::from_f64(0.0).unwrap()),
+                   ValueHolder::Integer(BigInt::from(0)));
+
     }
 
 }

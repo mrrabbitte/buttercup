@@ -1,3 +1,5 @@
+use std::any::Any;
+
 use num::{BigInt, BigRational, FromPrimitive};
 use num_rational::Ratio;
 use serde_json::Value;
@@ -121,6 +123,126 @@ impl ValueExtractor for IntegerExtractor {
                 ValueExtractionError::InvalidValueTypeError(
                     ValueExtractionPolicy::Lax))
         };
+    }
+
+}
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use crate::app::values::ValueType;
+
+    use super::*;
+
+    #[test]
+    fn test_decimal_strict() {
+        extract_and_check_ok(r#"
+                0.0
+                "#, DecimalExtractor::strict_extract,
+                             &ValueType::Decimal,
+                             ValueExtractionPolicy::Strict,
+                             ValueHolder::Decimal(BigRational::from_f64(0.0)
+                                 .unwrap()));
+        extract_and_check_ok(r#"
+                -0.0
+                "#, DecimalExtractor::strict_extract,
+                             &ValueType::Decimal,
+                             ValueExtractionPolicy::Strict,
+                             ValueHolder::Decimal(BigRational::from_f64(0.0)
+                                 .unwrap()));
+        extract_and_check_ok(r#"
+                -0.001
+                "#, DecimalExtractor::strict_extract,
+                             &ValueType::Decimal,
+                             ValueExtractionPolicy::Strict,
+                             ValueHolder::Decimal(BigRational::from_f64(-0.001)
+                                 .unwrap()));
+    }
+
+    #[test]
+    fn test_decimal_lax() {
+        extract_and_check_ok(r#"
+                0
+                "#, DecimalExtractor::lax_extract,
+                             &ValueType::Decimal,
+                             ValueExtractionPolicy::Lax,
+                             ValueHolder::Decimal(BigRational::from_f64(0.0)
+                                 .unwrap()));
+        extract_and_check_ok(r#"
+                -0
+                "#, DecimalExtractor::lax_extract,
+                             &ValueType::Decimal,
+                             ValueExtractionPolicy::Lax,
+                             ValueHolder::Decimal(BigRational::from_f64(0.0)
+                                 .unwrap()));
+        extract_and_check_ok(r#"
+                "-0.00000000000001"
+                "#, DecimalExtractor::lax_extract,
+                             &ValueType::Decimal,
+                             ValueExtractionPolicy::Lax,
+                             ValueHolder::Decimal(
+                                 BigRational::from_f64(-0.00000000000001).unwrap()));
+    }
+
+    #[test]
+    fn test_integer_strict() {
+        extract_and_check_ok(r#"
+                1012321311231231012
+                "#, IntegerExtractor::strict_extract,
+                             &ValueType::Integer,
+                             ValueExtractionPolicy::Strict,
+                             ValueHolder::Integer(
+                                 BigInt::from(1012321311231231012 as u64)));
+        extract_and_check_ok(r#"
+                -1012321311231231012
+                "#, IntegerExtractor::strict_extract,
+                             &ValueType::Integer,
+                             ValueExtractionPolicy::Strict,
+                             ValueHolder::Integer(
+                                 BigInt::from(-1012321311231231012 as i64)));
+    }
+
+    #[test]
+    fn test_integer_lax() {
+        extract_and_check_ok(r#"
+                -10123213112312310.0
+                "#, IntegerExtractor::lax_extract,
+                             &ValueType::Integer,
+                             ValueExtractionPolicy::Lax,
+                             ValueHolder::Integer(
+                                 BigInt::from(-10123213112312310 as i64)));
+        extract_and_check_ok(r#"
+                "-101232131123123100000000"
+                "#, IntegerExtractor::lax_extract,
+                             &ValueType::Integer,
+                             ValueExtractionPolicy::Lax,
+                             ValueHolder::Integer(
+                                 BigInt::from(-101232131123123100000000 as i128)));
+    }
+
+    fn extract<F>(value: &str,
+                  extraction: F,
+                  value_type: &ValueType,
+                  policy: ValueExtractionPolicy) -> Result<ValueHolder, ValueExtractionError>
+        where F: Fn(&ValueExtractorInput) -> Result<ValueHolder, ValueExtractionError> {
+        let input_value = Value::from_str(value)
+            .unwrap();
+        let input = ValueExtractorInput::new(
+            &input_value,
+            value_type,
+            &policy);
+        extraction(&input)
+    }
+
+    fn extract_and_check_ok<F>(value: &str,
+                               extraction: F,
+                               value_type: &ValueType,
+                               policy: ValueExtractionPolicy,
+                               expected: ValueHolder)
+        where F: Fn(&ValueExtractorInput) -> Result<ValueHolder, ValueExtractionError> {
+        let result = extract(value, extraction, value_type, policy).unwrap();
+        assert_eq!(expected, result);
     }
 
 }
