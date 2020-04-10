@@ -105,7 +105,7 @@ impl PartialEq for TzWrapper {
 
 impl Eq for TzWrapper {}
 
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct LanguageWrapper {
 
     code: String,
@@ -154,40 +154,5 @@ impl PartialOrd for LanguageWrapper {
 
 }
 
-impl Serialize for LanguageWrapper {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: Serializer,
-    {
-        serializer.serialize_str(self.code.as_str())
-    }
-}
 
 
-impl<'de> Deserialize<'de> for LanguageWrapper {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where
-            D: Deserializer<'de>,
-    {
-        struct LanguageWrapperVisitor;
-
-        impl<'de> Visitor<'de>  for LanguageWrapperVisitor {
-            type Value = LanguageWrapper;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str("iso 639-3 string")
-            }
-
-            fn visit_str<E>(self, v: &str)
-                -> Result<Self::Value, E> where E: Error {
-                match Language::from_639_3(v) {
-                    Some(language) => Result::Ok(LanguageWrapper::new(language)),
-                    None => Result::Err(Error::unknown_variant(v, &["ERROR"]))
-                }
-            }
-
-        }
-
-        deserializer.deserialize_string(LanguageWrapperVisitor)
-    }
-}

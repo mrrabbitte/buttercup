@@ -18,7 +18,7 @@ num = {version="0.2.*", features = ["serde"]}
 num-rational = "0.2"
 sunrise = "1.0.0"
 url = "2"
-isolang = "1.0"
+isolang = {version = "1", features = ["serde_serialize"]}
 isocountry = "0.2"
 publicsuffix = "1.5"
 regex = {version = "1", features = ["perf"]}
