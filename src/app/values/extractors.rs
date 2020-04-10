@@ -1,20 +1,21 @@
+use isocountry::CountryCodeParseErr;
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
 
 use crate::app::values::{ValueHolder, ValueType};
 use crate::app::values::extractors::boolean::BooleanExtractor;
+use crate::app::values::extractors::country::CountryValueExtractor;
 use crate::app::values::extractors::date_time::day_of_week::DayOfWeekExtractor;
 use crate::app::values::extractors::date_time::local::{LocalDateExtractor, LocalDateTimeExtractor, LocalTimeExtractor};
 use crate::app::values::extractors::date_time::zoned::{TimezoneExtractor, ZonedDateTimeExtractor};
+use crate::app::values::extractors::email::EmailValueExtractor;
 use crate::app::values::extractors::geolocation::GeoCoordinatesExtractor;
+use crate::app::values::extractors::ip::IpAddressValueExtractor;
+use crate::app::values::extractors::language::LanguageValueExtractor;
 use crate::app::values::extractors::number::{DecimalExtractor, IntegerExtractor};
 use crate::app::values::extractors::string::StringExtractor;
-use crate::app::values::zoned_date_time::ZonedDateTimeParsingError;
 use crate::app::values::geolocation::GeoCoordinatesValueError;
-use crate::app::values::extractors::language::LanguageValueExtractor;
-use crate::app::values::extractors::country::CountryValueExtractor;
-use crate::app::values::extractors::email::EmailValueExtractor;
-use crate::app::values::extractors::ip::IpAddressValueExtractor;
+use crate::app::values::zoned_date_time::ZonedDateTimeParsingError;
 
 pub mod boolean;
 pub mod date_time;
@@ -44,6 +45,7 @@ pub enum ValueExtractionError {
     JsonDeserializationError(ValueExtractionPolicy, String),
     PolicyNotSupported(ValueExtractionPolicy),
     ZonedDateTimeParsingError(ValueExtractionPolicy, ZonedDateTimeParsingError),
+    CountryCodeParsingError(ValueExtractionPolicy, CountryCodeParsingError),
     ValueIsNull
 
 }
@@ -55,6 +57,27 @@ pub enum ParsingValueSource {
     I64,
     U64,
     F64
+
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub enum CountryCodeParsingError {
+
+    InvalidAlpha2,
+    InvalidAlpha3,
+    InvalidCountryId
+
+}
+
+impl From<CountryCodeParseErr> for CountryCodeParsingError {
+
+    fn from(err: CountryCodeParseErr) -> Self {
+        match err {
+            CountryCodeParseErr::InvalidAlpha2 {..} => CountryCodeParsingError::InvalidAlpha2,
+            CountryCodeParseErr::InvalidAlpha3 {..} => CountryCodeParsingError::InvalidAlpha3,
+            CountryCodeParseErr::InvalidID {..} => CountryCodeParsingError::InvalidCountryId,
+        }
+    }
 
 }
 
