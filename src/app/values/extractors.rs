@@ -11,12 +11,20 @@ use crate::app::values::extractors::number::{DecimalExtractor, IntegerExtractor}
 use crate::app::values::extractors::string::StringExtractor;
 use crate::app::values::zoned_date_time::ZonedDateTimeParsingError;
 use crate::app::values::geolocation::GeoCoordinatesValueError;
+use crate::app::values::extractors::language::LanguageValueExtractor;
+use crate::app::values::extractors::country::CountryValueExtractor;
+use crate::app::values::extractors::email::EmailValueExtractor;
+use crate::app::values::extractors::ip::IpAddressValueExtractor;
 
 pub mod boolean;
 pub mod date_time;
 pub mod geolocation;
 pub mod number;
 pub mod string;
+pub mod language;
+pub mod country;
+pub mod email;
+pub mod ip;
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum ValueExtractionPolicy {
@@ -92,7 +100,11 @@ impl ValueExtractorService {
             ValueType::DayOfWeek => DayOfWeekExtractor::extract(input),
             ValueType::TimeZone => TimezoneExtractor::extract(input),
             ValueType::ZonedDateTime => ZonedDateTimeExtractor::extract(input),
-            ValueType::GeoCoordinates => GeoCoordinatesExtractor::extract(input)
+            ValueType::GeoCoordinates => GeoCoordinatesExtractor::extract(input),
+            ValueType::Language => LanguageValueExtractor::extract(input),
+            ValueType::Country => CountryValueExtractor::extract(input),
+            ValueType::Email => EmailValueExtractor::extract(input),
+            ValueType::IpAddress => IpAddressValueExtractor::extract(input),
         };
     }
 

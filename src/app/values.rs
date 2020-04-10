@@ -1,22 +1,26 @@
 use std::cmp::Ordering;
 use std::collections::HashMap;
+use std::net::IpAddr;
 use std::slice::Split;
 
 use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, Weekday};
+use isocountry::CountryCode;
 use num::bigint::BigInt;
 use num::rational::BigRational;
 use serde::{Deserialize, Serialize};
 use strum::VariantNames;
 use strum_macros::{AsRefStr, EnumVariantNames};
 
+use crate::app::values::email::Email;
 use crate::app::values::geolocation::GeoCoordinates;
-use crate::app::values::wrappers::{TzWrapper, WeekdayWrapper};
+use crate::app::values::wrappers::{LanguageWrapper, TzWrapper, WeekdayWrapper};
 use crate::app::values::zoned_date_time::ZonedDateTime;
 
 pub mod geolocation;
 pub mod zoned_date_time;
 pub mod extractors;
 pub mod wrappers;
+pub mod email;
 
 #[derive(Serialize, Deserialize, AsRefStr, EnumVariantNames, Eq, Hash, PartialEq, PartialOrd,
     Debug, Clone)]
@@ -33,6 +37,10 @@ pub enum ValueHolder {
     TimeZone(TzWrapper),
     ZonedDateTime(ZonedDateTime),
     GeoCoordinates(GeoCoordinates),
+    Language(LanguageWrapper),
+    Country(CountryCode),
+    Email(Email),
+    IpAddress(IpAddr)
 
 }
 
@@ -50,6 +58,10 @@ pub enum ValueType {
     TimeZone,
     ZonedDateTime,
     GeoCoordinates,
+    Language,
+    Country,
+    Email,
+    IpAddress
 
 }
 

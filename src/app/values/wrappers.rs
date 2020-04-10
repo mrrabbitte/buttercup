@@ -2,7 +2,9 @@ use std::cmp::Ordering;
 
 use chrono::Weekday;
 use chrono_tz::Tz;
+use isolang::Language;
 use serde::{Deserialize, Serialize};
+use std::hash::{Hash, Hasher};
 
 pub trait Wrapper<T> {
 
@@ -50,9 +52,10 @@ impl PartialEq for WeekdayWrapper {
 
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Eq, Hash, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TzWrapper {
 
+    str_value: String,
     value: Tz
 
 }
@@ -61,6 +64,7 @@ impl Wrapper<Tz> for TzWrapper {
 
     fn new(value: Tz) -> Self {
         TzWrapper {
+            str_value: format!("{:?}", value),
             value
         }
     }
@@ -74,9 +78,49 @@ impl Wrapper<Tz> for TzWrapper {
 impl PartialOrd for TzWrapper {
 
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        let first = format!("{:?}", self);
-        let other = format!("{:?}", other);
-        first.partial_cmp(&other)
+        self.str_value.partial_cmp(&other.str_value)
+    }
+
+}
+
+impl Hash for TzWrapper {
+
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.value.hash(state)
+    }
+
+}
+
+impl PartialEq for TzWrapper {
+
+    fn eq(&self, other: &Self) -> bool {
+        self.value.eq(other.value)
+    }
+
+}
+
+impl Eq for TzWrapper {
+
+}
+
+pub struct LanguageWrapper {
+
+    str_value: String,
+    value: Language
+
+}
+
+impl Wrapper<Language> for LanguageWrapper {
+
+    fn new(value: Language) -> Self {
+        LanguageWrapper {
+            str_value: value.to_639_3(),
+            value
+        }
+    }
+
+    fn get(&self) -> &Language {
+        &self.value
     }
 
 }
