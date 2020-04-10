@@ -1,10 +1,10 @@
 use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
 
 use chrono::Weekday;
 use chrono_tz::Tz;
 use isolang::Language;
 use serde::{Deserialize, Serialize};
-use std::hash::{Hash, Hasher};
 
 pub trait Wrapper<T> {
 
@@ -55,7 +55,7 @@ impl PartialEq for WeekdayWrapper {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TzWrapper {
 
-    str_value: String,
+    name: String,
     value: Tz
 
 }
@@ -64,7 +64,7 @@ impl Wrapper<Tz> for TzWrapper {
 
     fn new(value: Tz) -> Self {
         TzWrapper {
-            str_value: format!("{:?}", value),
+            name: value.name().to_string(),
             value
         }
     }
@@ -78,7 +78,7 @@ impl Wrapper<Tz> for TzWrapper {
 impl PartialOrd for TzWrapper {
 
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.str_value.partial_cmp(&other.str_value)
+        self.name.partial_cmp(&other.name)
     }
 
 }
@@ -94,18 +94,17 @@ impl Hash for TzWrapper {
 impl PartialEq for TzWrapper {
 
     fn eq(&self, other: &Self) -> bool {
-        self.value.eq(other.value)
+        self.value.eq(&other.value)
     }
 
 }
 
-impl Eq for TzWrapper {
+impl Eq for TzWrapper {}
 
-}
-
+#[derive(Debug, Clone)]
 pub struct LanguageWrapper {
 
-    str_value: String,
+    code: String,
     value: Language
 
 }
@@ -114,13 +113,39 @@ impl Wrapper<Language> for LanguageWrapper {
 
     fn new(value: Language) -> Self {
         LanguageWrapper {
-            str_value: value.to_639_3(),
+            code: value.to_639_3().to_string(),
             value
         }
     }
 
     fn get(&self) -> &Language {
         &self.value
+    }
+
+}
+
+impl Hash for LanguageWrapper {
+
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.value.hash(state)
+    }
+
+}
+
+impl PartialEq for LanguageWrapper {
+
+    fn eq(&self, other: &Self) -> bool {
+        self.value.eq(&other.value)
+    }
+
+}
+
+impl Eq for LanguageWrapper {}
+
+impl PartialOrd for LanguageWrapper {
+
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.code.partial_cmp(&other.code)
     }
 
 }
