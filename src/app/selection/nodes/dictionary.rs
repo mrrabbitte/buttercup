@@ -4,6 +4,7 @@ use crate::app::selection::edges::SelectionEdgeAddress;
 use crate::app::selection::nodes::{SelectionNodeDefinition, SelectionNodeDelegate, SelectionNodeError};
 use crate::app::values::{ValueHolder, ValuesPayload};
 
+#[derive(Debug)]
 pub struct DictionarySelectionNodeDetails {
 
     selection_node_definition_id: i32,
@@ -26,6 +27,7 @@ impl DictionarySelectionNodeDetails {
 
 }
 
+#[derive(Debug)]
 pub struct DictionarySelectionNode {
 
     definition: SelectionNodeDefinition,
@@ -81,6 +83,7 @@ pub enum DictionarySelectionError {
 
 }
 
+#[derive(Debug)]
 pub struct DictionaryNodeMapping {
 
     default_command_id: i32,

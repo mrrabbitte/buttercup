@@ -25,6 +25,7 @@ pub trait SelectionNodeDelegate {
 
 }
 
+#[derive(Debug)]
 pub struct SelectionNodeDefinition {
 
     id: i32,
@@ -43,6 +44,7 @@ impl SelectionNodeDefinition {
 
 }
 
+#[derive(Debug)]
 pub enum SelectionNode {
 
     Simple(SimpleSelectionNode),

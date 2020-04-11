@@ -2,6 +2,7 @@ use crate::app::selection::edges::SelectionEdgeAddress;
 use crate::app::selection::nodes::{SelectionNodeError, SelectionNodeDefinition, SelectionNodeDelegate};
 use crate::app::values::ValuesPayload;
 
+#[derive(Debug)]
 pub struct SimpleSelectionNodeDetails {
 
     selection_node_definition_id: i32,
@@ -21,6 +22,7 @@ impl SimpleSelectionNodeDetails {
 
 }
 
+#[derive(Debug)]
 pub struct SimpleSelectionNode {
 
     definition: SelectionNodeDefinition,

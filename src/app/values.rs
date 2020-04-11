@@ -114,7 +114,7 @@ mod tests {
     }
 
     #[test]
-    fn test_eq() {
+    fn test_ne() {
         assert_ne!(ValueHolder::Decimal(BigRational::from_f64(0.321421).unwrap()),
                    ValueHolder::Decimal(BigRational::from_f64(0.321422).unwrap()));
         assert_ne!(ValueHolder::Decimal(BigRational::from_f64(0.0).unwrap()),

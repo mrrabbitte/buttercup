@@ -133,20 +133,28 @@ mod tests {
     const FOURTH_VALUE_NAME: &str = "fourthValueName";
     const FIFTH_VALUE_NAME: &str = "fifthValueName";
 
-    // #[test]
-    // fn test_first_path() {
-    //     let evaluator = build_evaluator();
-    //     evaluator.select_commands();
-    // }
-    //
-    // #[test]
-    // fn test_second_path() {
-    //     let evaluator = build_evaluator();
-    //     evaluator.select_commands();
-    // }
-    //
     #[test]
     fn test_only_default_edge_match() {
+        let evaluator = build_evaluator();
+        let payload =
+            build_payload(vec![
+                (FIRST_VALUE_NAME.to_string(),
+                 ValueHolder::DayOfWeek(
+                     WeekdayWrapper::new(Weekday::Sat))),
+                (SECOND_VALUE_NAME.to_string(),
+                 ValueHolder::Decimal(BigRational::from_f64(0.3215421213).unwrap())),
+                (THIRD_VALUE_NAME.to_string(),
+                 ValueHolder::Decimal(BigRational::from_f64(11.2).unwrap())),
+                (FOURTH_VALUE_NAME.to_string(),
+                 ValueHolder::Integer("11".parse::<BigInt>().unwrap())),
+                (FIFTH_VALUE_NAME.to_string(),
+                 ValueHolder::String("Borsm".to_string()))
+            ]);
+        assert_eq!(vec![0, 2, 7], evaluator.select_commands(&payload).unwrap());
+    }
+
+    #[test]
+    fn test_both_expression_edges_match() {
         let evaluator = build_evaluator();
         let payload =
             build_payload(vec![
@@ -160,9 +168,9 @@ mod tests {
                 (FOURTH_VALUE_NAME.to_string(),
                  ValueHolder::Integer("11".parse::<BigInt>().unwrap())),
                 (FIFTH_VALUE_NAME.to_string(),
-                 ValueHolder::String("Borsm".to_string()))
+                 ValueHolder::String("Borski".to_string()))
             ]);
-        println!("{:?}", evaluator.select_commands(&payload));
+        assert_eq!(vec![0, 1, 4], evaluator.select_commands(&payload).unwrap());
     }
 
     #[test]
