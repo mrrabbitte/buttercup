@@ -74,6 +74,7 @@ impl SelectionNodeDelegate for DictionarySelectionNode {
 
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DictionarySelectionError {
 
     ValueOfTargetNameNotFound(String)

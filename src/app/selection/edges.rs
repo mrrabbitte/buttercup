@@ -15,6 +15,7 @@ pub enum SelectionEdge {
 
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SelectionEdgeError {
 
     LogicalExpressionSelectionEdgeError(ExpressionEvaluationError)
@@ -66,7 +67,7 @@ impl SelectionEdge {
 
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SelectionEdgeAddress {
 
     id: i32,

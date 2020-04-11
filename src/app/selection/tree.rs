@@ -27,6 +27,7 @@ pub struct SelectionTree {
 
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SelectionTreeError {
 
     SelectionNodeError(SelectionNodeError),

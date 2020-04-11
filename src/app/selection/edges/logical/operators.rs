@@ -3,7 +3,7 @@ use crate::app::values::ValueHolder;
 
 pub mod strings;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RelationalOperator {
 
     Equals,
@@ -17,7 +17,7 @@ pub enum RelationalOperator {
 
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RelationalOperatorError {
 
     UnsupportedValueTypeForOperator(ValueHolder, RelationalOperator),

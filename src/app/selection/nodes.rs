@@ -51,6 +51,7 @@ pub enum SelectionNode {
 
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SelectionNodeError {
 
     SimpleSelectionError,
@@ -71,7 +72,7 @@ impl SelectionNode {
 
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SelectionNodeAddress {
 
     id: i32,

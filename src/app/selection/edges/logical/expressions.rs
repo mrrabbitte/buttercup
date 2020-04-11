@@ -66,7 +66,7 @@ impl NextExpressionAddressWithOperator {
 
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ExpressionAddress {
 
     id: i32,
@@ -93,6 +93,7 @@ impl Address for ExpressionAddress {
 
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ExpressionEvaluationError {
 
     MissingExpression(ExpressionAddress),
@@ -110,7 +111,7 @@ impl Expression {
             Ok(result) => match &self.next_expression {
                 None => Result::Ok(result),
                 Some(address_with_operator) => {
-                    let address = address_with_operator.address;
+                    let address = &address_with_operator.address;
                     match expressions.get(address_with_operator.address.index) {
                         None => Result::Err(
                             ExpressionEvaluationError::MissingExpression(address.clone())),
@@ -169,7 +170,7 @@ impl Expression {
         };
     }
 
-    fn matches(&self, address: ExpressionAddress) -> bool {
+    fn matches(&self, address: &ExpressionAddress) -> bool {
         self.definition.id == *address.get_id()
     }
 
