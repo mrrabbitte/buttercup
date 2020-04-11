@@ -21,7 +21,8 @@ url = "2"
 isolang = {version = "1", features = ["serde_serialize"]}
 isocountry = "0.2"
 publicsuffix = "1.5"
-regex = {version = "1", features = ["perf"]}
+lazy_static = "1"
+fast_chemail = "0.9"
 
 [dev-dependencies]
 maplit = "1"

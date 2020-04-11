@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate lazy_static;
+
 use std::collections::HashMap;
 
 use actix_web::{App, HttpResponse, HttpServer, post, Responder, web};

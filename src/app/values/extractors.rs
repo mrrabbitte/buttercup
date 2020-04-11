@@ -46,6 +46,7 @@ pub enum ValueExtractionError {
     PolicyNotSupported(ValueExtractionPolicy),
     ZonedDateTimeParsingError(ValueExtractionPolicy, ZonedDateTimeParsingError),
     CountryCodeParsingError(ValueExtractionPolicy, CountryCodeParsingError),
+    EmailParsingError(ValueExtractionPolicy, String),
     ValueIsNull
 
 }
