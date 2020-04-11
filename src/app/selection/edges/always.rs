@@ -9,6 +9,18 @@ pub struct AlwaysTrueSelectionEdge {
 
 }
 
+impl AlwaysTrueSelectionEdge {
+
+    pub fn new(definition: SelectionEdgeDefinition,
+               next_selection_node: SelectionNodeAddress) -> AlwaysTrueSelectionEdge {
+        AlwaysTrueSelectionEdge {
+            definition,
+            next_selection_node
+        }
+    }
+
+}
+
 impl SelectionEdgeDelegate for AlwaysTrueSelectionEdge {
 
     fn get_id(&self) -> &i32 {
