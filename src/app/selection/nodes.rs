@@ -1,5 +1,4 @@
-use crate::app::content::ContentCommandId;
-use crate::app::selection::addressable::Address;
+use crate::app::common::addressable::Address;
 use crate::app::selection::edges::SelectionEdgeAddress;
 use crate::app::selection::nodes::dictionary::{DictionarySelectionError, DictionarySelectionNode};
 use crate::app::selection::nodes::recommendation::RecommendationSelectionNode;

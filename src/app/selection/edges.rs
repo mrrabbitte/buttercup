@@ -1,4 +1,4 @@
-use crate::app::selection::addressable::Address;
+use crate::app::common::addressable::Address;
 use crate::app::selection::edges::always::AlwaysTrueSelectionEdge;
 use crate::app::selection::nodes::SelectionNodeAddress;
 use crate::app::values::ValuesPayload;

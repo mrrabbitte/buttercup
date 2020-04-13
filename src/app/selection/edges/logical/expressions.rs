@@ -1,4 +1,4 @@
-use crate::app::selection::addressable::Address;
+use crate::app::common::addressable::Address;
 use crate::app::selection::edges::logical::conditions::{Condition, ConditionEvaluationError};
 use crate::app::selection::edges::logical::operators::LogicalOperator;
 use crate::app::values::ValuesPayload;

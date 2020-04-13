@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::app::arguments::ArgumentDefinition;
-use crate::app::selection::addressable::Address;
+use crate::app::common::addressable::Address;
 use crate::app::selection::edges::{SelectionEdge, SelectionEdgeAddress, SelectionEdgeDelegate, SelectionEdgeError};
 use crate::app::selection::nodes::{SelectionNode, SelectionNodeAddress, SelectionNodeDelegate, SelectionNodeError};
 use crate::app::selection::tree::evaluation::SelectionTreeEvaluator;

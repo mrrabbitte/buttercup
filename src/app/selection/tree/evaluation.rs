@@ -1,4 +1,4 @@
-use crate::app::selection::addressable::Address;
+use crate::app::common::addressable::Address;
 use crate::app::selection::edges::{SelectionEdge, SelectionEdgeAddress, SelectionEdgeDelegate};
 use crate::app::selection::nodes::{SelectionNode, SelectionNodeAddress, SelectionNodeDelegate, SelectionNodeError};
 use crate::app::selection::tree::SelectionTreeError;

@@ -1,6 +1,8 @@
+use crate::app::common::addressable::Address;
+
 pub mod video;
 
-
+#[derive(Debug, Clone)]
 pub enum ContentType {
 
     EmailHtml,
@@ -11,28 +13,36 @@ pub enum ContentType {
 
 }
 
+#[derive(Debug, Clone)]
 pub struct ContentCommandDefinition {
 
-    id: i32
+    id: i32,
+    content_type: ContentType
 
 }
 
-pub struct ContentCommandId {
+pub struct ContentCommandAddress {
 
-    value: i32
+    id: i32,
+    index: usize
 
 }
 
-impl ContentCommandId {
+impl Address for ContentCommandAddress {
 
-    pub fn new(value: &i32) -> ContentCommandId {
-        ContentCommandId {
-            value: *value
+    fn new(id: i32, index: usize) -> Self {
+        ContentCommandAddress {
+            id,
+            index
         }
     }
 
-    pub fn get(&self) -> &i32 {
-        &self.value
+    fn get_id(&self) -> &i32 {
+        &self.id
+    }
+
+    fn get_index(&self) -> &usize {
+        &self.index
     }
 
 }
