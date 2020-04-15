@@ -1,6 +1,7 @@
 use crate::app::content::ContentType;
 use serde_json::Value;
 use url::Url;
+use chrono::NaiveDateTime;
 
 
 pub struct SelectionTreeArguments {
@@ -13,7 +14,7 @@ pub struct SelectionTreeArguments {
 pub struct ContentPipelineRequest<'a> {
 
     tenant_id: String,
-    selection_tree_id: i32,
+    pipeline_id: i32,
     content_type: ContentType,
     payload: &'a Value
 
@@ -21,7 +22,9 @@ pub struct ContentPipelineRequest<'a> {
 
 pub struct ContentPipelineResponse {
 
-    selection_tree_id: i32,
+    pipeline_id: i32,
+    created_at_utc: NaiveDateTime,
+    content_type: ContentType,
     url: Url,
 
 }

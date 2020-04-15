@@ -1,5 +1,6 @@
 use crate::app::common::addressable::Address;
 use crate::app::content::ContentType;
+use crate::app::values::ValuesPayload;
 
 #[derive(Debug, Clone)]
 pub struct ContentCommandDefinition {
@@ -16,6 +17,14 @@ pub trait ContentCommandDelegate {
                address: &ContentCommandAddress) -> bool {
         address.get_id() == self.get_id()
     }
+
+}
+
+pub trait ContentCommandsContext<T: ContentCommandDelegate> {
+
+    fn execute(&self,
+               payload: ValuesPayload,
+               content_commands: Vec<T>)
 
 }
 

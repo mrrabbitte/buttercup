@@ -15,7 +15,6 @@ pub struct SelectionTreeDefinition {
 
     id: i32,
     name: String,
-    project_definition_id: i32
 
 }
 
