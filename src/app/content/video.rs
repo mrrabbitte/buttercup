@@ -1,6 +1,6 @@
+pub mod append;
+pub mod sources;
 
-pub struct VideoCommandDefinition {
-
-    content_command_definition_id: i32
+pub trait VideoContentCommand {
 
 }
