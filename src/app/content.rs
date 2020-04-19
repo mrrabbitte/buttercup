@@ -1,6 +1,5 @@
 use crate::app::common::addressable::Address;
 
-pub mod video;
 pub mod commands;
 pub mod responses;
 
@@ -8,6 +7,7 @@ pub mod responses;
 pub enum ContentType {
 
     EmailHtml,
+    Html,
     Json,
     Video,
     Image,

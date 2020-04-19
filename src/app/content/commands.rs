@@ -1,6 +1,7 @@
 use crate::app::common::addressable::Address;
 use crate::app::content::ContentType;
 use crate::app::values::ValuesPayload;
+use crate::app::content::responses::ContentCommandResponse;
 
 #[derive(Debug, Clone)]
 pub struct ContentCommandDefinition {
@@ -24,7 +25,8 @@ pub trait ContentCommandsContext<T: ContentCommandDelegate> {
 
     fn execute(&self,
                payload: ValuesPayload,
-               content_commands: Vec<T>)
+               content_commands: Vec<T>) -> ContentCommandResponse;
+
 
 }
 

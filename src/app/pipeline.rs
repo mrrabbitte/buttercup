@@ -11,18 +11,26 @@ pub struct SelectionTreeArguments {
 
 }
 
-pub struct ContentPipelineRequest<'a> {
+pub struct ContentPipelineRequestHeader {
 
+    id: String,
     tenant_id: String,
     pipeline_id: i32,
-    content_type: ContentType,
+    created_at_utc: NaiveDateTime,
+
+}
+
+pub struct ContentPipelineRequest<'a> {
+
+    header: ContentPipelineRequestHeader,
     payload: &'a Value
 
 }
 
 pub struct ContentPipelineResponse {
 
-    pipeline_id: i32,
+    id: String,
+    request: ContentPipelineRequestHeader,
     created_at_utc: NaiveDateTime,
     content_type: ContentType,
     url: Url,
