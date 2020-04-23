@@ -8,12 +8,21 @@ use crate::app::values::extractors::{ValueExtractionPolicy, ValueExtractorInput,
 
 pub mod extraction;
 
+pub struct ArgumentSetDefinition {
+
+    id: i32,
+    name: String,
+    description: String
+
+}
+
 pub struct ArgumentDefinition {
 
     id: i32,
     name: String,
     argument_type: ValueType,
-    extraction_policy: ValueExtractionPolicy
+    extraction_policy: ValueExtractionPolicy,
+    argument_set_definition_id: i32
 
 }
 
@@ -22,12 +31,14 @@ impl ArgumentDefinition {
     pub fn new(id: i32,
                name: String,
                argument_type: ValueType,
-               extraction_policy: ValueExtractionPolicy) -> ArgumentDefinition {
+               extraction_policy: ValueExtractionPolicy,
+               argument_set_definition_id: i32) -> ArgumentDefinition {
         ArgumentDefinition {
             id,
             name,
             argument_type,
-            extraction_policy
+            extraction_policy,
+            argument_set_definition_id
         }
     }
 
@@ -41,6 +52,10 @@ impl ArgumentDefinition {
 
     pub fn get_extraction_policy(&self) -> &ValueExtractionPolicy {
         &self.extraction_policy
+    }
+
+    pub fn get_argument_set_definition_id(&self) -> &i32 {
+        &self.argument_set_definition_id
     }
 
 }

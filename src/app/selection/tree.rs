@@ -8,6 +8,7 @@ use crate::app::selection::tree::evaluation::SelectionTreeEvaluator;
 use crate::app::transformations::Transformer;
 use crate::app::transformations::transformer::TransformationRequest;
 use crate::app::values::ValuesPayload;
+use crate::app::content::commands::ContentCommandAddress;
 
 pub mod evaluation;
 
@@ -41,7 +42,8 @@ pub enum SelectionTreeError {
 impl SelectionTree {
 
     pub fn evaluate(&self,
-                    payload: &ValuesPayload) -> Result<Vec<i32>, SelectionTreeError> {
+                    payload: &ValuesPayload)
+        -> Result<Vec<ContentCommandAddress>, SelectionTreeError> {
         self.evaluator.select_commands(payload)
     }
 

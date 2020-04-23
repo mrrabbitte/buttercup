@@ -3,6 +3,7 @@ use crate::app::selection::edges::{SelectionEdge, SelectionEdgeAddress, Selectio
 use crate::app::selection::nodes::{SelectionNode, SelectionNodeAddress, SelectionNodeDelegate, SelectionNodeError};
 use crate::app::selection::tree::SelectionTreeError;
 use crate::app::values::ValuesPayload;
+use crate::app::content::commands::ContentCommandAddress;
 
 pub struct SelectionTreeEvaluator {
 
@@ -25,7 +26,8 @@ impl SelectionTreeEvaluator {
     }
 
     pub fn select_commands(&self,
-                           payload: &ValuesPayload) -> Result<Vec<i32>, SelectionTreeError> {
+                           payload: &ValuesPayload)
+        -> Result<Vec<ContentCommandAddress>, SelectionTreeError> {
         let mut selected_command_ids: Vec<i32> = Vec::new();
         return match self.handle(&mut selected_command_ids, payload, &self.start_node) {
             Ok(_) => Result::Ok(selected_command_ids),

@@ -6,7 +6,6 @@ pub mod responses;
 #[derive(Debug, Clone)]
 pub enum ContentType {
 
-    EmailHtml,
     Html,
     Json,
     Video,
