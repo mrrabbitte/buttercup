@@ -27,8 +27,8 @@ impl SelectionTreeEvaluator {
 
     pub fn select_commands(&self,
                            payload: &ValuesPayload)
-        -> Result<Vec<ContentCommandAddress>, SelectionTreeError> {
-        let mut selected_command_ids: Vec<i32> = Vec::new();
+                           -> Result<Vec<ContentCommandAddress>, SelectionTreeError> {
+        let mut selected_command_ids: Vec<ContentCommandAddress> = Vec::new();
         return match self.handle(&mut selected_command_ids, payload, &self.start_node) {
             Ok(_) => Result::Ok(selected_command_ids),
             Err(error) => Result::Err(error),
@@ -69,12 +69,12 @@ impl SelectionTreeEvaluator {
     }
 
     fn handle(&self,
-              selected_command_ids: &mut Vec<i32>,
+              selected_command_ids: &mut Vec<ContentCommandAddress>,
               payload: &ValuesPayload,
               current: &SelectionNode) -> Result<(), SelectionTreeError> {
         match current.select_content_command_id(payload) {
-            Ok(command_id) =>
-                selected_command_ids.push(*command_id),
+            Ok(command_address) =>
+                selected_command_ids.push(command_address.clone()),
             Err(error) =>
                 return Result::Err(
                     SelectionTreeError::SelectionNodeError(error)),
@@ -152,7 +152,7 @@ mod tests {
                 (FIFTH_VALUE_NAME.to_string(),
                  ValueHolder::String("Borsm".to_string()))
             ]);
-        assert_eq!(vec![0, 2, 7], evaluator.select_commands(&payload).unwrap());
+        check_command_ids(vec![0, 2, 7], evaluator.select_commands(&payload).unwrap());
     }
 
     #[test]
@@ -172,7 +172,7 @@ mod tests {
                 (FIFTH_VALUE_NAME.to_string(),
                  ValueHolder::String("Borski".to_string()))
             ]);
-        assert_eq!(vec![0, 1, 4], evaluator.select_commands(&payload).unwrap());
+        check_command_ids(vec![0, 1, 4], evaluator.select_commands(&payload).unwrap());
     }
 
     #[test]
@@ -200,7 +200,8 @@ mod tests {
                         SelectionEdgeAddress::new(0, 0),
                         SelectionEdgeAddress::new(1, 1)
                     ],
-                    SimpleSelectionNodeDetails::new(0, 0)
+                    SimpleSelectionNodeDetails::new(0, 0),
+                    ContentCommandAddress::new(0, 0)
                 ));
         let nodes: Vec<SelectionNode> = vec![
             SelectionNode::Simple(
@@ -208,14 +209,16 @@ mod tests {
                     SelectionNodeDefinition::new(
                         1, "First After Condition Node".to_string()),
                     vec![SelectionEdgeAddress::new(2, 2)],
-                    SimpleSelectionNodeDetails::new(1, 1)
+                    SimpleSelectionNodeDetails::new(1, 1),
+                    ContentCommandAddress::new(1, 0)
                 )),
             SelectionNode::Simple(
                 SimpleSelectionNode::new(
                     SelectionNodeDefinition::new(
                         2, "Second Default Node".to_string()),
                     vec![SelectionEdgeAddress::new(3, 3)],
-                    SimpleSelectionNodeDetails::new(2, 2)
+                    SimpleSelectionNodeDetails::new(2, 2),
+                    ContentCommandAddress::new(2, 0)
                 )),
             SelectionNode::Dictionary(
                 DictionarySelectionNode::new(
@@ -225,16 +228,17 @@ mod tests {
                     DictionarySelectionNodeDetails::new(
                         3, 3,
                         FIRST_VALUE_NAME.to_string()),
-                    DictionaryNodeMapping::new(3,
-                                               build_map(
-                                                   vec!{
-                                                       (ValueHolder::DayOfWeek(
-                                                           WeekdayWrapper::new(Weekday::Sat)),
-                                                        4),
-                                                       (ValueHolder::DayOfWeek(
-                                                           WeekdayWrapper::new(Weekday::Sun)),
-                                                        5)
-                                                   })
+                    DictionaryNodeMapping::new(
+                        ContentCommandAddress::new(3, 0),
+                        build_map(
+                            vec!{
+                                (ValueHolder::DayOfWeek(
+                                    WeekdayWrapper::new(Weekday::Sat)),
+                                 ContentCommandAddress::new(4, 0)),
+                                (ValueHolder::DayOfWeek(
+                                    WeekdayWrapper::new(Weekday::Sun)),
+                                 ContentCommandAddress::new(5, 0))
+                            })
                     )
                 )),
             SelectionNode::Dictionary(
@@ -245,18 +249,19 @@ mod tests {
                     DictionarySelectionNodeDetails::new(
                         4, 6,
                         FIRST_VALUE_NAME.to_string()),
-                    DictionaryNodeMapping::new(6,
+                    DictionaryNodeMapping::new(
+                        ContentCommandAddress::new(6, 0),
                                                build_map(
                                                    vec!{
                                                        (ValueHolder::DayOfWeek(
                                                            WeekdayWrapper::new(Weekday::Sat)),
-                                                        7),
+                                                        ContentCommandAddress::new(7, 0)),
                                                        (ValueHolder::DayOfWeek(
                                                            WeekdayWrapper::new(Weekday::Sun)),
-                                                        8),
+                                                        ContentCommandAddress::new(8, 0)),
                                                        (ValueHolder::DayOfWeek(
                                                            WeekdayWrapper::new(Weekday::Mon)),
-                                                        9)
+                                                        ContentCommandAddress::new(9, 0))
                                                    })
                     ))
             )
@@ -379,6 +384,14 @@ mod tests {
 
     fn build_payload(values: Vec<(String, ValueHolder)>) -> ValuesPayload {
         ValuesPayload::new(build_map(values))
+    }
+
+    fn check_command_ids(expected: Vec<i32>, actual: Vec<ContentCommandAddress>) {
+        assert_eq!(expected,
+                   actual
+                       .iter()
+                       .map(|command| *command.get_id())
+                       .collect::<Vec<i32>>());
     }
 
 }

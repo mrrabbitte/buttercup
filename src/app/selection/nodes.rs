@@ -4,6 +4,7 @@ use crate::app::selection::nodes::dictionary::{DictionarySelectionError, Diction
 use crate::app::selection::nodes::recommendation::RecommendationSelectionNode;
 use crate::app::selection::nodes::simple::SimpleSelectionNode;
 use crate::app::values::ValuesPayload;
+use crate::app::content::commands::ContentCommandAddress;
 
 pub mod simple;
 pub mod dictionary;
@@ -16,7 +17,7 @@ pub trait SelectionNodeDelegate {
     fn get_outgoing_edges(&self) -> &Vec<SelectionEdgeAddress>;
 
     fn select_content_command_id(&self, payload: &ValuesPayload)
-        -> Result<&i32, SelectionNodeError>;
+        -> Result<&ContentCommandAddress, SelectionNodeError>;
 
     fn matches(&self, address: &SelectionNodeAddress) -> bool {
         address.get_id() == self.get_id()
@@ -92,7 +93,8 @@ impl SelectionNodeDelegate for SelectionNode {
     }
 
     fn select_content_command_id(&self,
-                                 payload: &ValuesPayload) -> Result<&i32, SelectionNodeError> {
+                                 payload: &ValuesPayload)
+        -> Result<&ContentCommandAddress, SelectionNodeError> {
         self.get_delegate().select_content_command_id(payload)
     }
 

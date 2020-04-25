@@ -1,6 +1,7 @@
 use crate::app::selection::edges::SelectionEdgeAddress;
 use crate::app::selection::nodes::{SelectionNodeError, SelectionNodeDefinition, SelectionNodeDelegate};
 use crate::app::values::ValuesPayload;
+use crate::app::content::commands::ContentCommandAddress;
 
 #[derive(Debug)]
 pub struct RecommendationSelectionNodeDetails {
@@ -33,7 +34,8 @@ impl SelectionNodeDelegate for RecommendationSelectionNode {
     }
 
     fn select_content_command_id(&self,
-                                 payload: &ValuesPayload) -> Result<&i32, SelectionNodeError> {
+                                 payload: &ValuesPayload)
+        -> Result<&ContentCommandAddress, SelectionNodeError> {
         unimplemented!()
     }
 

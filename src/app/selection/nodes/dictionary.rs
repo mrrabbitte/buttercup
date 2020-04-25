@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use crate::app::selection::edges::SelectionEdgeAddress;
 use crate::app::selection::nodes::{SelectionNodeDefinition, SelectionNodeDelegate, SelectionNodeError};
 use crate::app::values::{ValueHolder, ValuesPayload};
+use crate::app::content::commands::ContentCommandAddress;
 
 #[derive(Debug)]
 pub struct DictionarySelectionNodeDetails {
@@ -63,7 +64,9 @@ impl SelectionNodeDelegate for DictionarySelectionNode {
         &self.outgoing_edges
     }
 
-    fn select_content_command_id(&self, payload: &ValuesPayload) -> Result<&i32, SelectionNodeError> {
+    fn select_content_command_id(&self,
+                                 payload: &ValuesPayload)
+        -> Result<&ContentCommandAddress, SelectionNodeError> {
         let target_value_name = &self.details.target_value_name;
         return match payload.get(&self.details.target_value_name) {
             None => Result::Err(
@@ -86,24 +89,24 @@ pub enum DictionarySelectionError {
 #[derive(Debug)]
 pub struct DictionaryNodeMapping {
 
-    default_command_id: i32,
-    values: HashMap<ValueHolder, i32>
+    default_command_address: ContentCommandAddress,
+    values: HashMap<ValueHolder, ContentCommandAddress>
 
 }
 
 impl DictionaryNodeMapping {
 
-    pub fn new(default_command_id: i32,
-               values: HashMap<ValueHolder, i32>) -> DictionaryNodeMapping {
+    pub fn new(default_command_address: ContentCommandAddress,
+               values: HashMap<ValueHolder, ContentCommandAddress>) -> DictionaryNodeMapping {
         DictionaryNodeMapping {
-            default_command_id,
+            default_command_address,
             values
         }
     }
 
-    fn get(&self, key: &ValueHolder) -> Result<&i32, SelectionNodeError> {
+    fn get(&self, key: &ValueHolder) -> Result<&ContentCommandAddress, SelectionNodeError> {
         return match self.values.get(key) {
-            None => Result::Ok(&self.default_command_id),
+            None => Result::Ok(&self.default_command_address),
             Some(command_id) => Result::Ok(command_id),
         };
     }

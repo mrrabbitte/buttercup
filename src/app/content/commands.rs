@@ -30,6 +30,7 @@ pub trait ContentCommandsContext<T: ContentCommandDelegate> {
 
 }
 
+#[derive(Debug, Clone)]
 pub struct ContentCommandAddress {
 
     id: i32,
