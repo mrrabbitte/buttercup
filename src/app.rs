@@ -6,3 +6,4 @@ pub mod projects;
 pub mod selection;
 pub mod pipeline;
 pub mod common;
+pub mod reinforcement;

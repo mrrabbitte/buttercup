@@ -9,8 +9,10 @@ use crate::app::transformations::Transformer;
 use crate::app::transformations::transformer::TransformationRequest;
 use crate::app::values::ValuesPayload;
 use crate::app::content::commands::ContentCommandAddress;
+use crate::app::selection::tree::decision::SelectionDecision;
 
 pub mod evaluation;
+pub mod decision;
 
 pub struct SelectionTreeDefinition {
 
@@ -43,8 +45,13 @@ impl SelectionTree {
 
     pub fn evaluate(&self,
                     payload: &ValuesPayload)
-        -> Result<Vec<ContentCommandAddress>, SelectionTreeError> {
+        -> Result<SelectionDecision, SelectionTreeError> {
         self.evaluator.select_commands(payload)
+                .map(
+                    |commands|
+                        SelectionDecision::new(
+                            self.definition.id, commands))
+
     }
 
 }

@@ -9,6 +9,7 @@ use crate::app::content::commands::ContentCommandAddress;
 pub mod simple;
 pub mod dictionary;
 pub mod recommendation;
+pub mod context;
 
 pub trait SelectionNodeDelegate {
 

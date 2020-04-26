@@ -373,7 +373,7 @@ mod tests {
         }
     }
 
-    fn build_map<K,V>(entries: Vec<(K, V)>) -> HashMap<K, V>
+    fn build_map<K, V>(entries: Vec<(K, V)>) -> HashMap<K, V>
         where K: Hash + Eq {
         let mut ret = HashMap::new();
         for entry in entries {
