@@ -1,7 +1,7 @@
 use chrono::NaiveDateTime;
 use uuid::Uuid;
 use std::sync::Arc;
-use crate::app::selection::tree::decision::{SelectionDecisionService, SelectionDecisionError, SelectionDecision};
+use crate::app::decision::{SelectionDecisionService, SelectionDecisionError, SelectionDecision};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ReinforcementEvent {
@@ -86,10 +86,11 @@ pub struct ReinforcementService {
 impl ReinforcementService {
 
     pub fn handle(&self,
-                  event: ReinforcementEvent) -> Result<(), ReinforcementServiceError> {
+                  event: &ReinforcementEvent) -> Result<(), ReinforcementServiceError> {
         match self.decision_service.get_decision_by_id(&event.decision_id) {
-            Ok(decision) => {},
-            Err(err) => Result::Err(err),
+            Ok(decision) => self.do_handle(decision, event),
+            Err(err) => Result::Err(
+                ReinforcementServiceError::SelectionDecisionError(err)),
         }
     }
 
@@ -99,9 +100,10 @@ impl ReinforcementService {
 
     }
 
-    fn do_handle(decision: SelectionDecision,
-                 event: ReinforcementEvent) -> Result<(), ReinforcementServiceError> {
-        
+    fn do_handle(&self,
+                 decision: &SelectionDecision,
+                 event: &ReinforcementEvent) -> Result<(), ReinforcementServiceError> {
+
     }
 
 }

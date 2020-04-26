@@ -4,6 +4,8 @@ use url::Url;
 use chrono::NaiveDateTime;
 use crate::app::selection::tree::SelectionTreeError;
 use crate::app::selection::nodes::SelectionNodeError;
+use crate::app::pipeline::response::ContentPipelineResponse;
+use crate::app::pipeline::request::ContentPipelineRequest;
 
 pub mod evaluation;
 pub mod definitions;
