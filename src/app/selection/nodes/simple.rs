@@ -2,6 +2,7 @@ use crate::app::selection::edges::SelectionEdgeAddress;
 use crate::app::selection::nodes::{SelectionNodeError, SelectionNodeDefinition, SelectionNodeDelegate};
 use crate::app::values::ValuesPayload;
 use crate::app::content::commands::ContentCommandAddress;
+use crate::app::selection::nodes::context::SelectionNodesContext;
 
 #[derive(Debug)]
 pub struct SimpleSelectionNodeDetails {
@@ -60,7 +61,8 @@ impl SelectionNodeDelegate for SimpleSelectionNode {
     }
 
     fn select_content_command_id(&self,
-                                 payload: &ValuesPayload)
+                                 payload: &ValuesPayload,
+                                 context: &SelectionNodesContext)
         -> Result<&ContentCommandAddress, SelectionNodeError> {
         Result::Ok(&self.content_command_address)
     }

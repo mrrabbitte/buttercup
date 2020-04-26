@@ -1,10 +1,11 @@
 use crate::app::common::addressable::Address;
+use crate::app::content::commands::ContentCommandAddress;
 use crate::app::selection::edges::SelectionEdgeAddress;
+use crate::app::selection::nodes::context::SelectionNodesContext;
 use crate::app::selection::nodes::dictionary::{DictionarySelectionError, DictionarySelectionNode};
 use crate::app::selection::nodes::recommendation::RecommendationSelectionNode;
 use crate::app::selection::nodes::simple::SimpleSelectionNode;
 use crate::app::values::ValuesPayload;
-use crate::app::content::commands::ContentCommandAddress;
 
 pub mod simple;
 pub mod dictionary;
@@ -17,7 +18,9 @@ pub trait SelectionNodeDelegate {
 
     fn get_outgoing_edges(&self) -> &Vec<SelectionEdgeAddress>;
 
-    fn select_content_command_id(&self, payload: &ValuesPayload)
+    fn select_content_command_id(&self,
+                                 payload: &ValuesPayload,
+                                 context: &SelectionNodesContext)
         -> Result<&ContentCommandAddress, SelectionNodeError>;
 
     fn matches(&self, address: &SelectionNodeAddress) -> bool {
@@ -94,9 +97,10 @@ impl SelectionNodeDelegate for SelectionNode {
     }
 
     fn select_content_command_id(&self,
-                                 payload: &ValuesPayload)
+                                 payload: &ValuesPayload,
+                                 context: &SelectionNodesContext)
         -> Result<&ContentCommandAddress, SelectionNodeError> {
-        self.get_delegate().select_content_command_id(payload)
+        self.get_delegate().select_content_command_id(payload, context)
     }
 
 }

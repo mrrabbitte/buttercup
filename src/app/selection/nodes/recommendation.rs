@@ -2,14 +2,17 @@ use crate::app::selection::edges::SelectionEdgeAddress;
 use crate::app::selection::nodes::{SelectionNodeError, SelectionNodeDefinition, SelectionNodeDelegate};
 use crate::app::values::ValuesPayload;
 use crate::app::content::commands::ContentCommandAddress;
+use std::collections::HashMap;
+use crate::app::selection::nodes::context::SelectionNodesContext;
 
 #[derive(Debug)]
 pub struct RecommendationSelectionNodeDetails {
 
+    id: i32,
     selection_node_definition_id: i32,
-    mock_best_content_command_definition_id: i32
 
 }
+
 
 #[derive(Debug)]
 pub struct RecommendationSelectionNode {
@@ -17,7 +20,8 @@ pub struct RecommendationSelectionNode {
     tenant_id: String,
     definition: SelectionNodeDefinition,
     outgoing_edges: Vec<SelectionEdgeAddress>,
-    details: RecommendationSelectionNodeDetails
+    details: RecommendationSelectionNodeDetails,
+    choose_from_commands: HashMap<i32, ContentCommandAddress>
 
 }
 
@@ -34,7 +38,8 @@ impl SelectionNodeDelegate for RecommendationSelectionNode {
     }
 
     fn select_content_command_id(&self,
-                                 payload: &ValuesPayload)
+                                 payload: &ValuesPayload,
+                                 context: &SelectionNodesContext)
         -> Result<&ContentCommandAddress, SelectionNodeError> {
         unimplemented!()
     }

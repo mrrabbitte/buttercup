@@ -4,6 +4,7 @@ use crate::app::selection::edges::SelectionEdgeAddress;
 use crate::app::selection::nodes::{SelectionNodeDefinition, SelectionNodeDelegate, SelectionNodeError};
 use crate::app::values::{ValueHolder, ValuesPayload};
 use crate::app::content::commands::ContentCommandAddress;
+use crate::app::selection::nodes::context::SelectionNodesContext;
 
 #[derive(Debug)]
 pub struct DictionarySelectionNodeDetails {
@@ -65,7 +66,8 @@ impl SelectionNodeDelegate for DictionarySelectionNode {
     }
 
     fn select_content_command_id(&self,
-                                 payload: &ValuesPayload)
+                                 payload: &ValuesPayload,
+                                 context: &SelectionNodesContext)
         -> Result<&ContentCommandAddress, SelectionNodeError> {
         let target_value_name = &self.details.target_value_name;
         return match payload.get(&self.details.target_value_name) {

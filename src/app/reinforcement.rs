@@ -97,13 +97,13 @@ impl ReinforcementService {
     pub fn get_simple_report(&self,
                              request: SimpleSuccessFailureReportRequest)
         -> Result<SimpleSuccessFailureReport, ReinforcementServiceError> {
-
+        unimplemented!()
     }
 
     fn do_handle(&self,
                  decision: &SelectionDecision,
                  event: &ReinforcementEvent) -> Result<(), ReinforcementServiceError> {
-
+        unimplemented!()
     }
 
 }
