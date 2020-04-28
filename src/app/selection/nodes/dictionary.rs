@@ -67,7 +67,7 @@ impl SelectionNodeDelegate for DictionarySelectionNode {
 
     fn select_content_command_id(&self,
                                  payload: &ValuesPayload,
-                                 context: &SelectionNodesContext)
+                                 context: &dyn SelectionNodesContext)
         -> Result<&ContentCommandAddress, SelectionNodeError> {
         let target_value_name = &self.details.target_value_name;
         return match payload.get(&self.details.target_value_name) {

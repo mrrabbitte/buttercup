@@ -9,6 +9,8 @@ use crate::app::transformations::Transformer;
 use crate::app::transformations::transformer::TransformationRequest;
 use crate::app::values::ValuesPayload;
 use crate::app::content::commands::ContentCommandAddress;
+use crate::app::decision::SelectionDecision;
+use crate::app::selection::nodes::context::SelectionNodesContext;
 
 pub mod evaluation;
 
@@ -42,9 +44,10 @@ pub enum SelectionTreeError {
 impl SelectionTree {
 
     pub fn evaluate(&self,
-                    payload: &ValuesPayload)
+                    payload: &ValuesPayload,
+                    context: &dyn SelectionNodesContext)
         -> Result<SelectionDecision, SelectionTreeError> {
-        self.evaluator.select_commands(payload)
+        self.evaluator.select_commands(payload, context)
                 .map(
                     |commands|
                         SelectionDecision::new(

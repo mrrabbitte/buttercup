@@ -1,11 +1,18 @@
-use crate::app::selection::nodes::context::recommendation::RecommendationContext;
+use crate::app::reinforcement::{SimpleSuccessFailureReportRequest, SimpleSuccessFailureReport, ReinforcementServiceError};
+use mockall::automock;
 
-pub mod recommendation;
-pub mod reinforcement;
+#[automock]
+pub trait SelectionNodesContext {
 
-pub struct SelectionNodesContext {
+    fn get_success_failures_report(&self,
+                                   request: SimpleSuccessFailureReportRequest)
+        -> Result<SimpleSuccessFailureReport, ReinforcementServiceError>;
 
-    recommendation_context: RecommendationContext
+}
+
+pub struct SimpleSelectionNodesContext {
+
+
 
 }
 

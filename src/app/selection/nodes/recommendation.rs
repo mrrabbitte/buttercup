@@ -39,7 +39,7 @@ impl SelectionNodeDelegate for RecommendationSelectionNode {
 
     fn select_content_command_id(&self,
                                  payload: &ValuesPayload,
-                                 context: &SelectionNodesContext)
+                                 context: &dyn SelectionNodesContext)
         -> Result<&ContentCommandAddress, SelectionNodeError> {
         unimplemented!()
     }

@@ -4,6 +4,7 @@ use crate::app::selection::nodes::{SelectionNode, SelectionNodeAddress, Selectio
 use crate::app::selection::tree::SelectionTreeError;
 use crate::app::values::ValuesPayload;
 use crate::app::content::commands::ContentCommandAddress;
+use crate::app::selection::nodes::context::SelectionNodesContext;
 
 pub struct SelectionTreeEvaluator {
 
@@ -26,13 +27,17 @@ impl SelectionTreeEvaluator {
     }
 
     pub fn select_commands(&self,
-                           payload: &ValuesPayload)
+                           payload: &ValuesPayload,
+                           context: &dyn SelectionNodesContext)
                            -> Result<Vec<ContentCommandAddress>, SelectionTreeError> {
         let mut selected_command_ids: Vec<ContentCommandAddress> = Vec::new();
-        return match self.handle(&mut selected_command_ids, payload, &self.start_node) {
+        match self.handle(&mut selected_command_ids,
+                          payload,
+                          context,
+                          &self.start_node) {
             Ok(_) => Result::Ok(selected_command_ids),
             Err(error) => Result::Err(error),
-        };
+        }
     }
 
 
@@ -71,15 +76,16 @@ impl SelectionTreeEvaluator {
     fn handle(&self,
               selected_command_ids: &mut Vec<ContentCommandAddress>,
               payload: &ValuesPayload,
-              current: &SelectionNode) -> Result<(), SelectionTreeError> {
-        match current.select_content_command_id(payload) {
+              context: &dyn SelectionNodesContext,
+              current_node: &SelectionNode) -> Result<(), SelectionTreeError> {
+        match current_node.select_content_command_id(payload, context) {
             Ok(command_address) =>
                 selected_command_ids.push(command_address.clone()),
             Err(error) =>
                 return Result::Err(
                     SelectionTreeError::SelectionNodeError(error)),
         };
-        for address in current.get_outgoing_edges() {
+        for address in current_node.get_outgoing_edges() {
             match self.get_edge(address) {
                 Ok(edge) => {
                     match edge.can_pass(payload) {
@@ -87,7 +93,8 @@ impl SelectionTreeEvaluator {
                             if can_pass {
                                 return match self.get_node(edge.get_next_selection_node()) {
                                     Ok(node) =>
-                                        self.handle(selected_command_ids, payload, node),
+                                        self.handle(
+                                            selected_command_ids, payload, context, node),
                                     Err(error) => Result::Err(error),
                                 };
                             }
@@ -152,7 +159,9 @@ mod tests {
                 (FIFTH_VALUE_NAME.to_string(),
                  ValueHolder::String("Borsm".to_string()))
             ]);
-        check_command_ids(vec![0, 2, 7], evaluator.select_commands(&payload).unwrap());
+        let mock = MockSelectionNodeContext::new();
+        check_command_ids(vec![0, 2, 7],
+                          evaluator.select_commands(&payload, &mock).unwrap());
     }
 
     #[test]
@@ -172,7 +181,9 @@ mod tests {
                 (FIFTH_VALUE_NAME.to_string(),
                  ValueHolder::String("Borski".to_string()))
             ]);
-        check_command_ids(vec![0, 1, 4], evaluator.select_commands(&payload).unwrap());
+        let mock = MockSelectionNodeContext::new();
+        check_command_ids(vec![0, 1, 4],
+                          evaluator.select_commands(&payload, &mock).unwrap());
     }
 
     #[test]
@@ -180,7 +191,9 @@ mod tests {
         let evaluator = build_evaluator();
         let payload =
             build_payload(vec![]);
-        let result = evaluator.select_commands(&payload);
+        let mock = MockSelectionNodeContext::new();
+        let result =
+            evaluator.select_commands(&payload, &mock);
         assert_eq!(true, result.is_err());
         assert_eq!(SelectionTreeError::SelectionEdgeError(
             SelectionEdgeError::LogicalExpressionSelectionEdgeError(

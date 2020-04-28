@@ -28,19 +28,16 @@ impl Astro {
 
     fn transform(first: &ValueHolder,
                  second: &ValueHolder) -> Result<SunPositionTimes, TransformationError> {
-        return match first {
-            ValueHolder::ZonedDateTime(zdt) =>
-                match second {
-                    ValueHolder::GeoCoordinates(coordinates) =>
-                        Result::Ok(
-                            SunPositionTimes::new(
-                                zdt.get_date_time(),
-                                zdt.get_zone(),
-                                &coordinates)),
-                    _ => Result::Err(
-                        TransformationError::InvalidInputType(second.clone(), InputOrder::Second))
-                },
-            _ => Result::Err(
+        return match (first, second) {
+            (ValueHolder::ZonedDateTime(zdt),
+                ValueHolder::GeoCoordinates(coordinates)) => Result::Ok(
+                SunPositionTimes::new(
+                    zdt.get_date_time(),
+                    zdt.get_zone(),
+                    &coordinates)),
+            (ValueHolder::ZonedDateTime(_), _) =>  Result::Err(
+                TransformationError::InvalidInputType(second.clone(), InputOrder::Second)),
+            (_, _ )=> Result::Err(
                 TransformationError::InvalidInputType(first.clone(), InputOrder::First))
         };
     }

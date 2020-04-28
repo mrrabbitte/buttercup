@@ -62,7 +62,7 @@ impl SelectionNodeDelegate for SimpleSelectionNode {
 
     fn select_content_command_id(&self,
                                  payload: &ValuesPayload,
-                                 context: &SelectionNodesContext)
+                                 context: &dyn SelectionNodesContext)
         -> Result<&ContentCommandAddress, SelectionNodeError> {
         Result::Ok(&self.content_command_address)
     }

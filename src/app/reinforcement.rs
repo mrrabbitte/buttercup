@@ -1,7 +1,9 @@
 use chrono::NaiveDateTime;
 use uuid::Uuid;
 use std::sync::Arc;
+use serde::{Serialize, Deserialize};
 use crate::app::decision::{SelectionDecisionService, SelectionDecisionError, SelectionDecision};
+use dashmap::DashMap;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ReinforcementEvent {
@@ -11,6 +13,14 @@ pub struct ReinforcementEvent {
     created_at_utc: NaiveDateTime,
     decision_id: Uuid,
     event_type: ReinforcementEventType
+
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum ReinforcementEventType {
+
+    Success,
+    Failure
 
 }
 
@@ -63,14 +73,6 @@ impl SuccessFailureDetails {
 
 }
 
-#[derive(Debug)]
-pub enum ReinforcementEventType {
-
-    Success,
-    Failure
-
-}
-
 pub enum ReinforcementServiceError {
 
     SelectionDecisionError(SelectionDecisionError)
@@ -105,5 +107,19 @@ impl ReinforcementService {
                  event: &ReinforcementEvent) -> Result<(), ReinforcementServiceError> {
         unimplemented!()
     }
+
+}
+
+
+pub struct ContentCommandSuccessEvent {
+
+    id: String,
+    created_at_utc: NaiveDateTime,
+    content_command_definition_id: i32,
+    selection_decision_id: i32
+
+}
+
+pub struct ContentCommandFailureEvent {
 
 }
