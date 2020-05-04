@@ -3,7 +3,7 @@ use crate::app::content::commands::ContentCommandAddress;
 use crate::app::selection::edges::SelectionEdgeAddress;
 use crate::app::selection::nodes::context::SelectionNodesContext;
 use crate::app::selection::nodes::dictionary::{DictionarySelectionError, DictionarySelectionNode};
-use crate::app::selection::nodes::recommendation::RecommendationSelectionNode;
+use crate::app::selection::nodes::recommendation::{RecommendationSelectionNode, RecommendationSelectionError};
 use crate::app::selection::nodes::simple::SimpleSelectionNode;
 use crate::app::values::ValuesPayload;
 
@@ -20,7 +20,7 @@ pub trait SelectionNodeDelegate {
 
     fn select_content_command_id(&self,
                                  payload: &ValuesPayload,
-                                 context: &SelectionNodesContext)
+                                 context: &dyn SelectionNodesContext)
         -> Result<&ContentCommandAddress, SelectionNodeError>;
 
     fn matches(&self, address: &SelectionNodeAddress) -> bool {
@@ -60,8 +60,7 @@ pub enum SelectionNode {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SelectionNodeError {
 
-    SimpleSelectionError,
-    RecommendationSelectionError,
+    RecommendationSelectionError(RecommendationSelectionError),
     DictionarySelectionError(DictionarySelectionError)
 
 }
@@ -98,7 +97,7 @@ impl SelectionNodeDelegate for SelectionNode {
 
     fn select_content_command_id(&self,
                                  payload: &ValuesPayload,
-                                 context: &SelectionNodesContext)
+                                 context: &dyn SelectionNodesContext)
         -> Result<&ContentCommandAddress, SelectionNodeError> {
         self.get_delegate().select_content_command_id(payload, context)
     }

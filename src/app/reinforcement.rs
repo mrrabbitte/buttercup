@@ -1,9 +1,11 @@
-use chrono::NaiveDateTime;
-use uuid::Uuid;
 use std::sync::Arc;
-use serde::{Serialize, Deserialize};
-use crate::app::decision::{SelectionDecisionService, SelectionDecisionError, SelectionDecision};
+
+use chrono::NaiveDateTime;
 use dashmap::DashMap;
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+
+use crate::app::decision::{SelectionDecision, SelectionDecisionError, SelectionDecisionService};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ReinforcementEvent {
@@ -21,15 +23,6 @@ pub enum ReinforcementEventType {
 
     Success,
     Failure
-
-}
-
-#[derive(Debug)]
-pub struct SimpleSuccessFailureReportRequest {
-
-    tenant_id: String,
-    pipeline_id: i32,
-    command_ids: Vec<i32>
 
 }
 
@@ -52,8 +45,8 @@ impl SimpleSuccessFailureReport {
 pub struct SuccessFailureDetails {
 
     command_id: i32,
-    num_successes: i32,
-    num_failures: i32
+    num_successes: f32,
+    num_failures: f32
 
 }
 
@@ -63,16 +56,17 @@ impl SuccessFailureDetails {
         &self.command_id
     }
 
-    pub fn get_num_successes(&self) -> &i32 {
+    pub fn get_num_successes(&self) -> &f32 {
         &self.num_successes
     }
 
-    pub fn get_num_failures(&self) -> &i32 {
+    pub fn get_num_failures(&self) -> &f32 {
         &self.num_failures
     }
 
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ReinforcementServiceError {
 
     SelectionDecisionError(SelectionDecisionError)
@@ -97,7 +91,8 @@ impl ReinforcementService {
     }
 
     pub fn get_simple_report(&self,
-                             request: SimpleSuccessFailureReportRequest)
+                             tenant_id: &String,
+                             choice_space: &Vec<i32>)
         -> Result<SimpleSuccessFailureReport, ReinforcementServiceError> {
         unimplemented!()
     }

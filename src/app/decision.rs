@@ -44,6 +44,7 @@ impl SelectionDecision {
 
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SelectionDecisionError {
 
     CouldNotSaveDecision,

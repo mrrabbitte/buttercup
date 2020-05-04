@@ -1,9 +1,16 @@
-use crate::app::selection::edges::SelectionEdgeAddress;
-use crate::app::selection::nodes::{SelectionNodeError, SelectionNodeDefinition, SelectionNodeDelegate};
-use crate::app::values::ValuesPayload;
-use crate::app::content::commands::ContentCommandAddress;
 use std::collections::HashMap;
+
+use rand_distr::BetaError;
+
+use crate::app::content::commands::ContentCommandAddress;
+use crate::app::reinforcement::ReinforcementServiceError;
+use crate::app::selection::edges::SelectionEdgeAddress;
+use crate::app::selection::nodes::{SelectionNodeDefinition, SelectionNodeDelegate, SelectionNodeError};
 use crate::app::selection::nodes::context::SelectionNodesContext;
+use crate::app::selection::nodes::recommendation::beta_bandits::{BetaBanditRecommender, BetaBanditResponse};
+use crate::app::values::ValuesPayload;
+
+pub mod beta_bandits;
 
 #[derive(Debug)]
 pub struct RecommendationSelectionNodeDetails {
@@ -21,11 +28,51 @@ pub struct RecommendationSelectionNode {
     definition: SelectionNodeDefinition,
     outgoing_edges: Vec<SelectionEdgeAddress>,
     details: RecommendationSelectionNodeDetails,
-    choose_from_commands: HashMap<i32, ContentCommandAddress>
+    node_type: RecommendationSelectionNodeType,
+    choice_space: Vec<ContentCommandAddress>
 
 }
 
-pub struct RecommendationService;
+#[derive(Debug)]
+pub enum RecommendationSelectionNodeType {
+
+    SimpleBetaBandit
+
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RecommendationSelectionError {
+
+    ReinforcementServiceError(ReinforcementServiceError),
+    BetaError(BetaError),
+    DidNotFindCommandOfRecommendedId(i32),
+    DidNotFindCommandOfIndex(usize)
+
+}
+
+impl RecommendationSelectionNode {
+
+    fn handle_recommendation_result(
+        &self,
+        result: Result<BetaBanditResponse, RecommendationSelectionError>)
+        -> Result<&ContentCommandAddress, SelectionNodeError> {
+        match result {
+            Ok(response) => {
+                let chosen_command_index = *response.get_chosen_command_index();
+                match self.choice_space.get(chosen_command_index) {
+                    None => Result::Err(
+                        SelectionNodeError::RecommendationSelectionError(
+                            RecommendationSelectionError::DidNotFindCommandOfIndex(
+                                chosen_command_index))),
+                    Some(address) => Result::Err(),
+                }
+            },
+            Err(err) =>
+                Result::Err(SelectionNodeError::RecommendationSelectionError(err)),
+        }
+    }
+
+}
 
 impl SelectionNodeDelegate for RecommendationSelectionNode {
 
@@ -40,8 +87,16 @@ impl SelectionNodeDelegate for RecommendationSelectionNode {
     fn select_content_command_id(&self,
                                  payload: &ValuesPayload,
                                  context: &dyn SelectionNodesContext)
-        -> Result<&ContentCommandAddress, SelectionNodeError> {
-        unimplemented!()
+                                 -> Result<&ContentCommandAddress, SelectionNodeError> {
+        match self.node_type {
+            RecommendationSelectionNodeType::SimpleBetaBandit =>
+                self.handle_recommendation_result(
+                    BetaBanditRecommender::choose_best_command(
+                        &self.tenant_id,
+                        &self.choice_space,
+                        context
+                    )),
+        }
     }
 
 }

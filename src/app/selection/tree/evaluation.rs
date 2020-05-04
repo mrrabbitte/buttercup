@@ -133,7 +133,7 @@ mod tests {
     use crate::app::selection::nodes::simple::{SimpleSelectionNode, SimpleSelectionNodeDetails};
     use crate::app::values::ValueHolder;
     use crate::app::values::wrappers::{WeekdayWrapper, Wrapper};
-
+    use crate::app::selection::nodes::context::MockSelectionNodesContext;
     use super::*;
 
     const FIRST_VALUE_NAME: &str = "firstValueName";
@@ -159,7 +159,7 @@ mod tests {
                 (FIFTH_VALUE_NAME.to_string(),
                  ValueHolder::String("Borsm".to_string()))
             ]);
-        let mock = MockSelectionNodeContext::new();
+        let mock = MockSelectionNodesContext::new();
         check_command_ids(vec![0, 2, 7],
                           evaluator.select_commands(&payload, &mock).unwrap());
     }
@@ -181,7 +181,7 @@ mod tests {
                 (FIFTH_VALUE_NAME.to_string(),
                  ValueHolder::String("Borski".to_string()))
             ]);
-        let mock = MockSelectionNodeContext::new();
+        let mock = MockSelectionNodesContext::new();
         check_command_ids(vec![0, 1, 4],
                           evaluator.select_commands(&payload, &mock).unwrap());
     }
@@ -191,7 +191,7 @@ mod tests {
         let evaluator = build_evaluator();
         let payload =
             build_payload(vec![]);
-        let mock = MockSelectionNodeContext::new();
+        let mock = MockSelectionNodesContext::new();
         let result =
             evaluator.select_commands(&payload, &mock);
         assert_eq!(true, result.is_err());
