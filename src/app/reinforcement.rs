@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::app::decision::{SelectionDecision, SelectionDecisionError, SelectionDecisionService};
+use crate::app::content::commands::ContentCommandAddress;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ReinforcementEvent {
@@ -92,7 +93,7 @@ impl ReinforcementService {
 
     pub fn get_simple_report(&self,
                              tenant_id: &String,
-                             choice_space: &Vec<i32>)
+                             choice_space: &Vec<ContentCommandAddress>)
         -> Result<SimpleSuccessFailureReport, ReinforcementServiceError> {
         unimplemented!()
     }

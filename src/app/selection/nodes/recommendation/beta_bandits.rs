@@ -8,6 +8,7 @@ use crate::app::selection::nodes::context::SelectionNodesContext;
 use crate::app::selection::nodes::recommendation::RecommendationSelectionError;
 use crate::app::selection::nodes::SelectionNodeError;
 use crate::app::values::ValuesPayload;
+use crate::app::selection::nodes::recommendation::response::RecommenderResponse;
 
 pub struct BetaBanditRecommender;
 
@@ -16,7 +17,7 @@ impl BetaBanditRecommender {
     pub fn choose_best_command(tenant_id: &String,
                                choice_space: &Vec<ContentCommandAddress>,
                                context: &dyn SelectionNodesContext)
-                               -> Result<BetaBanditResponse, RecommendationSelectionError> {
+                               -> Result<RecommenderResponse, RecommendationSelectionError> {
         match context.get_success_failures_report(tenant_id, choice_space) {
             Ok(report) =>
                 BetaBanditRecommender::handle_report(&report),
@@ -26,10 +27,10 @@ impl BetaBanditRecommender {
     }
 
     fn handle_report(report: &SimpleSuccessFailureReport)
-                     -> Result<BetaBanditResponse, RecommendationSelectionError> {
+                     -> Result<RecommenderResponse, RecommendationSelectionError> {
         let mut highest_score = -1.;
         let mut highest_score_command_id = -1;
-        let mut highest_score_command_index = -1;
+        let mut highest_score_command_index = 0;
         let all_details = report.get();
         for i in 0..all_details.len() {
             let details = &all_details[i];
@@ -46,36 +47,9 @@ impl BetaBanditRecommender {
         }
 
         Result::Ok(
-            BetaBanditResponse::new(
+            RecommenderResponse::new(
                 highest_score_command_index,
                 highest_score_command_id))
-    }
-
-}
-
-pub struct BetaBanditResponse {
-
-    chosen_command_index: usize,
-    chosen_command_id: i32
-
-}
-
-impl BetaBanditResponse {
-
-    pub fn new(chosen_command_index: usize,
-               chosen_command_id: i32) -> BetaBanditResponse {
-        BetaBanditResponse {
-            chosen_command_index,
-            chosen_command_id
-        }
-    }
-
-    pub fn get_chosen_command_index(&self) -> &usize {
-        &self.chosen_command_index
-    }
-
-    pub fn get_chosen_command_id(&self) -> &i32 {
-        &self.chosen_command_id
     }
 
 }

@@ -7,10 +7,13 @@ use crate::app::reinforcement::ReinforcementServiceError;
 use crate::app::selection::edges::SelectionEdgeAddress;
 use crate::app::selection::nodes::{SelectionNodeDefinition, SelectionNodeDelegate, SelectionNodeError};
 use crate::app::selection::nodes::context::SelectionNodesContext;
-use crate::app::selection::nodes::recommendation::beta_bandits::{BetaBanditRecommender, BetaBanditResponse};
+use crate::app::selection::nodes::recommendation::beta_bandits::{BetaBanditRecommender};
 use crate::app::values::ValuesPayload;
+use crate::app::selection::nodes::recommendation::response::RecommenderResponse;
+use crate::app::common::addressable::Address;
 
 pub mod beta_bandits;
+pub mod response;
 
 #[derive(Debug)]
 pub struct RecommendationSelectionNodeDetails {
@@ -46,7 +49,8 @@ pub enum RecommendationSelectionError {
     ReinforcementServiceError(ReinforcementServiceError),
     BetaError(BetaError),
     DidNotFindCommandOfRecommendedId(i32),
-    DidNotFindCommandOfIndex(usize)
+    DidNotFindCommandOfIndex(usize),
+    MismatchedRecommenderResponseIdWithCommandId(ContentCommandAddress, RecommenderResponse)
 
 }
 
@@ -54,7 +58,7 @@ impl RecommendationSelectionNode {
 
     fn handle_recommendation_result(
         &self,
-        result: Result<BetaBanditResponse, RecommendationSelectionError>)
+        result: Result<RecommenderResponse, RecommendationSelectionError>)
         -> Result<&ContentCommandAddress, SelectionNodeError> {
         match result {
             Ok(response) => {
@@ -64,12 +68,25 @@ impl RecommendationSelectionNode {
                         SelectionNodeError::RecommendationSelectionError(
                             RecommendationSelectionError::DidNotFindCommandOfIndex(
                                 chosen_command_index))),
-                    Some(address) => Result::Err(),
+                    Some(address) =>
+                        RecommendationSelectionNode::ensure_consistency(
+                            address, response),
                 }
             },
             Err(err) =>
                 Result::Err(SelectionNodeError::RecommendationSelectionError(err)),
         }
+    }
+
+    fn ensure_consistency(chosen_command: &ContentCommandAddress,
+                          response: RecommenderResponse)
+                          -> Result<&ContentCommandAddress, SelectionNodeError> {
+        if chosen_command.get_id() != response.get_chosen_command_id() {
+            return Result::Err(SelectionNodeError::RecommendationSelectionError(
+                RecommendationSelectionError::MismatchedRecommenderResponseIdWithCommandId(
+                    chosen_command.clone(), response)));
+        }
+        Result::Ok(chosen_command)
     }
 
 }
