@@ -105,17 +105,3 @@ impl ReinforcementService {
     }
 
 }
-
-
-pub struct ContentCommandSuccessEvent {
-
-    id: String,
-    created_at_utc: NaiveDateTime,
-    content_command_definition_id: i32,
-    selection_decision_id: i32
-
-}
-
-pub struct ContentCommandFailureEvent {
-
-}

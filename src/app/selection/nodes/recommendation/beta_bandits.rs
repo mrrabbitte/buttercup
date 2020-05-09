@@ -45,11 +45,38 @@ impl BetaBanditRecommender {
                     return Result::Err(RecommendationSelectionError::BetaError(err))
             }
         }
-
         Result::Ok(
             RecommenderResponse::new(
                 highest_score_command_index,
                 highest_score_command_id))
+    }
+
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    const TENANT_ID: &str = "tenant_1";
+
+    #[test]
+    fn test_variant_is_chosen_out_of_choice_space() {
+        let context = MockSelectionNodesContext::new();
+        context.expect_get_success_failures_report()
+    }
+
+    #[test]
+    fn test_variant_with_best_success_failure_report_is_chosen() {
+
+    }
+
+    #[test]
+    fn test_error_from_context_is_forwarded() {
+
+    }
+
+    fn build_choice_space() -> Vec<ContentCommandAddress> {
+        
     }
 
 }
