@@ -27,7 +27,7 @@ pub enum ReinforcementEventType {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SimpleSuccessFailureReport {
 
     report: Vec<SuccessFailureDetails>
@@ -36,32 +36,48 @@ pub struct SimpleSuccessFailureReport {
 
 impl SimpleSuccessFailureReport {
 
+    pub fn new(report: Vec<SuccessFailureDetails>) -> SimpleSuccessFailureReport {
+        SimpleSuccessFailureReport {
+            report
+        }
+    }
+
     pub fn get(&self) -> &Vec<SuccessFailureDetails> {
         &self.report
     }
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SuccessFailureDetails {
 
     command_id: i32,
-    num_successes: f32,
-    num_failures: f32
+    num_successes: u32,
+    num_failures: u32
 
 }
 
 impl SuccessFailureDetails {
 
+    pub fn new(command_id: i32,
+               num_successes: u32,
+               num_failures: u32) -> SuccessFailureDetails {
+        SuccessFailureDetails {
+            command_id,
+            num_successes,
+            num_failures
+        }
+    }
+
     pub fn get_command_id(&self) -> &i32 {
         &self.command_id
     }
 
-    pub fn get_num_successes(&self) -> &f32 {
+    pub fn get_num_successes(&self) -> &u32 {
         &self.num_successes
     }
 
-    pub fn get_num_failures(&self) -> &f32 {
+    pub fn get_num_failures(&self) -> &u32 {
         &self.num_failures
     }
 
@@ -70,7 +86,8 @@ impl SuccessFailureDetails {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ReinforcementServiceError {
 
-    SelectionDecisionError(SelectionDecisionError)
+    SelectionDecisionError(SelectionDecisionError),
+    SuccessFailureReportError
 
 }
 
