@@ -34,8 +34,9 @@ impl BetaBanditRecommender {
         let all_details = report.get();
         for i in 0..all_details.len() {
             let details = &all_details[i];
-            match Beta::new(*details.get_num_successes() as f32,
-                            *details.get_num_failures() as f32) {
+            match Beta::new(
+                BetaBanditRecommender::safe_for_beta(*details.get_num_successes()),
+                BetaBanditRecommender::safe_for_beta(*details.get_num_failures())) {
                 Ok(beta) => {
                     let score = beta.sample(&mut rand::thread_rng());
                     if score > highest_score {
@@ -52,6 +53,13 @@ impl BetaBanditRecommender {
             RecommenderResponse::new(
                 highest_score_command_index,
                 highest_score_command_id))
+    }
+
+    fn safe_for_beta(value: u32) -> f32 {
+        if 0 == value {
+            return 1.0;
+        }
+        return value as f32;
     }
 
 }
@@ -118,7 +126,7 @@ mod tests {
     }
 
     #[test]
-    fn test_beta_error_is_forwarded() {
+    fn test_works_for_zero_counts() {
         let choice_space  =
             vec![ContentCommandAddress::new(CONTENT_COMMAND_ID, CONTENT_COMMAND_INDEX)];
         let tenant_id = String::from(TENANT_ID);
@@ -128,9 +136,10 @@ mod tests {
                     CONTENT_COMMAND_ID, 0, 1)])));
         let result =
             BetaBanditRecommender::choose_best_command(&tenant_id, &choice_space, &context);
-        assert!(result.is_err());
-        assert_eq!(RecommendationSelectionError::BetaError(BetaError::AlphaTooSmall),
-                   result.err().unwrap());
+        assert!(result.is_ok());
+        let response = result.unwrap();
+        assert_eq!(*response.get_chosen_command_id(), CONTENT_COMMAND_ID);
+        assert_eq!(*response.get_chosen_command_index(), CONTENT_COMMAND_INDEX);
     }
 
     #[test]
