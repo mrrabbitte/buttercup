@@ -30,6 +30,7 @@ pub struct ContentPipelineKey {
 
 }
 
+#[derive(Debug)]
 pub enum ContentPipelineCacheError {
 
     NotFound

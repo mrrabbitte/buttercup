@@ -17,6 +17,7 @@ use crate::app::values::ValuesPayload;
 
 pub mod cache;
 
+#[derive(Debug)]
 pub enum ContentPipelineEvaluationError {
 
     ContentPipelineCacheError(ContentPipelineCacheError),

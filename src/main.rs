@@ -18,11 +18,6 @@ mod app;
 mod builder;
 mod endpoints;
 
-
-async fn index() -> impl Responder {
-    HttpResponse::Ok().body("Hello world!")
-}
-
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     TransformationService::initialize();

@@ -9,11 +9,12 @@ use crate::app::pipeline::core::ContentPipelineRequest;
 
 #[post("{tenant_id}/pipeline/{id}")]
 pub async fn pipeline(service: Data<ContentPipelineService>,
-                      tenant_id: Path<String>,
-                      id: Path<i32>,
+                      id: Path<(String, i32)>,
                       body: Json<Value>) -> impl Responder {
+    let (tenant_id, pipeline_id) = id.into_inner();
     let request = ContentPipelineRequest::new(
-        tenant_id.into_inner(), id.into_inner(), body.deref());
-    service.evaluate(&request);
+        tenant_id, pipeline_id, body.deref());
+    let response = service.evaluate(&request);
+    println!("{:?}", response);
     HttpResponse::Ok().body(format!("OK"))
 }
