@@ -12,27 +12,25 @@ use crate::app::arguments::extraction::{ArgumentsExtractionInput, ArgumentValues
 use crate::app::transformations::transformer::TransformationService;
 use crate::app::values::{ValuesPayload, ValueType};
 use crate::app::values::extractors::ValueExtractionPolicy;
-
+use crate::builder::content_pipeline_service;
 
 mod app;
+mod builder;
+mod endpoints;
+
 
 async fn index() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
 
-#[post("/video/{id}")]
-async fn index2(path: Path<u32>,
-                body: Json<Value>) -> impl Responder {
-    HttpResponse::Ok().body(format!("OK"))
-}
-
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     TransformationService::initialize();
-    HttpServer::new(|| {
+    let pipeline_service = content_pipeline_service();
+    HttpServer::new(move || {
         App::new()
-            .service(index2)
-            .route("/", web::get().to(index))
+            .data(pipeline_service.clone())
+            .service(endpoints::pipeline)
     })
         .bind("127.0.0.1:8088")?
         .run()

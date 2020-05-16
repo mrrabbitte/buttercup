@@ -1,35 +1,31 @@
-use chrono::NaiveDateTime;
-use serde_json::Value;
-use url::Url;
+use crate::app::pipeline::core::{ContentPipelineRequest, ContentPipelineResponse};
+use crate::app::pipeline::evaluation::{ContentPipelineEvaluationError, ContentPipelineEvaluationService};
 
-use crate::app::content::ContentType;
-use crate::app::pipeline::request::ContentPipelineRequest;
-use crate::app::pipeline::response::ContentPipelineResponse;
-use crate::app::selection::nodes::SelectionNodeError;
-use crate::app::selection::tree::SelectionTreeError;
-
-pub mod evaluation;
+pub mod core;
 pub mod definitions;
-pub mod request;
-pub mod response;
+pub mod evaluation;
 
+#[derive(Clone)]
+pub struct ContentPipelineService {
 
-
-pub enum ContentPipelineError {
-
-    SelectionTreeError(SelectionTreeError)
+    evaluation_service: ContentPipelineEvaluationService
 
 }
 
-pub struct ContentPipelineEvaluationService;
+impl ContentPipelineService {
 
-impl ContentPipelineEvaluationService {
+    pub fn new(evaluation_service: ContentPipelineEvaluationService) -> ContentPipelineService {
+        ContentPipelineService {
+            evaluation_service
+        }
+    }
 
-    pub fn handle(request: &ContentPipelineRequest)
-        -> Result<ContentPipelineResponse, ContentPipelineError> {
-        unimplemented!()
+    pub fn evaluate(&self,
+                    request: &ContentPipelineRequest)
+        -> Result<ContentPipelineResponse, ContentPipelineEvaluationError> {
+        self.evaluation_service.handle(request)
     }
 
 }
 
-pub struct ContentPipeline;
+

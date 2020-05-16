@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use serde_json::{Map, Value};
 use strum_macros::AsRefStr;
 
+use crate::app::arguments::extraction::{ArgumentsExtractionInput, ArgumentValueExtractorError, ArgumentValuesExtractionService};
 use crate::app::values::{ValueHolder, ValuesPayload, ValueType};
 use crate::app::values::extractors::{ValueExtractionPolicy, ValueExtractorInput, ValueExtractorService};
 
@@ -56,6 +57,24 @@ impl ArgumentDefinition {
 
     pub fn get_argument_set_definition_id(&self) -> &i32 {
         &self.argument_set_definition_id
+    }
+
+}
+
+pub struct ArgumentsExtractor {
+
+    argument_definitions: HashMap<String, ArgumentDefinition>
+
+}
+
+impl ArgumentsExtractor {
+
+    pub fn extract(&self, payload: &Value) -> Result<ValuesPayload, ArgumentValueExtractorError> {
+        ArgumentValuesExtractionService::process(
+            ArgumentsExtractionInput::new(
+                &self.argument_definitions,
+                payload)
+        )
     }
 
 }

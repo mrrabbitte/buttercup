@@ -91,13 +91,20 @@ pub enum ReinforcementServiceError {
 
 }
 
+#[derive(Clone)]
 pub struct ReinforcementService {
 
-    decision_service: Arc<SelectionDecisionService>
+    decision_service: SelectionDecisionService
 
 }
 
 impl ReinforcementService {
+
+    pub fn new(decision_service: SelectionDecisionService) -> ReinforcementService {
+        ReinforcementService {
+            decision_service
+        }
+    }
 
     pub fn handle(&self,
                   event: &ReinforcementEvent) -> Result<(), ReinforcementServiceError> {

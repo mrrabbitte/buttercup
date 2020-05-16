@@ -52,11 +52,16 @@ pub enum SelectionDecisionError {
 
 }
 
+#[derive(Clone)]
 pub struct SelectionDecisionService {
 
 }
 
 impl SelectionDecisionService {
+
+    pub fn new() -> SelectionDecisionService {
+        SelectionDecisionService{}
+    }
 
     pub fn save(&self,
                 decision: &SelectionDecision) -> Result <(), SelectionDecisionError> {

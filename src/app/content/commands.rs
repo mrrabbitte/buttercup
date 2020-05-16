@@ -1,15 +1,9 @@
 use crate::app::common::addressable::Address;
-use crate::app::content::ContentType;
+use crate::app::content::definitions::ContentType;
 use crate::app::values::ValuesPayload;
 use crate::app::content::responses::ContentCommandResponse;
 
-#[derive(Debug, Clone)]
-pub struct ContentCommandDefinition {
-
-    id: i32,
-    content_type: ContentType
-
-}
+pub mod video;
 
 pub trait ContentCommandDelegate {
 

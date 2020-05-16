@@ -1,5 +1,6 @@
 use url::Url;
-use crate::app::content::ContentType;
+
+use crate::app::content::definitions::ContentType;
 
 pub struct ContentCommandResponse {
 

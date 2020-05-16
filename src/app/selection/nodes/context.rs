@@ -13,9 +13,20 @@ pub trait SelectionNodesContext {
 
 }
 
+#[derive(Clone)]
 pub struct SimpleSelectionNodesContext {
 
     reinforcement_service: ReinforcementService
+
+}
+
+impl SimpleSelectionNodesContext {
+
+    pub fn new(reinforcement_service: ReinforcementService) -> SimpleSelectionNodesContext {
+        SimpleSelectionNodesContext {
+            reinforcement_service
+        }
+    }
 
 }
 
