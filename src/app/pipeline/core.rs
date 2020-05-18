@@ -11,6 +11,7 @@ use crate::app::content::definitions::ContentType;
 use crate::app::selection::tree::SelectionTree;
 use crate::app::transformations::Transformer;
 use crate::app::transformations::transformer::TransformationRequest;
+use crate::app::content::ContentCommandExecutor;
 
 #[derive(Debug, Clone)]
 pub struct ContentPipelineRequestHeader {
@@ -87,7 +88,8 @@ pub struct ContentPipeline {
 
     extractor: ArgumentsExtractor,
     transformer: Transformer,
-    selection_tree: SelectionTree
+    selection_tree: SelectionTree,
+    command_executor: ContentCommandExecutor
 
 }
 

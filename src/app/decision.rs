@@ -11,7 +11,7 @@ pub struct SelectionDecision {
 
     id: Uuid,
     pipeline_id: i32,
-    content_command_ids: Vec<i32>
+    content_commands: Vec<ContentCommandAddress>
 
 }
 
@@ -22,11 +22,7 @@ impl SelectionDecision {
         SelectionDecision {
             id: Uuid::new_v4(),
             pipeline_id,
-            content_command_ids:
             content_commands
-                .iter()
-                .map(|addr| *addr.get_id())
-                .collect::<Vec<i32>>()
         }
     }
 
@@ -38,8 +34,8 @@ impl SelectionDecision {
         &self.pipeline_id
     }
 
-    pub fn get_content_commands(&self) -> &Vec<i32> {
-        &self.content_command_ids
+    pub fn get_content_commands(&self) -> &Vec<ContentCommandAddress> {
+        &self.content_commands
     }
 
 }
