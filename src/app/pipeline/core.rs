@@ -7,11 +7,11 @@ use url::Url;
 use uuid::Uuid;
 
 use crate::app::arguments::{ArgumentDefinition, ArgumentsExtractor};
+use crate::app::content::commands::ContentCommandExecutor;
 use crate::app::content::definitions::ContentType;
 use crate::app::selection::tree::SelectionTree;
 use crate::app::transformations::Transformer;
 use crate::app::transformations::transformer::TransformationRequest;
-use crate::app::content::ContentCommandExecutor;
 
 #[derive(Debug, Clone)]
 pub struct ContentPipelineRequestHeader {
@@ -84,8 +84,11 @@ pub struct ContentPipelineResponse {
 
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct ContentPipeline {
 
+    id: i32,
+    tenant_id: String,
     extractor: ArgumentsExtractor,
     transformer: Transformer,
     selection_tree: SelectionTree,
@@ -94,6 +97,30 @@ pub struct ContentPipeline {
 }
 
 impl ContentPipeline {
+
+    pub fn new(id: i32,
+               tenant_id: String,
+               extractor: ArgumentsExtractor,
+               transformer: Transformer,
+               selection_tree: SelectionTree,
+               command_executor: ContentCommandExecutor) -> ContentPipeline {
+        ContentPipeline {
+            id,
+            tenant_id,
+            extractor,
+            transformer,
+            selection_tree,
+            command_executor
+        }
+    }
+
+    pub fn get_id(&self) -> &i32 {
+        &self.id
+    }
+
+    pub fn get_tenant_id(&self) -> &String {
+        &self.tenant_id
+    }
 
     pub fn get_extractor(&self) -> &ArgumentsExtractor {
         &self.extractor
@@ -105,6 +132,10 @@ impl ContentPipeline {
 
     pub fn get_selection_tree(&self) -> &SelectionTree {
         &self.selection_tree
+    }
+
+    pub fn get_command_executor(&self) -> &ContentCommandExecutor {
+        &self.command_executor
     }
 
 }

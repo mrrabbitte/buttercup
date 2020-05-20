@@ -7,6 +7,8 @@ use crate::app::selection::nodes::recommendation::{RecommendationSelectionNode, 
 use crate::app::selection::nodes::simple::SimpleSelectionNode;
 use crate::app::values::ValuesPayload;
 
+use serde::{Serialize, Deserialize};
+
 pub mod simple;
 pub mod dictionary;
 pub mod recommendation;
@@ -29,7 +31,7 @@ pub trait SelectionNodeDelegate {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SelectionNodeDefinition {
 
     id: i32,
@@ -48,7 +50,7 @@ impl SelectionNodeDefinition {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum SelectionNode {
 
     Simple(SimpleSelectionNode),
@@ -77,7 +79,7 @@ impl SelectionNode {
 
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SelectionNodeAddress {
 
     id: i32,

@@ -11,9 +11,11 @@ use crate::app::values::ValuesPayload;
 use crate::app::content::commands::ContentCommandAddress;
 use crate::app::decision::SelectionDecision;
 use crate::app::selection::nodes::context::SelectionNodesContext;
+use serde::{Serialize, Deserialize};
 
 pub mod evaluation;
 
+#[derive(Serialize, Deserialize)]
 pub struct SelectionTreeDefinition {
 
     id: i32,
@@ -21,6 +23,7 @@ pub struct SelectionTreeDefinition {
 
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct SelectionTree {
 
     tenant_id: String,
@@ -42,6 +45,16 @@ pub enum SelectionTreeError {
 }
 
 impl SelectionTree {
+
+    pub fn new(tenant_id: String,
+               definition: SelectionTreeDefinition,
+               evaluator: SelectionTreeEvaluator) -> SelectionTree {
+        SelectionTree {
+            tenant_id,
+            definition,
+            evaluator
+        }
+    }
 
     pub fn evaluate(&self,
                     payload: &ValuesPayload,

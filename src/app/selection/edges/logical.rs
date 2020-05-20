@@ -3,11 +3,13 @@ use crate::app::selection::edges::logical::expressions::{Expression, ExpressionE
 use crate::app::selection::nodes::SelectionNodeAddress;
 use crate::app::values::ValuesPayload;
 
+use serde::{Serialize, Deserialize};
+
 pub mod conditions;
 pub mod expressions;
 pub mod operators;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LogicalExpressionSelectionEdgeDetails {
 
     id: i32,
@@ -27,7 +29,7 @@ impl LogicalExpressionSelectionEdgeDetails {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LogicalExpressionSelectionEdge {
 
     definition: SelectionEdgeDefinition,

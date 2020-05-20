@@ -6,7 +6,7 @@ use strum_macros::AsRefStr;
 use crate::app::arguments::extraction::{ArgumentsExtractionInput, ArgumentValueExtractorError, ArgumentValuesExtractionService};
 use crate::app::values::{ValueHolder, ValuesPayload, ValueType};
 use crate::app::values::extractors::{ValueExtractionPolicy, ValueExtractorInput, ValueExtractorService};
-
+use serde::{Serialize, Deserialize};
 pub mod extraction;
 
 pub struct ArgumentSetDefinition {
@@ -17,6 +17,7 @@ pub struct ArgumentSetDefinition {
 
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct ArgumentDefinition {
 
     id: i32,
@@ -61,6 +62,7 @@ impl ArgumentDefinition {
 
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct ArgumentsExtractor {
 
     argument_definitions: HashMap<String, ArgumentDefinition>
@@ -68,6 +70,12 @@ pub struct ArgumentsExtractor {
 }
 
 impl ArgumentsExtractor {
+
+    pub fn new(argument_definitions: HashMap<String, ArgumentDefinition>) -> ArgumentsExtractor {
+        ArgumentsExtractor {
+            argument_definitions
+        }
+    }
 
     pub fn extract(&self, payload: &Value) -> Result<ValuesPayload, ArgumentValueExtractorError> {
         ArgumentValuesExtractionService::process(

@@ -6,6 +6,9 @@ use crate::app::values::ValuesPayload;
 use crate::app::content::commands::ContentCommandAddress;
 use crate::app::selection::nodes::context::SelectionNodesContext;
 
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
 pub struct SelectionTreeEvaluator {
 
     start_node: SelectionNode,

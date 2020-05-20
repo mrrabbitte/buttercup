@@ -3,7 +3,9 @@ use crate::app::selection::edges::logical::conditions::{Condition, ConditionEval
 use crate::app::selection::edges::logical::operators::LogicalOperator;
 use crate::app::values::ValuesPayload;
 
-#[derive(Debug)]
+use serde::{Serialize, Deserialize};
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ExpressionDefinition {
 
     id: i32,
@@ -23,7 +25,7 @@ impl ExpressionDefinition {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Expression {
 
     definition: ExpressionDefinition,
@@ -46,7 +48,7 @@ impl Expression {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct NextExpressionAddressWithOperator {
 
     address: ExpressionAddress,
@@ -66,7 +68,7 @@ impl NextExpressionAddressWithOperator {
 
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ExpressionAddress {
 
     id: i32,

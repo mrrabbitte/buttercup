@@ -14,6 +14,7 @@ use crate::app::selection::tree::{SelectionTree, SelectionTreeError};
 use crate::app::transformations::Transformer;
 use crate::app::transformations::transformer::{TransformationError, TransformationRequest};
 use crate::app::values::ValuesPayload;
+use crate::app::content::commands::ContentCommandExecutorContexts;
 
 pub mod cache;
 
@@ -32,17 +33,21 @@ pub enum ContentPipelineEvaluationError {
 pub struct ContentPipelineEvaluationService {
 
     cache: ContentPipelineCache,
-    selection_context: SimpleSelectionNodesContext
+    selection_context: SimpleSelectionNodesContext,
+    executor_contexts: ContentCommandExecutorContexts
 
 }
 
 impl ContentPipelineEvaluationService {
 
     pub fn new(cache: ContentPipelineCache,
-               selection_context: SimpleSelectionNodesContext) -> ContentPipelineEvaluationService {
+               selection_context: SimpleSelectionNodesContext,
+               executor_contexts: ContentCommandExecutorContexts)
+        -> ContentPipelineEvaluationService {
         ContentPipelineEvaluationService {
             cache,
-            selection_context
+            selection_context,
+            executor_contexts
         }
     }
 

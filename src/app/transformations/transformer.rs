@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use serde::{Deserialize, Serialize};
+
 use crate::app::transformations::di::DiInputTransformation;
 use crate::app::transformations::mono::MonoInputTransformation;
 use crate::app::values::{ValueHolder, ValuesPayload};
@@ -23,6 +25,7 @@ pub enum TransformationError {
 
 }
 
+#[derive(Serialize, Deserialize)]
 pub enum TransformationType {
 
     SingleInput,
@@ -30,6 +33,7 @@ pub enum TransformationType {
 
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct TransformationDefinition {
 
     id: i32,
@@ -52,6 +56,7 @@ impl TransformationDefinition {
 
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct SingleInputTransformationDefinition {
 
     transformation_definition_id: i32,
@@ -74,6 +79,7 @@ impl SingleInputTransformationDefinition {
 
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct DoubleInputTransformationDefinition {
 
     transformation_definition_id: i32,
@@ -99,6 +105,7 @@ impl DoubleInputTransformationDefinition {
 
 }
 
+#[derive(Serialize, Deserialize)]
 pub enum Transformation {
 
     Mono(SingleInputTransformationDefinition),
@@ -106,6 +113,7 @@ pub enum Transformation {
 
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct TransformationRequest {
 
     definition: TransformationDefinition,

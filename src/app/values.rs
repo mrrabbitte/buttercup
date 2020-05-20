@@ -44,7 +44,7 @@ pub enum ValueHolder {
 
 }
 
-#[derive(AsRefStr, EnumVariantNames, Debug, PartialEq)]
+#[derive(AsRefStr, EnumVariantNames, Debug, PartialEq, Serialize, Deserialize)]
 pub enum ValueType {
 
     Boolean,

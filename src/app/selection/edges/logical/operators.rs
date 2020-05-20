@@ -1,9 +1,11 @@
+use serde::{Deserialize, Serialize};
+
 use crate::app::selection::edges::logical::operators::strings::StringOperators;
 use crate::app::values::ValueHolder;
 
 pub mod strings;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RelationalOperator {
 
     Equals,
@@ -44,7 +46,7 @@ impl RelationalOperator {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum LogicalOperator {
 
     And,

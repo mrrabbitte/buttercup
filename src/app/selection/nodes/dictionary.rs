@@ -6,7 +6,9 @@ use crate::app::values::{ValueHolder, ValuesPayload};
 use crate::app::content::commands::ContentCommandAddress;
 use crate::app::selection::nodes::context::SelectionNodesContext;
 
-#[derive(Debug)]
+use serde::{Serialize, Deserialize};
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DictionarySelectionNodeDetails {
 
     selection_node_definition_id: i32,
@@ -29,7 +31,7 @@ impl DictionarySelectionNodeDetails {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DictionarySelectionNode {
 
     definition: SelectionNodeDefinition,
@@ -88,7 +90,7 @@ pub enum DictionarySelectionError {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DictionaryNodeMapping {
 
     default_command_address: ContentCommandAddress,

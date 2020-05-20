@@ -8,6 +8,9 @@ use crate::app::content::commands::video::VideoContentCommandsContext;
 pub mod video;
 pub mod html;
 
+use serde::{Serialize, Deserialize};
+
+#[derive(Debug, Clone)]
 pub struct ContentCommandExecutorContexts {
 
     html_context: HtmlContentCommandsContext,
@@ -15,6 +18,19 @@ pub struct ContentCommandExecutorContexts {
 
 }
 
+impl ContentCommandExecutorContexts {
+
+    pub fn new(html_context: HtmlContentCommandsContext,
+               video_context: VideoContentCommandsContext) -> ContentCommandExecutorContexts {
+        ContentCommandExecutorContexts {
+            html_context,
+            video_context
+        }
+    }
+
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct ContentCommandExecutor {
 
     tenant_id: String,
@@ -34,23 +50,28 @@ pub enum ContentCommandExecutionError {
 impl ContentCommandExecutor {
 
     pub fn execute(&self,
-                   contexts: ContentCommandExecutorContexts,
+                   contexts: &ContentCommandExecutorContexts,
                    payload: &ValuesPayload,
-                   content_commands: &Vec<ContentCommandAddress>)
+                   addresses: &Vec<ContentCommandAddress>)
                    -> Result<ContentCommandResponse, ContentCommandExecutionError> {
-        match content_commands.get(0) {
-            None => return Result::Err(ContentCommandExecutionError::NoCommandsProvided),
-            Some(first) => self.do_execute(content_commands),
+        if addresses.is_empty() {
+            return Result::Err(ContentCommandExecutionError::NoCommandsProvided);
         }
+        self.do_execute(contexts, payload, addresses)
     }
 
     fn do_execute(&self,
-                  contexts: ContentCommandExecutorContexts,
+                  contexts: &ContentCommandExecutorContexts,
                   payload: &ValuesPayload,
-                  content_commands: &Vec<ContentCommandAddress>)
-        -> Result<ContentCommandResponse, ContentCommandExecutionError> {
-        let commands =
-            self.choose(content_commands);
+                  addresses: &Vec<ContentCommandAddress>)
+                  -> Result<ContentCommandResponse, ContentCommandExecutionError> {
+        match self.content_type {
+            ContentType::Html => contexts.html_context.execute(
+                payload, &self.commands, addresses),
+            ContentType::Video => contexts.video_context.execute(
+                payload, &self.commands, addresses),
+        }
+
     }
 
     fn choose(&self, target: &Vec<ContentCommandAddress>)
@@ -76,6 +97,7 @@ impl ContentCommandExecutor {
 
 }
 
+#[derive(Serialize, Deserialize)]
 pub enum ContentCommand {
 
     HtmlCommand,
@@ -110,12 +132,13 @@ pub trait ContentCommandsContext {
 
     fn execute(&self,
                payload: &ValuesPayload,
-               content_commands: &Vec<ContentCommand>)
+               commands: &Vec<ContentCommand>,
+               addresses: &Vec<ContentCommandAddress>)
         -> Result<ContentCommandResponse, ContentCommandExecutionError>;
 
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ContentCommandAddress {
 
     id: i32,

@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
@@ -9,7 +10,7 @@ use crate::app::values::{ValueHolder, ValueType};
 pub mod astro;
 pub mod local_to_zoned;
 
-#[derive(EnumIter)]
+#[derive(EnumIter, Serialize, Deserialize)]
 pub enum DiInputTransformation {
 
     IsAfterSunset,

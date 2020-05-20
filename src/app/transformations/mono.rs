@@ -9,7 +9,9 @@ use crate::app::values::{ValueHolder, ValueType};
 pub mod day_of_week;
 pub mod geolocation;
 
-#[derive(EnumIter)]
+use serde::{Serialize, Deserialize};
+
+#[derive(EnumIter, Serialize, Deserialize)]
 pub enum MonoInputTransformation {
 
     DayOfWeekFromDateTimeRetrieval,

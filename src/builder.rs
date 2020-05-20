@@ -1,3 +1,6 @@
+use crate::app::content::commands::ContentCommandExecutorContexts;
+use crate::app::content::commands::html::HtmlContentCommandsContext;
+use crate::app::content::commands::video::VideoContentCommandsContext;
 use crate::app::decision::SelectionDecisionService;
 use crate::app::pipeline::ContentPipelineService;
 use crate::app::pipeline::evaluation::cache::ContentPipelineCache;
@@ -11,7 +14,10 @@ pub fn content_pipeline_service() -> ContentPipelineService {
             ContentPipelineCache::new(),
             SimpleSelectionNodesContext::new(
                 ReinforcementService::new(
-                    SelectionDecisionService::new()))
+                    SelectionDecisionService::new())),
+            ContentCommandExecutorContexts::new(
+                HtmlContentCommandsContext::new(),
+                VideoContentCommandsContext::new())
         )
     )
 }

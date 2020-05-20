@@ -2,6 +2,9 @@ use crate::app::selection::edges::{SelectionEdgeDefinition, SelectionEdgeDelegat
 use crate::app::selection::nodes::SelectionNodeAddress;
 use crate::app::values::ValuesPayload;
 
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
 pub struct AlwaysTrueSelectionEdge {
 
     definition: SelectionEdgeDefinition,

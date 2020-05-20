@@ -1,10 +1,12 @@
-use crate::app::selection::edges::SelectionEdgeAddress;
-use crate::app::selection::nodes::{SelectionNodeError, SelectionNodeDefinition, SelectionNodeDelegate};
-use crate::app::values::ValuesPayload;
-use crate::app::content::commands::ContentCommandAddress;
-use crate::app::selection::nodes::context::SelectionNodesContext;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+use crate::app::content::commands::ContentCommandAddress;
+use crate::app::selection::edges::SelectionEdgeAddress;
+use crate::app::selection::nodes::{SelectionNodeDefinition, SelectionNodeDelegate, SelectionNodeError};
+use crate::app::selection::nodes::context::SelectionNodesContext;
+use crate::app::values::ValuesPayload;
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SimpleSelectionNodeDetails {
 
     selection_node_definition_id: i32,
@@ -24,7 +26,7 @@ impl SimpleSelectionNodeDetails {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SimpleSelectionNode {
 
     definition: SelectionNodeDefinition,

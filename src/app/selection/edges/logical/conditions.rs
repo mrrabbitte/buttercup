@@ -1,12 +1,13 @@
 use std::collections::HashMap;
 
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::app::selection::edges::logical::operators::{RelationalOperator, RelationalOperatorError};
 use crate::app::selection::SelectionEvaluationError;
 use crate::app::values::{ValueHolder, ValuesPayload, ValueType};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ConditionDefinition {
 
     id: i32,
@@ -17,7 +18,7 @@ pub struct ConditionDefinition {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct StaticValueConditionDefinition {
 
     condition_definition_id: i32,
@@ -26,7 +27,7 @@ pub struct StaticValueConditionDefinition {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RuntimeValueConditionDefinition {
 
     condition_definition_id: i32,
@@ -34,7 +35,7 @@ pub struct RuntimeValueConditionDefinition {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Condition {
 
     id: i32,
@@ -45,7 +46,7 @@ pub struct Condition {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum ConditionValue {
 
     Static(ValueHolder),

@@ -8,7 +8,9 @@ pub mod transformer;
 pub mod mono;
 pub mod di;
 
+use serde::{Serialize, Deserialize};
 
+#[derive(Serialize, Deserialize)]
 pub struct Transformer {
 
     requests: Vec<TransformationRequest>

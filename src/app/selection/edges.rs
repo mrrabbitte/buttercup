@@ -5,9 +5,12 @@ use crate::app::values::ValuesPayload;
 use crate::app::selection::edges::logical::LogicalExpressionSelectionEdge;
 use crate::app::selection::edges::logical::expressions::ExpressionEvaluationError;
 
+use serde::{Serialize, Deserialize};
+
 pub mod always;
 pub mod logical;
 
+#[derive(Serialize, Deserialize)]
 pub enum SelectionEdge {
 
     AlwaysTrueSelectionEdge(AlwaysTrueSelectionEdge),
@@ -67,7 +70,7 @@ impl SelectionEdge {
 
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SelectionEdgeAddress {
 
     id: i32,
@@ -94,14 +97,15 @@ impl Address for SelectionEdgeAddress {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum SelectionEdgeType {
 
     AlwaysTrueSelectionEdge,
     LogicalExpressionSelectionEdge
 
 }
-#[derive(Debug)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SelectionEdgeDefinition {
 
     id: i32,

@@ -12,10 +12,12 @@ use crate::app::values::ValuesPayload;
 use crate::app::selection::nodes::recommendation::response::RecommenderResponse;
 use crate::app::common::addressable::Address;
 
+use serde::{Serialize, Deserialize};
+
 pub mod beta_bandits;
 pub mod response;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RecommendationSelectionNodeDetails {
 
     id: i32,
@@ -24,7 +26,7 @@ pub struct RecommendationSelectionNodeDetails {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RecommendationSelectionNode {
 
     tenant_id: String,
@@ -36,7 +38,7 @@ pub struct RecommendationSelectionNode {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum RecommendationSelectionNodeType {
 
     SimpleBetaBandit
