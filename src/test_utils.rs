@@ -229,7 +229,7 @@ impl TestUtils {
                                                false,
                                                ConditionValue::Static(
                                                    ValueHolder::Decimal(
-                                                       "11.1".parse::<BigRational>().unwrap())))
+                                                       "11/2".parse::<BigRational>().unwrap())))
                             ],
                             Option::None)
                     ],
@@ -249,14 +249,14 @@ impl TestUtils {
                                            false,
                                            ConditionValue::Static(
                                                ValueHolder::Decimal(
-                                                   "11.1".parse::<BigRational>().unwrap()))),
+                                                   "11/2".parse::<BigRational>().unwrap()))),
                             Condition::new(4,
                                            "decimalArg".to_owned(),
                                            RelationalOperator::GreaterThanOrEquals,
                                            true,
                                            ConditionValue::Static(
                                                ValueHolder::Decimal(
-                                                   "22.22".parse::<BigRational>().unwrap())))
+                                                   "22/21".parse::<BigRational>().unwrap())))
                         ],
                         Option::Some(
                             NextExpressionAddressWithOperator::new(
