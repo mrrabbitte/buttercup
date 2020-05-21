@@ -17,6 +17,7 @@ use crate::builder::content_pipeline_service;
 mod app;
 mod builder;
 mod endpoints;
+mod test_utils;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -27,7 +28,7 @@ async fn main() -> std::io::Result<()> {
             .data(pipeline_service.clone())
             .service(endpoints::pipeline)
     })
-        .bind("127.0.0.1:8088")?
+        .bind("127.0.0.1:7777")?
         .run()
         .await
 }

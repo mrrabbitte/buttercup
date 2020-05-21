@@ -23,6 +23,17 @@ pub struct SelectionTreeDefinition {
 
 }
 
+impl SelectionTreeDefinition {
+
+    pub fn new(id: i32,
+               name: String) -> SelectionTreeDefinition {
+        SelectionTreeDefinition {
+            id,
+            name
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct SelectionTree {
 

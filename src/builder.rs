@@ -7,11 +7,18 @@ use crate::app::pipeline::evaluation::cache::ContentPipelineCache;
 use crate::app::pipeline::evaluation::ContentPipelineEvaluationService;
 use crate::app::reinforcement::ReinforcementService;
 use crate::app::selection::nodes::context::SimpleSelectionNodesContext;
+use crate::test_utils::TestUtils;
 
 pub fn content_pipeline_service() -> ContentPipelineService {
+    let cache = ContentPipelineCache::new();
+    let test_pipeline = TestUtils::test_pipeline();
+    cache.put(
+        test_pipeline.get_tenant_id().clone(),
+        test_pipeline.get_id().clone(),
+        TestUtils::test_pipeline());
     ContentPipelineService::new(
         ContentPipelineEvaluationService::new(
-            ContentPipelineCache::new(),
+            cache,
             SimpleSelectionNodesContext::new(
                 ReinforcementService::new(
                     SelectionDecisionService::new())),

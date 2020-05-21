@@ -19,6 +19,12 @@ pub struct Transformer {
 
 impl Transformer {
 
+    pub fn new(requests: Vec<TransformationRequest>) -> Transformer {
+        Transformer {
+            requests
+        }
+    }
+
     pub fn transform(&self,
                      payload: &ValuesPayload) -> Result<ValuesPayload, TransformationError> {
         TransformationService::transform(payload, &self.requests)

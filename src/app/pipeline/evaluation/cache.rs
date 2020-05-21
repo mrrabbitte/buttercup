@@ -64,12 +64,11 @@ impl ContentPipelineCache {
     }
 
     pub fn put(&self,
-               tenant_id: &String,
-               pipeline_id: &i32,
+               tenant_id: String,
+               pipeline_id: i32,
                pipeline: ContentPipeline) {
         self.pipelines.insert(
-            ContentPipelineKey::new(tenant_id.clone(), *pipeline_id),
-            pipeline);
+            ContentPipelineKey::new(tenant_id, pipeline_id),pipeline);
     }
 
 }

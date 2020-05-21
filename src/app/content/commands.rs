@@ -49,6 +49,16 @@ pub enum ContentCommandExecutionError {
 
 impl ContentCommandExecutor {
 
+    pub fn new(tenant_id: String,
+               content_type: ContentType,
+               commands: Vec<ContentCommand>) -> ContentCommandExecutor {
+        ContentCommandExecutor {
+            tenant_id,
+            content_type,
+            commands
+        }
+    }
+
     pub fn execute(&self,
                    contexts: &ContentCommandExecutorContexts,
                    payload: &ValuesPayload,
