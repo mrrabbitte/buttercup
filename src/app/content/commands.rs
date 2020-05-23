@@ -39,6 +39,7 @@ pub struct ContentCommandExecutor {
 
 }
 
+#[derive(Debug, Clone)]
 pub enum ContentCommandExecutionError {
 
     NoCommandsProvided,

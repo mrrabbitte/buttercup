@@ -13,7 +13,7 @@ use crate::app::selection::tree::SelectionTree;
 use crate::app::transformations::Transformer;
 use crate::app::transformations::transformer::TransformationRequest;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ContentPipelineRequestHeader {
 
     id: Uuid,
@@ -77,10 +77,27 @@ impl<'a> ContentPipelineRequest<'a> {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ContentPipelineResponse {
 
-    id: String,
+    id: Uuid,
+    request: ContentPipelineRequestHeader,
     created_at_utc: NaiveDateTime,
-    content_type: ContentType,
+    decision_id: Uuid,
     external_url: String
+
+}
+
+impl ContentPipelineResponse {
+
+    pub fn new(request: ContentPipelineRequestHeader,
+               decision_id: Uuid,
+               external_url: String) -> ContentPipelineResponse {
+        ContentPipelineResponse {
+            id: Uuid::new_v4(),
+            request,
+            created_at_utc: Utc::now().naive_utc(),
+            decision_id,
+            external_url
+        }
+    }
 
 }
 

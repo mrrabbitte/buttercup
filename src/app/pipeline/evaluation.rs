@@ -6,6 +6,8 @@ use dashmap::mapref::one::Ref;
 
 use crate::app::arguments::ArgumentDefinition;
 use crate::app::arguments::extraction::{ArgumentsExtractionInput, ArgumentValueExtractorError, ArgumentValuesExtractionService};
+use crate::app::content::commands::{ContentCommandExecutionError, ContentCommandExecutorContexts};
+use crate::app::content::responses::ContentCommandResponse;
 use crate::app::decision::SelectionDecision;
 use crate::app::pipeline::core::{ContentPipeline, ContentPipelineRequest, ContentPipelineRequestHeader, ContentPipelineResponse};
 use crate::app::pipeline::evaluation::cache::{ContentPipelineCache, ContentPipelineCacheError, ContentPipelineKey};
@@ -14,7 +16,6 @@ use crate::app::selection::tree::{SelectionTree, SelectionTreeError};
 use crate::app::transformations::Transformer;
 use crate::app::transformations::transformer::{TransformationError, TransformationRequest};
 use crate::app::values::ValuesPayload;
-use crate::app::content::commands::ContentCommandExecutorContexts;
 
 pub mod cache;
 
@@ -25,7 +26,7 @@ pub enum ContentPipelineEvaluationError {
     ArgumentValueExtractorError(ArgumentValueExtractorError),
     TransformationError(TransformationError),
     SelectionTreeError(SelectionTreeError),
-    ContentCommandsError
+    ContentCommandExecutionError(ContentCommandExecutionError)
 
 }
 
@@ -107,8 +108,19 @@ impl ContentPipelineEvaluationService {
                         values: ValuesPayload,
                         decision: SelectionDecision)
         -> Result<ContentPipelineResponse, ContentPipelineEvaluationError> {
-        println!("{:?}", decision);
-        Result::Err(ContentPipelineEvaluationError::ContentCommandsError)
+        match pipeline.get_command_executor().execute(&self.executor_contexts,
+                                                &values,
+                                                decision.get_content_commands()) {
+            Ok(result) =>
+                Result::Ok(
+                    ContentPipelineResponse::new(header.clone(),
+                                                 decision.get_id().clone(),
+                                                 result.get_path().clone())),
+            Err(err) =>
+                Result::Err(
+                    ContentPipelineEvaluationError::ContentCommandExecutionError(err)),
+        }
+
     }
 
 }
