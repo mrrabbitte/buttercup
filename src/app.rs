@@ -8,3 +8,4 @@ pub mod pipeline;
 pub mod common;
 pub mod reinforcement;
 pub mod decision;
+pub mod files;
