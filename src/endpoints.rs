@@ -16,5 +16,5 @@ pub async fn pipeline(service: Data<ContentPipelineService>,
         tenant_id, pipeline_id, body.deref());
     let response = service.evaluate(&request);
     println!("{:?}", response);
-    HttpResponse::Ok().body(format!("OK"))
+    HttpResponse::Ok().body(String::from("OK").into_bytes())
 }

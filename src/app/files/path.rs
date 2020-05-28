@@ -97,12 +97,12 @@ mod tests {
 
     use super::*;
 
-    const TENANT_ID: &str = "tenant_id_1";
-    const BASE_PATH: &str = "base-path/";
-    const TENANT_PATH: &str = "tenant-id-1/";
+    const TENANT_ID: &str = "tenantid1";
+    const BASE_PATH: &str = "basepath/";
+    const TENANT_PATH: &str = "tenantid1/";
 
     #[test]
-    fn test_happy_path() {
+    fn test_happy_path_html() {
         let mut tenant_paths = HashMap::new();
         tenant_paths.insert(TENANT_ID.to_owned(), TENANT_PATH.to_owned());
         let service = FilesPathService::new(BASE_PATH, tenant_paths);
@@ -112,6 +112,26 @@ mod tests {
         assert_eq!(true, name.starts_with(BASE_PATH));
         assert_eq!(true, name.contains(TENANT_PATH));
         assert_eq!(true, name.contains(".html"));
+    }
+
+    #[test]
+    fn test_happy_path_mp4() {
+        let mut tenant_paths = HashMap::new();
+        tenant_paths.insert(TENANT_ID.to_owned(), TENANT_PATH.to_owned());
+        let service = FilesPathService::new(BASE_PATH, tenant_paths);
+        let result = service.new_mp4(&TENANT_ID.to_owned());
+        assert_eq!(true, result.is_ok());
+        let name = result.unwrap();
+        assert_eq!(true, name.starts_with(BASE_PATH));
+        assert_eq!(true, name.contains(TENANT_PATH));
+        assert_eq!(true, name.contains(".mp4"));
+    }
+
+    #[test]
+    fn test_unknown_tenant() {
+        let service = FilesPathService::new(BASE_PATH, HashMap::new());
+        let result = service.new_html(&TENANT_ID.to_owned());
+        assert_eq!(true, result.is_err());
     }
 
 }

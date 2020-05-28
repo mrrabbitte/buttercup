@@ -108,6 +108,10 @@ impl ContentPipelineEvaluationService {
                         values: ValuesPayload,
                         decision: SelectionDecision)
         -> Result<ContentPipelineResponse, ContentPipelineEvaluationError> {
+        let content_commands = decision.get_content_commands();
+        if content_commands.is_empty() {
+            return Result::Err(ContentCommandExecutionError::NoCommandsProvided);
+        }
         match pipeline.get_command_executor().execute(&self.executor_contexts,
                                                 &values,
                                                 decision.get_content_commands()) {
@@ -120,7 +124,6 @@ impl ContentPipelineEvaluationService {
                 Result::Err(
                     ContentPipelineEvaluationError::ContentCommandExecutionError(err)),
         }
-
     }
 
 }
