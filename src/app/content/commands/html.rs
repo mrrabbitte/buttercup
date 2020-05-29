@@ -1,18 +1,19 @@
 use crate::app::content::commands::{ContentCommand, ContentCommandAddress, ContentCommandExecutionError, ContentCommandsContext, ContentCommandDelegate, ContentCommandExecutorDelegate, ContentCommandExecutorContexts};
 use crate::app::content::responses::ContentCommandResponse;
-use crate::app::values::ValuesPayload;
+use crate::app::values::{ValuesPayload, ValueHolder};
 use crate::app::files::FileService;
 use std::io::Write;
 use crate::app::common::addressable::Address;
 use crate::app::content::definitions::ContentType;
 use serde::{Serialize, Deserialize};
+use crate::app::content::commands::html::template::AppendHtmlFromTemplateCommand;
 
 pub mod template;
 
 #[derive(Serialize, Deserialize)]
 pub enum HtmlContentCommand {
 
-    TemplateCommand
+    AppendHtmlFromTemplateCommand(AppendHtmlFromTemplateCommand)
 
 }
 
@@ -20,7 +21,9 @@ pub enum HtmlContentCommand {
 pub enum HtmlContentCommandError {
 
     DidNotFindRequestedBlock(usize),
-    DidNotFindValueName(String)
+    DidNotFindRequestedValueName(usize),
+    DidNotFindValue(String),
+    AmbigousStringValueConversion(String, ValueHolder)
 
 }
 
