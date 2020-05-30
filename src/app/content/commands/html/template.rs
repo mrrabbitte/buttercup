@@ -3,19 +3,20 @@ use std::io::Write;
 use crate::app::values::{ValuesPayload, ValueHolder};
 use crate::app::content::commands::html::HtmlContentCommandError;
 
+pub mod builder;
+
 pub struct AppendHtmlFromTemplateCommand {
 
     id: i32,
     operations: Vec<TemplateOperation>,
-    blocks: Vec<[u8]>,
-    value_names: Vec<String>
+    template: Vec<u8>,
 
 }
 
 enum TemplateOperation {
 
-    AddBlock,
-    AddValue
+    AddContent(usize, usize),
+    AddValue(String)
 
 }
 
@@ -23,65 +24,51 @@ impl AppendHtmlFromTemplateCommand {
 
     pub fn new(id: i32,
                operations: Vec<TemplateOperation>,
-               blocks: Vec<[u8]>,
-               value_names: Vec<String>) -> AppendHtmlFromTemplateCommand {
+               template: Vec<u8>) -> AppendHtmlFromTemplateCommand {
         AppendHtmlFromTemplateCommand {
             id,
             operations,
-            blocks,
-            value_names
+            template
         }
     }
 
     pub fn execute(&self,
                    payload: &ValuesPayload,
                    target: &mut dyn Write) -> Result<(), ContentCommandExecutionError> {
-        let mut current_idx_blocks = 0;
-        let mut current_idx_value_names = 0;
         for operation in self.operations {
             match operation {
-                TemplateOperation::AddBlock => {
-                    match self.blocks.get(current_idx_blocks) {
-                        None =>
-                            return Result::Err(
-                                ContentCommandExecutionError::HtmlContentCommandError(
-                                    HtmlContentCommandError::DidNotFindRequestedBlock(
-                                        current_idx_blocks))),
-                        Some(block) => {
-                            target.write(block);
-                            current_idx_blocks += 1;
-                        },
-                    }
+                TemplateOperation::AddContent(start_idx, end_idx) => {
+                    target.write(&self.template[start_idx..end_idx]);
                 },
-                TemplateOperation::AddValue => {
-                    match self.value_names.get(current_idx_value_names) {
+                TemplateOperation::AddValue(value_name) => {
+                    match payload.get(&value_name) {
                         None => return Result::Err(
                             ContentCommandExecutionError::HtmlContentCommandError(
-                                HtmlContentCommandError::DidNotFindRequestedValueName(
-                                    current_idx_value_names))),
-                        Some(value_name) => {
-                            match payload.get(value_name) {
-                                None => return Result::Err(
-                                    ContentCommandExecutionError::HtmlContentCommandError(
-                                        HtmlContentCommandError::DidNotFindValue(
-                                            value_name.clone()))),
-                                Some(value) => {
-                                    match ValuesToString::convert(value) {
-                                        Ok(string_value) => {
-                                            target.write(string_value.as_bytes());
-                                            current_idx_value_names += 1;
-                                        },
-                                        Err(_) => return Result::Err(
-                                            ContentCommandExecutionError::HtmlContentCommandError(
-                                                HtmlContentCommandError::AmbigousStringValueConversion(
-                                                    value_name.clone(), value.clone()))),
-                                    }
-                                },
-                            }
-                        },
+                                HtmlContentCommandError::DidNotFindValue(value_name.clone()))),
+                        Some(value) =>
+                            match AppendHtmlFromTemplateCommand::handle_value(
+                                &value_name, value, target) {
+                                Ok(_) => {},
+                                Err(err) =>
+                                    return Result::Err(
+                                        ContentCommandExecutionError::HtmlContentCommandError(err)),
+                            },
                     }
                 },
             }
+        }
+        Result::Ok(())
+    }
+
+    fn handle_value(name: &String,
+                    value: &ValueHolder,
+                    target: &mut dyn Write) -> Result<(), HtmlContentCommandError> {
+        match value {
+            ValueHolder::String(val) => Result::Ok(val.as_bytes()),
+            ValueHolder::Email(val) => Result::Ok(val.get().as_bytes()),
+            ValueHolder::IpAddress(val) => target.write(val.to_string().as_bytes()),
+            _ => return Result::Err(
+                HtmlContentCommandError::AmbiguousStringConversion(name.clone(), value.clone()))
         }
         Result::Ok(())
     }
@@ -92,21 +79,6 @@ impl ContentCommand for AppendHtmlFromTemplateCommand {
 
     fn get_id(&self) -> &i32 {
         &self.id
-    }
-
-}
-
-struct ValuesToString;
-
-impl ValuesToString {
-
-    fn convert(value: &ValueHolder) -> Result<String, ()> {
-        match value {
-            ValueHolder::String(val) => Result::Ok(val.clone()),
-            ValueHolder::Email(val) => Result::Ok(val.get().clone()),
-            ValueHolder::IpAddress(val) => Result::Ok(val.to_string()),
-            _ => Result::Err(())
-        }
     }
 
 }

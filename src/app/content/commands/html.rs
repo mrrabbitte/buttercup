@@ -1,4 +1,4 @@
-use crate::app::content::commands::{ContentCommand, ContentCommandAddress, ContentCommandExecutionError, ContentCommandsContext, ContentCommandDelegate, ContentCommandExecutorDelegate, ContentCommandExecutorContexts};
+use crate::app::content::commands::{ContentCommand, ContentCommandAddress, ContentCommandExecutionError, ContentCommandDelegate, ContentCommandExecutorDelegate, ContentCommandExecutorContexts};
 use crate::app::content::responses::ContentCommandResponse;
 use crate::app::values::{ValuesPayload, ValueHolder};
 use crate::app::files::FileService;
@@ -20,10 +20,8 @@ pub enum HtmlContentCommand {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum HtmlContentCommandError {
 
-    DidNotFindRequestedBlock(usize),
-    DidNotFindRequestedValueName(usize),
     DidNotFindValue(String),
-    AmbigousStringValueConversion(String, ValueHolder)
+    AmbiguousStringConversion(String, ValueHolder)
 
 }
 
