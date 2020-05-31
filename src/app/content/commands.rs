@@ -3,7 +3,7 @@ use crate::app::content::definitions::ContentType;
 use crate::app::values::ValuesPayload;
 use crate::app::content::responses::ContentCommandResponse;
 use crate::app::content::commands::html::{HtmlContentCommandsContext, HtmlContentCommandExecutor, HtmlContentCommandError};
-use crate::app::content::commands::video::VideoContentCommandsContext;
+use crate::app::content::commands::video::{VideoContentCommandsContext, VideoContentCommandsExecutor};
 
 pub mod video;
 pub mod html;
@@ -54,7 +54,20 @@ pub enum ContentCommandExecutionError {
 pub enum ContentCommandExecutor {
 
     HtmlCommandExecutor(HtmlContentCommandExecutor),
-    VideoCommandExecutor
+    VideoCommandExecutor(VideoContentCommandsExecutor)
+
+}
+
+impl ContentCommandExecutor {
+
+    fn get_delegate(&self) -> &dyn ContentCommandExecutorDelegate {
+        match self {
+            ContentCommandExecutor::HtmlCommandExecutor(
+                executor) => executor,
+            ContentCommandExecutor::VideoCommandExecutor(
+                executor) => executor,
+        }
+    }
 
 }
 
@@ -65,11 +78,11 @@ impl ContentCommandExecutorDelegate for ContentCommandExecutor {
                   payload: &ValuesPayload,
                   addresses: &Vec<ContentCommandAddress>)
         -> Result<ContentCommandResponse, ContentCommandExecutionError> {
-        unimplemented!()
+        self.get_delegate().do_execute(contexts, payload, addresses)
     }
 
-    fn get_content_type(&self) -> &ContentType {
-        unimplemented!()
+    fn get_content_type(&self) -> ContentType {
+        self.get_delegate().get_content_type()
     }
 }
 

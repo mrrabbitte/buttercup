@@ -64,8 +64,8 @@ impl AppendHtmlFromTemplateCommand {
                     value: &ValueHolder,
                     target: &mut dyn Write) -> Result<(), HtmlContentCommandError> {
         match value {
-            ValueHolder::String(val) => Result::Ok(val.as_bytes()),
-            ValueHolder::Email(val) => Result::Ok(val.get().as_bytes()),
+            ValueHolder::String(val) => target.write(val.as_bytes()),
+            ValueHolder::Email(val) => target.write(val.get().as_bytes()),
             ValueHolder::IpAddress(val) => target.write(val.to_string().as_bytes()),
             _ => return Result::Err(
                 HtmlContentCommandError::AmbiguousStringConversion(name.clone(), value.clone()))

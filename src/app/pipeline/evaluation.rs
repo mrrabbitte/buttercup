@@ -6,7 +6,7 @@ use dashmap::mapref::one::Ref;
 
 use crate::app::arguments::ArgumentDefinition;
 use crate::app::arguments::extraction::{ArgumentsExtractionInput, ArgumentValueExtractorError, ArgumentValuesExtractionService};
-use crate::app::content::commands::{ContentCommandExecutionError, ContentCommandExecutorContexts};
+use crate::app::content::commands::{ContentCommandExecutionError, ContentCommandExecutorContexts, ContentCommandExecutorDelegate};
 use crate::app::content::responses::ContentCommandResponse;
 use crate::app::decision::SelectionDecision;
 use crate::app::pipeline::core::{ContentPipeline, ContentPipelineRequest, ContentPipelineRequestHeader, ContentPipelineResponse};
@@ -109,9 +109,6 @@ impl ContentPipelineEvaluationService {
                         decision: SelectionDecision)
         -> Result<ContentPipelineResponse, ContentPipelineEvaluationError> {
         let content_commands = decision.get_content_commands();
-        if content_commands.is_empty() {
-            return Result::Err(ContentCommandExecutionError::NoCommandsProvided);
-        }
         match pipeline.get_command_executor().execute(&self.executor_contexts,
                                                 &values,
                                                 decision.get_content_commands()) {

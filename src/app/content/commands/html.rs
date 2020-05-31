@@ -33,6 +33,16 @@ pub struct HtmlContentCommandsContext {
 
 }
 
+impl HtmlContentCommandsContext {
+
+    pub fn new(file_service: FileService) -> HtmlContentCommandsContext {
+        HtmlContentCommandsContext {
+            file_service
+        }
+    }
+
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct HtmlContentCommandExecutor {
 

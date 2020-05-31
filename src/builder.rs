@@ -8,6 +8,8 @@ use crate::app::pipeline::evaluation::ContentPipelineEvaluationService;
 use crate::app::reinforcement::ReinforcementService;
 use crate::app::selection::nodes::context::SimpleSelectionNodesContext;
 use crate::test_utils::TestUtils;
+use crate::app::files::FileService;
+use std::collections::HashMap;
 
 pub fn content_pipeline_service() -> ContentPipelineService {
     let cache = ContentPipelineCache::new();
@@ -23,7 +25,8 @@ pub fn content_pipeline_service() -> ContentPipelineService {
                 ReinforcementService::new(
                     SelectionDecisionService::new())),
             ContentCommandExecutorContexts::new(
-                HtmlContentCommandsContext::new(),
+                HtmlContentCommandsContext::new(
+                    TestUtils::test_file_service()),
                 VideoContentCommandsContext::new())
         )
     )

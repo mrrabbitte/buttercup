@@ -28,13 +28,30 @@ use crate::app::values::{ValueHolder, ValueType};
 use crate::app::values::extractors::ValueExtractionPolicy;
 use crate::app::values::wrappers::{WeekdayWrapper, Wrapper};
 use std::hash::Hash;
+use crate::app::files::FileService;
+use crate::app::files::path::FilesPathService;
 
 pub struct TestUtils;
 
 impl TestUtils {
 
+    const TENANT_ID: &'static str = "tenant_id_1";
+    const BASE_DIR: &'static str = "/content/";
+    const BASE_PATH: &'static str = "/content/";
+
+    pub fn test_file_service() -> FileService {
+        let mut tenant_paths = HashMap::new();
+        tenant_paths.insert(TestUtils::TENANT_ID.to_owned(), "t_1/");
+        FileService::new(
+            root_path: TestUtils::BASE_PATH,
+            root_dir: TestUtils::BASE_DIR,
+            files_path_service: FilesPathService::new(
+                TestUtils::BASE_PATH, tenant_paths)
+        )
+    }
+
     pub fn test_pipeline() -> ContentPipeline {
-        let tenant_id = "tenant_id_1".to_owned();
+        let tenant_id = TENANT_ID.to_owned();
         let mut argument_definitions = HashMap::new();
         argument_definitions.insert("dayOfWeekArg".to_owned(),
                                     ArgumentDefinition::new(1,
