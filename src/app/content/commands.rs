@@ -9,6 +9,7 @@ pub mod video;
 pub mod html;
 
 use serde::{Serialize, Deserialize};
+use crate::app::files::FilesServiceError;
 
 #[derive(Debug, Clone)]
 pub struct ContentCommandExecutorContexts {
@@ -44,7 +45,8 @@ pub enum ContentCommandExecutionError {
     NoCommandsProvided,
     ContentCommandNotFound(ContentCommandAddress),
     CommandIdMismatch(i32, i32),
-    HtmlContentCommandError(HtmlContentCommandError)
+    HtmlContentCommandError(HtmlContentCommandError),
+    FilesServiceError(FilesServiceError)
 
 }
 
