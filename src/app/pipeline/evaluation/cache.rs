@@ -3,6 +3,8 @@ use std::sync::Arc;
 use dashmap::DashMap;
 use dashmap::mapref::one::Ref;
 
+use serde::{Serialize, Deserialize};
+
 use crate::app::pipeline::core::ContentPipeline;
 
 #[derive(Clone)]
@@ -30,7 +32,7 @@ pub struct ContentPipelineKey {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ContentPipelineCacheError {
 
     NotFound

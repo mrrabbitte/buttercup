@@ -18,7 +18,7 @@ pub enum SelectionEdge {
 
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum SelectionEdgeError {
 
     LogicalExpressionSelectionEdgeError(ExpressionEvaluationError)

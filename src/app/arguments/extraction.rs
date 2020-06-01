@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use serde_json::{Map, Value};
 use strum_macros::AsRefStr;
+use serde::{Serialize, Deserialize};
 
 use crate::app::arguments::ArgumentDefinition;
 use crate::app::values::{ValueHolder, ValuesPayload};
@@ -26,7 +27,7 @@ impl<'a> ArgumentsExtractionInput<'a> {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ArgumentValueExtractorError {
 
     MissingArgument(String),

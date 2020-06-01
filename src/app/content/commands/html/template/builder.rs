@@ -106,6 +106,16 @@ mod tests {
             Some(TemplateOperation::AddContent(end))));
     }
 
+    #[test]
+    fn test_handles_only_content() {
+        let template = "Hello, \n this is some great content.".to_owned();
+        let command =
+            AppendHtmlFromTemplateCommandBuilder::build(0, template);
+        assert_eq!(1, command.operations.len());
+        assert!(matches!(command.operations.get(0),
+            Some(TemplateOperation::AddContent(template))));
+    }
+
 }
 
 

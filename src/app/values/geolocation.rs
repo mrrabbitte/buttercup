@@ -19,7 +19,7 @@ pub struct GeoCoordinates {
 
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum GeoCoordinatesValueError {
 
     InvalidCommaSeparatedStructure,

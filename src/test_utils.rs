@@ -8,7 +8,7 @@ use num_rational::BigRational;
 use crate::app::arguments::{ArgumentDefinition, ArgumentsExtractor};
 use crate::app::common::addressable::Address;
 use crate::app::content::commands::{ContentCommandAddress, ContentCommandExecutor};
-use crate::app::content::commands::html::HtmlContentCommandExecutor;
+use crate::app::content::commands::html::{HtmlContentCommandExecutor, HtmlContentCommand};
 use crate::app::content::definitions::ContentType;
 use crate::app::files::FileService;
 use crate::app::files::path::FilesPathService;
@@ -31,6 +31,8 @@ use crate::app::transformations::transformer::{DoubleInputTransformationDefiniti
 use crate::app::values::{ValueHolder, ValueType};
 use crate::app::values::extractors::ValueExtractionPolicy;
 use crate::app::values::wrappers::{WeekdayWrapper, Wrapper};
+use crate::app::content::commands::html::template::AppendHtmlFromTemplateCommand;
+use crate::app::content::commands::html::template::builder::AppendHtmlFromTemplateCommandBuilder;
 
 pub struct TestUtils;
 
@@ -38,7 +40,7 @@ impl TestUtils {
 
     const TENANT_ID: &'static str = "tenant_id_1";
     const BASE_DIR: &'static str = "/content/";
-    const BASE_PATH: &'static str = "/content/";
+    const BASE_PATH: &'static str = "./content/";
 
     pub fn test_file_service() -> FileService {
         let mut tenant_paths = HashMap::new();
@@ -130,7 +132,7 @@ impl TestUtils {
         let tree_definition = SelectionTreeDefinition::new(1,
                                                            "test selection tree".to_owned());
         let evaluator = TestUtils::build_evaluator();
-        
+
         ContentPipeline::new(1,
                              tenant_id.clone(),
                              ArgumentsExtractor::new(argument_definitions),
@@ -139,9 +141,44 @@ impl TestUtils {
                                                 tree_definition,
                                                 evaluator),
                              ContentCommandExecutor::HtmlCommandExecutor(
-                                 HtmlContentCommandExecutor::new(tenant_id.clone(),
-                                                                 Vec::new()))
+                                 HtmlContentCommandExecutor::new(
+                                     tenant_id.clone(),
+                                     TestUtils::test_commands()))
         )
+    }
+
+    fn test_commands() -> Vec<HtmlContentCommand> {
+        return vec![
+            HtmlContentCommand::AppendHtmlFromTemplateCommand(
+                AppendHtmlFromTemplateCommandBuilder::build(0,
+                                                            "Command 0".to_owned())),
+            HtmlContentCommand::AppendHtmlFromTemplateCommand(
+                AppendHtmlFromTemplateCommandBuilder::build(1,
+                                                            "Command 1".to_owned())),
+            HtmlContentCommand::AppendHtmlFromTemplateCommand(
+                AppendHtmlFromTemplateCommandBuilder::build(2,
+                                                            "Command 2".to_owned())),
+            HtmlContentCommand::AppendHtmlFromTemplateCommand(
+                AppendHtmlFromTemplateCommandBuilder::build(3,
+                                                            "Command 3".to_owned())),
+            HtmlContentCommand::AppendHtmlFromTemplateCommand(
+                AppendHtmlFromTemplateCommandBuilder::build(4,
+                                                            "Command 4".to_owned())),
+            HtmlContentCommand::AppendHtmlFromTemplateCommand(
+                AppendHtmlFromTemplateCommandBuilder::build(5,
+                                                            "Command 5".to_owned())),
+            HtmlContentCommand::AppendHtmlFromTemplateCommand(
+                AppendHtmlFromTemplateCommandBuilder::build(6,
+                                                            "Command 6".to_owned())),
+            HtmlContentCommand::AppendHtmlFromTemplateCommand(
+                AppendHtmlFromTemplateCommandBuilder::build(7,
+                                                            "Command 7".to_owned())),
+            HtmlContentCommand::AppendHtmlFromTemplateCommand(
+                AppendHtmlFromTemplateCommandBuilder::build(8,
+                                                            "Command 8".to_owned())),
+            HtmlContentCommand::AppendHtmlFromTemplateCommand(
+                AppendHtmlFromTemplateCommandBuilder::build(9,
+                                                            "Command 9".to_owned()))];
     }
 
     fn build_evaluator() -> SelectionTreeEvaluator {

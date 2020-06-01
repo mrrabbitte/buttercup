@@ -27,7 +27,7 @@ pub mod country;
 pub mod email;
 pub mod ip;
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum ValueExtractionPolicy {
 
     Strict,
@@ -35,7 +35,7 @@ pub enum ValueExtractionPolicy {
 
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum ValueExtractionError {
 
     InvalidValueTypeError(ValueExtractionPolicy),
@@ -51,7 +51,7 @@ pub enum ValueExtractionError {
 
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum ParsingValueSource {
 
     String,
@@ -61,7 +61,7 @@ pub enum ParsingValueSource {
 
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum CountryCodeParsingError {
 
     InvalidAlpha2,

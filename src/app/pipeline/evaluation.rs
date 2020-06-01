@@ -17,9 +17,11 @@ use crate::app::transformations::Transformer;
 use crate::app::transformations::transformer::{TransformationError, TransformationRequest};
 use crate::app::values::ValuesPayload;
 
+use serde::{Serialize, Deserialize};
+
 pub mod cache;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ContentPipelineEvaluationError {
 
     ContentPipelineCacheError(ContentPipelineCacheError),
@@ -108,7 +110,6 @@ impl ContentPipelineEvaluationService {
                         values: ValuesPayload,
                         decision: SelectionDecision)
         -> Result<ContentPipelineResponse, ContentPipelineEvaluationError> {
-        let content_commands = decision.get_content_commands();
         match pipeline.get_command_executor().execute(&self.executor_contexts,
                                                 &values,
                                                 decision.get_content_commands()) {

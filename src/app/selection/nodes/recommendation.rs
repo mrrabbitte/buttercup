@@ -45,11 +45,11 @@ pub enum RecommendationSelectionNodeType {
 
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum RecommendationSelectionError {
 
     ReinforcementServiceError(ReinforcementServiceError),
-    BetaError(BetaError),
+    BetaError(String),
     DidNotFindCommandOfRecommendedId(i32),
     DidNotFindCommandOfIndex(usize),
     MismatchedRecommenderResponseIdWithCommandId(ContentCommandAddress, RecommenderResponse)
