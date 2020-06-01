@@ -76,3 +76,47 @@ impl AppendHtmlFromTemplateCommand {
     }
 
 }
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+    use std::net::{IpAddr, Ipv4Addr};
+
+    use crate::app::content::commands::html::template::builder::AppendHtmlFromTemplateCommandBuilder;
+    use crate::app::values::email::Email;
+
+    use super::*;
+
+    #[test]
+    fn test_writes_template_with_provided_values() {
+        let template = "\
+        Hello, {{name}}! \
+        \n Your email: {{email}}. \
+        \n How are you doing? \
+        I can see that you use the following ip: {{ip}}.\
+        \n Some other content that is not a tag."
+            .to_owned();
+        let command =
+            AppendHtmlFromTemplateCommandBuilder::build(0, template);
+        let mut values = HashMap::new();
+        values.insert("name".to_owned(), ValueHolder::String("SomeName".to_owned()));
+        values.insert("email".to_owned(), ValueHolder::Email(
+            Email::new("some@example.com").unwrap()));
+        values.insert("ip".to_owned(), ValueHolder::IpAddress(
+            IpAddr::V4(
+                Ipv4Addr::new(192, 168, 0, 1))));
+        let payload = ValuesPayload::new(values);
+        let mut output: Vec<u8> = Vec::new();
+        let result = command.execute(&payload, &mut output);
+        assert_eq!(true, result.is_ok());
+        assert_eq!("\
+        Hello, SomeName! \
+        \n Your email: some@example.com. \
+        \n How are you doing? \
+        I can see that you use the following ip: 192.168.0.1.\
+        \n Some other content that is not a tag."
+            .to_owned(),
+                   String::from_utf8(output).unwrap());
+    }
+
+}
