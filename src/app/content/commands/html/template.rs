@@ -12,15 +12,14 @@ pub mod builder;
 pub struct AppendHtmlFromTemplateCommand {
 
     id: i32,
-    operations: Vec<TemplateOperation>,
-    template: Vec<u8>,
+    operations: Vec<TemplateOperation>
 
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TemplateOperation {
 
-    AddContent(usize, usize),
+    AddContent(String),
     AddValue(String)
 
 }
@@ -28,12 +27,10 @@ pub enum TemplateOperation {
 impl AppendHtmlFromTemplateCommand {
 
     pub fn new(id: i32,
-               operations: Vec<TemplateOperation>,
-               template: Vec<u8>) -> AppendHtmlFromTemplateCommand {
+               operations: Vec<TemplateOperation>) -> AppendHtmlFromTemplateCommand {
         AppendHtmlFromTemplateCommand {
             id,
-            operations,
-            template
+            operations
         }
     }
 
@@ -42,8 +39,8 @@ impl AppendHtmlFromTemplateCommand {
                    target: &mut dyn Write) -> Result<(), ContentCommandExecutionError> {
         for operation in &self.operations {
             match operation {
-                TemplateOperation::AddContent(start_idx, end_idx) => {
-                    target.write(&self.template[*start_idx..*end_idx]);
+                TemplateOperation::AddContent(content) => {
+                    target.write(content.as_bytes());
                 },
                 TemplateOperation::AddValue(value_name) => {
                     match payload.get(&value_name) {
