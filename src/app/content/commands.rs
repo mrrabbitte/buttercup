@@ -1,15 +1,15 @@
+use serde::{Deserialize, Serialize};
+
 use crate::app::common::addressable::Address;
-use crate::app::content::definitions::ContentType;
-use crate::app::values::ValuesPayload;
-use crate::app::content::responses::ContentCommandResponse;
-use crate::app::content::commands::html::{HtmlContentCommandsContext, HtmlContentCommandExecutor, HtmlContentCommandError};
+use crate::app::content::commands::html::{HtmlContentCommandError, HtmlContentCommandExecutor, HtmlContentCommandsContext};
 use crate::app::content::commands::video::{VideoContentCommandsContext, VideoContentCommandsExecutor};
+use crate::app::content::definitions::ContentType;
+use crate::app::content::responses::ContentCommandResponse;
+use crate::app::files::FilesServiceError;
+use crate::app::values::ValuesPayload;
 
 pub mod video;
 pub mod html;
-
-use serde::{Serialize, Deserialize};
-use crate::app::files::FilesServiceError;
 
 #[derive(Debug, Clone)]
 pub struct ContentCommandExecutorContexts {
@@ -39,7 +39,7 @@ impl ContentCommandExecutorContexts {
 
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ContentCommandExecutionError {
 
     NoCommandsProvided,
@@ -106,16 +106,6 @@ pub trait ContentCommandExecutorDelegate {
                   -> Result<ContentCommandResponse, ContentCommandExecutionError>;
 
     fn get_content_type(&self) -> ContentType;
-
-}
-
-pub trait ContentCommand {
-
-    fn get_id(&self) -> &i32;
-    fn matches(&self,
-               address: &ContentCommandAddress) -> bool {
-        address.get_id() == self.get_id()
-    }
 
 }
 

@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::hash::Hash;
 
 use chrono::Weekday;
 use num::BigInt;
@@ -6,8 +7,11 @@ use num_rational::BigRational;
 
 use crate::app::arguments::{ArgumentDefinition, ArgumentsExtractor};
 use crate::app::common::addressable::Address;
-use crate::app::content::commands::{ContentCommand, ContentCommandAddress, ContentCommandExecutor};
+use crate::app::content::commands::{ContentCommandAddress, ContentCommandExecutor};
+use crate::app::content::commands::html::HtmlContentCommandExecutor;
 use crate::app::content::definitions::ContentType;
+use crate::app::files::FileService;
+use crate::app::files::path::FilesPathService;
 use crate::app::pipeline::core::ContentPipeline;
 use crate::app::selection::edges::{SelectionEdge, SelectionEdgeAddress, SelectionEdgeDefinition, SelectionEdgeType};
 use crate::app::selection::edges::always::AlwaysTrueSelectionEdge;
@@ -27,9 +31,6 @@ use crate::app::transformations::transformer::{DoubleInputTransformationDefiniti
 use crate::app::values::{ValueHolder, ValueType};
 use crate::app::values::extractors::ValueExtractionPolicy;
 use crate::app::values::wrappers::{WeekdayWrapper, Wrapper};
-use std::hash::Hash;
-use crate::app::files::FileService;
-use crate::app::files::path::FilesPathService;
 
 pub struct TestUtils;
 
@@ -41,17 +42,17 @@ impl TestUtils {
 
     pub fn test_file_service() -> FileService {
         let mut tenant_paths = HashMap::new();
-        tenant_paths.insert(TestUtils::TENANT_ID.to_owned(), "t_1/");
+        tenant_paths.insert(TestUtils::TENANT_ID.to_string(), "t_1/".to_string());
         FileService::new(
-            root_path: TestUtils::BASE_PATH,
-            root_dir: TestUtils::BASE_DIR,
-            files_path_service: FilesPathService::new(
+            TestUtils::BASE_PATH,
+            TestUtils::BASE_DIR,
+            FilesPathService::new(
                 TestUtils::BASE_PATH, tenant_paths)
         )
     }
 
     pub fn test_pipeline() -> ContentPipeline {
-        let tenant_id = TENANT_ID.to_owned();
+        let tenant_id = TestUtils::TENANT_ID.to_owned();
         let mut argument_definitions = HashMap::new();
         argument_definitions.insert("dayOfWeekArg".to_owned(),
                                     ArgumentDefinition::new(1,
@@ -129,8 +130,7 @@ impl TestUtils {
         let tree_definition = SelectionTreeDefinition::new(1,
                                                            "test selection tree".to_owned());
         let evaluator = TestUtils::build_evaluator();
-        let mut commands = Vec::new();
-        commands.push(ContentCommand::HtmlCommand);
+        
         ContentPipeline::new(1,
                              tenant_id.clone(),
                              ArgumentsExtractor::new(argument_definitions),
@@ -138,9 +138,9 @@ impl TestUtils {
                              SelectionTree::new(tenant_id.clone(),
                                                 tree_definition,
                                                 evaluator),
-                             ContentCommandExecutor::new(tenant_id.clone(),
-                                                         ContentType::Html,
-                                                         commands)
+                             ContentCommandExecutor::HtmlCommandExecutor(
+                                 HtmlContentCommandExecutor::new(tenant_id.clone(),
+                                                                 Vec::new()))
         )
     }
 

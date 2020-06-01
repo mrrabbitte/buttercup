@@ -3,9 +3,10 @@ use std::fs::File;
 use std::io;
 use crate::app::files::path::{FilesPathService, FilesPathServiceError};
 use std::io::Error;
-
+use serde::{Serialize, Deserialize};
 pub mod path;
 
+#[derive(Debug, Clone)]
 pub struct FileService {
 
     root_path: &'static str,
@@ -14,6 +15,7 @@ pub struct FileService {
 
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum FilesServiceError {
 
     FilesPathServiceError(FilesPathServiceError),
@@ -37,8 +39,8 @@ impl FileResponse {
         }
     }
 
-    pub fn get_file(&self) -> &File {
-        &self.file
+    pub fn get_file(&mut self) -> &mut File {
+        &mut self.file
     }
 
     pub fn get_external_path(&self) -> &String {
@@ -73,8 +75,8 @@ impl FileService {
 
     fn create(result: Result<String, FilesPathServiceError>) -> Result<FileResponse, FilesServiceError> {
         match result {
-            Ok(path) => match File::create(path) {
-                Ok(file) => Result::Ok(FileResponse::new(file, path.clone())),
+            Ok(path) => match File::create(&path) {
+                Ok(file) => Result::Ok(FileResponse::new(file, path)),
                 Err(err) => Result::Err(
                     FilesServiceError::FileCreationError(
                         format!("{}", err))),

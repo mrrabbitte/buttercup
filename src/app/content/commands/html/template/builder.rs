@@ -4,7 +4,7 @@ use regex::bytes::Regex;
 
 pub enum AppendHtmlFromTemplateCommandBuildError {
 
-
+    RegexError
 
 }
 
@@ -18,6 +18,7 @@ impl AppendHtmlFromTemplateCommandBuild {
         let template_bytes = template.as_bytes();
         let re = Regex::new(r"(\{\{.*}})").unwrap();
         let cap = re.captures(template.as_bytes()).unwrap();
+        Result::Err(AppendHtmlFromTemplateCommandBuildError::RegexError)
     }
 
 }

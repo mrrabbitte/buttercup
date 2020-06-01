@@ -1,12 +1,14 @@
-use crate::app::content::commands::{ContentCommand, ContentCommandAddress, ContentCommandExecutionError, ContentCommandExecutorDelegate, ContentCommandExecutorContexts};
 use crate::app::content::responses::ContentCommandResponse;
 use crate::app::values::ValuesPayload;
 use crate::app::content::definitions::ContentType;
 
+use serde::{Serialize, Deserialize};
+use crate::app::content::commands::{ContentCommandExecutorDelegate, ContentCommandExecutorContexts, ContentCommandAddress, ContentCommandExecutionError};
+
 pub mod append;
 pub mod sources;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VideoContentCommandsContext {
 
 }
@@ -19,6 +21,7 @@ impl VideoContentCommandsContext {
 
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VideoContentCommandsExecutor;
 
 impl ContentCommandExecutorDelegate for VideoContentCommandsExecutor {

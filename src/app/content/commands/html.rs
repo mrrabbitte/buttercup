@@ -1,4 +1,4 @@
-use crate::app::content::commands::{ContentCommand, ContentCommandAddress, ContentCommandExecutionError, ContentCommandDelegate, ContentCommandExecutorDelegate, ContentCommandExecutorContexts};
+use crate::app::content::commands::{ContentCommandAddress, ContentCommandExecutionError, ContentCommandExecutorDelegate, ContentCommandExecutorContexts};
 use crate::app::content::responses::ContentCommandResponse;
 use crate::app::values::{ValuesPayload, ValueHolder};
 use crate::app::files::{FileService, FilesServiceError, FileResponse};
@@ -11,7 +11,7 @@ use std::fs::File;
 
 pub mod template;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum HtmlContentCommand {
 
     AppendHtmlFromTemplateCommand(AppendHtmlFromTemplateCommand)
@@ -43,7 +43,7 @@ impl HtmlContentCommandsContext {
 
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HtmlContentCommandExecutor {
 
     tenant_id: String,
@@ -53,11 +53,19 @@ pub struct HtmlContentCommandExecutor {
 
 impl HtmlContentCommandExecutor {
 
+    pub fn new(tenant_id: String,
+               commands: Vec<HtmlContentCommand>) -> HtmlContentCommandExecutor {
+        HtmlContentCommandExecutor {
+            tenant_id,
+            commands
+        }
+    }
+
     fn execute_commands(&self,
-                        target: FileResponse,
+                        mut target: FileResponse,
                         payload: &ValuesPayload,
                         addresses: &Vec<ContentCommandAddress>)
-        -> Result<ContentCommandResponse, ContentCommandExecutionError> {
+                        -> Result<ContentCommandResponse, ContentCommandExecutionError> {
         let mut file = target.get_file();
         for address in addresses {
             match self.commands.get(address.index) {

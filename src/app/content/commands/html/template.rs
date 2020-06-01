@@ -1,10 +1,14 @@
-use crate::app::content::commands::{ContentCommand, ContentCommandExecutionError};
 use std::io::Write;
-use crate::app::values::{ValuesPayload, ValueHolder};
+
+use serde::{Deserialize, Serialize};
+
+use crate::app::content::commands::ContentCommandExecutionError;
 use crate::app::content::commands::html::HtmlContentCommandError;
+use crate::app::values::{ValueHolder, ValuesPayload};
 
 pub mod builder;
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppendHtmlFromTemplateCommand {
 
     id: i32,
@@ -13,7 +17,8 @@ pub struct AppendHtmlFromTemplateCommand {
 
 }
 
-enum TemplateOperation {
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum TemplateOperation {
 
     AddContent(usize, usize),
     AddValue(String)
@@ -35,10 +40,10 @@ impl AppendHtmlFromTemplateCommand {
     pub fn execute(&self,
                    payload: &ValuesPayload,
                    target: &mut dyn Write) -> Result<(), ContentCommandExecutionError> {
-        for operation in self.operations {
+        for operation in &self.operations {
             match operation {
                 TemplateOperation::AddContent(start_idx, end_idx) => {
-                    target.write(&self.template[start_idx..end_idx]);
+                    target.write(&self.template[*start_idx..*end_idx]);
                 },
                 TemplateOperation::AddValue(value_name) => {
                     match payload.get(&value_name) {
@@ -69,16 +74,8 @@ impl AppendHtmlFromTemplateCommand {
             ValueHolder::IpAddress(val) => target.write(val.to_string().as_bytes()),
             _ => return Result::Err(
                 HtmlContentCommandError::AmbiguousStringConversion(name.clone(), value.clone()))
-        }
+        };
         Result::Ok(())
-    }
-
-}
-
-impl ContentCommand for AppendHtmlFromTemplateCommand {
-
-    fn get_id(&self) -> &i32 {
-        &self.id
     }
 
 }

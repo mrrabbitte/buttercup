@@ -13,6 +13,7 @@ pub enum FilesPathServiceError {
 
 }
 
+#[derive(Debug, Clone)]
 pub struct FilesPathService {
 
     name_generator: NameGenerator,
@@ -64,6 +65,7 @@ impl FilesPathService {
 
 }
 
+#[derive(Debug, Clone)]
 struct NameGenerator {
 
     secure_random: SystemRandom
