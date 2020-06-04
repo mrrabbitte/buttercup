@@ -33,14 +33,15 @@ use crate::app::values::extractors::ValueExtractionPolicy;
 use crate::app::values::wrappers::{WeekdayWrapper, Wrapper};
 use crate::app::content::commands::html::template::AppendHtmlFromTemplateCommand;
 use crate::app::content::commands::html::template::builder::AppendHtmlFromTemplateCommandBuilder;
+use crate::html_test_utils;
 
 pub struct TestUtils;
 
 impl TestUtils {
 
     const TENANT_ID: &'static str = "tenant_id_1";
-    const BASE_DIR: &'static str = "/content/";
-    const BASE_PATH: &'static str = "./content/";
+    const BASE_PATH: &'static str = "/content";
+    const BASE_DIR: &'static str = "./content/";
 
     pub fn test_file_service() -> FileService {
         let mut tenant_paths = HashMap::new();
@@ -49,7 +50,7 @@ impl TestUtils {
             TestUtils::BASE_PATH,
             TestUtils::BASE_DIR,
             FilesPathService::new(
-                TestUtils::BASE_PATH, tenant_paths)
+                TestUtils::BASE_DIR, tenant_paths)
         )
     }
 
@@ -84,6 +85,24 @@ impl TestUtils {
                                     ArgumentDefinition::new(5,
                                                             "zoneArg".to_owned(),
                                                             ValueType::TimeZone,
+                                                            ValueExtractionPolicy::Lax,
+                                                            1));
+        argument_definitions.insert("someStringArg".to_owned(),
+                                    ArgumentDefinition::new(5,
+                                                            "someStringArg".to_owned(),
+                                                            ValueType::String,
+                                                            ValueExtractionPolicy::Lax,
+                                                            1));
+        argument_definitions.insert("someEmailArg".to_owned(),
+                                    ArgumentDefinition::new(5,
+                                                            "someEmailArg".to_owned(),
+                                                            ValueType::Email,
+                                                            ValueExtractionPolicy::Lax,
+                                                            1));
+        argument_definitions.insert("ipArg".to_owned(),
+                                    ArgumentDefinition::new(5,
+                                                            "ipArg".to_owned(),
+                                                            ValueType::IpAddress,
                                                             ValueExtractionPolicy::Lax,
                                                             1));
         let mut transformation_requests = Vec::new();
@@ -151,34 +170,34 @@ impl TestUtils {
         return vec![
             HtmlContentCommand::AppendHtmlFromTemplateCommand(
                 AppendHtmlFromTemplateCommandBuilder::build(0,
-                                                            "Command 0".to_owned())),
+                                                            html_test_utils::HTML.to_owned())),
             HtmlContentCommand::AppendHtmlFromTemplateCommand(
                 AppendHtmlFromTemplateCommandBuilder::build(1,
-                                                            "Command 1".to_owned())),
+                                                            html_test_utils::HTML.to_owned())),
             HtmlContentCommand::AppendHtmlFromTemplateCommand(
                 AppendHtmlFromTemplateCommandBuilder::build(2,
-                                                            "Command 2".to_owned())),
+                                                            html_test_utils::HTML.to_owned())),
             HtmlContentCommand::AppendHtmlFromTemplateCommand(
                 AppendHtmlFromTemplateCommandBuilder::build(3,
-                                                            "Command 3".to_owned())),
+                                                            html_test_utils::HTML.to_owned())),
             HtmlContentCommand::AppendHtmlFromTemplateCommand(
                 AppendHtmlFromTemplateCommandBuilder::build(4,
-                                                            "Command 4".to_owned())),
+                                                            html_test_utils::HTML.to_owned())),
             HtmlContentCommand::AppendHtmlFromTemplateCommand(
                 AppendHtmlFromTemplateCommandBuilder::build(5,
-                                                            "Command 5".to_owned())),
+                                                            html_test_utils::HTML.to_owned())),
             HtmlContentCommand::AppendHtmlFromTemplateCommand(
                 AppendHtmlFromTemplateCommandBuilder::build(6,
-                                                            "Command 6".to_owned())),
+                                                            html_test_utils::HTML.to_owned())),
             HtmlContentCommand::AppendHtmlFromTemplateCommand(
                 AppendHtmlFromTemplateCommandBuilder::build(7,
-                                                            "Command 7".to_owned())),
+                                                            html_test_utils::HTML.to_owned())),
             HtmlContentCommand::AppendHtmlFromTemplateCommand(
                 AppendHtmlFromTemplateCommandBuilder::build(8,
-                                                            "Command 8".to_owned())),
+                                                            html_test_utils::HTML.to_owned())),
             HtmlContentCommand::AppendHtmlFromTemplateCommand(
                 AppendHtmlFromTemplateCommandBuilder::build(9,
-                                                            "Command 9".to_owned()))];
+                                                            html_test_utils::HTML.to_owned()))];
     }
 
     fn build_evaluator() -> SelectionTreeEvaluator {

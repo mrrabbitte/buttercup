@@ -58,7 +58,10 @@ impl FilesPathService {
         let mut result = String::new();
         result.write_str(&self.base_path).expect("This should never fail.");
         result.write_str(tenant_path).expect("This should never fail.");
-        self.name_generator.generate_random(&mut result);
+        let gen_result = self.name_generator.generate_random(&mut result);
+        if gen_result.is_err() {
+            panic!("Generate random operation should not fail: {:?}", gen_result);
+        }
         result.write_str(extension).expect("This should never fail.");
         result
     }

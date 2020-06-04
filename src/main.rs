@@ -20,7 +20,7 @@ mod app;
 mod builder;
 mod endpoints;
 mod test_utils;
-
+mod html_test_utils;
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     TransformationService::initialize();
@@ -29,11 +29,11 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .wrap(middleware::Logger::default())
-            .service(file_service.get_files())
             .data(pipeline_service.clone())
             .service(endpoints::pipeline)
+            .service(file_service.get_files())
     })
-        .bind("127.0.0.1:7777")?
+        .bind("localhost:7777")?
         .run()
         .await
 }
