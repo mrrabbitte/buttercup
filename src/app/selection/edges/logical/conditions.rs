@@ -54,7 +54,7 @@ pub enum ConditionValue {
 
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum ConditionEvaluationError {
 
     DidNotFindLeftValue(String),

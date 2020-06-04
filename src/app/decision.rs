@@ -1,10 +1,13 @@
-use crate::app::content::commands::ContentCommandAddress;
-use uuid::Uuid;
-use dashmap::DashMap;
-use std::sync::Arc;
-use dashmap::mapref::one::Ref;
-use crate::app::common::addressable::Address;
 use std::ops::Deref;
+use std::sync::Arc;
+
+use dashmap::DashMap;
+use dashmap::mapref::one::Ref;
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+
+use crate::app::common::addressable::Address;
+use crate::app::content::commands::ContentCommandAddress;
 
 #[derive(Debug, Clone)]
 pub struct SelectionDecision {
@@ -40,7 +43,7 @@ impl SelectionDecision {
 
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum SelectionDecisionError {
 
     CouldNotSaveDecision,

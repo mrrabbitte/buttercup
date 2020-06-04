@@ -1,10 +1,14 @@
-use crate::app::content::commands::{ContentCommand, ContentCommandAddress, ContentCommandExecutionError, ContentCommandsContext};
 use crate::app::content::responses::ContentCommandResponse;
 use crate::app::values::ValuesPayload;
+use crate::app::content::definitions::ContentType;
+
+use serde::{Serialize, Deserialize};
+use crate::app::content::commands::{ContentCommandExecutorDelegate, ContentCommandExecutorContexts, ContentCommandAddress, ContentCommandExecutionError};
 
 pub mod append;
 pub mod sources;
-#[derive(Debug, Clone)]
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VideoContentCommandsContext {
 
 }
@@ -17,13 +21,20 @@ impl VideoContentCommandsContext {
 
 }
 
-impl ContentCommandsContext for VideoContentCommandsContext {
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VideoContentCommandsExecutor;
 
-    fn execute(&self,
-               payload: &ValuesPayload,
-               content_commands: &Vec<ContentCommand>,
-               addresses: &Vec<ContentCommandAddress>)
-               -> Result<ContentCommandResponse, ContentCommandExecutionError> {
+impl ContentCommandExecutorDelegate for VideoContentCommandsExecutor {
+
+    fn do_execute(&self,
+                  contexts: &ContentCommandExecutorContexts,
+                  payload: &ValuesPayload,
+                  addresses: &Vec<ContentCommandAddress>)
+        -> Result<ContentCommandResponse, ContentCommandExecutionError> {
         unimplemented!()
+    }
+
+    fn get_content_type(&self) -> ContentType {
+        ContentType::Video
     }
 }

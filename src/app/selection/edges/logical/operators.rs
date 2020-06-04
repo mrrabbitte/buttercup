@@ -19,7 +19,7 @@ pub enum RelationalOperator {
 
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum RelationalOperatorError {
 
     UnsupportedValueTypeForOperator(ValueHolder, RelationalOperator),

@@ -95,7 +95,7 @@ impl Address for ExpressionAddress {
 
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum ExpressionEvaluationError {
 
     MissingExpression(ExpressionAddress),

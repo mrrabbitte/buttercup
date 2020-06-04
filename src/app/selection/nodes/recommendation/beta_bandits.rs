@@ -46,7 +46,9 @@ impl BetaBanditRecommender {
                     }
                 },
                 Err(err) =>
-                    return Result::Err(RecommendationSelectionError::BetaError(err))
+                    return Result::Err(
+                        RecommendationSelectionError::BetaError(
+                            format!("{:?}", err)))
             }
         }
         Result::Ok(

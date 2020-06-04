@@ -32,3 +32,4 @@ rand = "0.7"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 ring = "0.16"
 base64 = "0.12"
+regex = "1.3"

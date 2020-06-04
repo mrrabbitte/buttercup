@@ -7,7 +7,7 @@ use crate::app::transformations::mono::MonoInputTransformation;
 use crate::app::values::{ValueHolder, ValuesPayload};
 use crate::app::values::geolocation::GeoCoordinates;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum InputOrder {
 
     First,
@@ -15,7 +15,7 @@ pub enum InputOrder {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TransformationError {
 
     InvalidInputType(ValueHolder, InputOrder),

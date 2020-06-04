@@ -1,14 +1,15 @@
+use serde::{Deserialize, Serialize};
+
 use crate::app::common::addressable::Address;
+use crate::app::content::commands::html::{HtmlContentCommandError, HtmlContentCommandExecutor, HtmlContentCommandsContext};
+use crate::app::content::commands::video::{VideoContentCommandsContext, VideoContentCommandsExecutor};
 use crate::app::content::definitions::ContentType;
-use crate::app::values::ValuesPayload;
 use crate::app::content::responses::ContentCommandResponse;
-use crate::app::content::commands::html::HtmlContentCommandsContext;
-use crate::app::content::commands::video::VideoContentCommandsContext;
+use crate::app::files::FilesServiceError;
+use crate::app::values::ValuesPayload;
 
 pub mod video;
 pub mod html;
-
-use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Clone)]
 pub struct ContentCommandExecutorContexts {
@@ -28,39 +29,66 @@ impl ContentCommandExecutorContexts {
         }
     }
 
+    pub fn get_html_context(&self) -> &HtmlContentCommandsContext {
+        &self.html_context
+    }
+
+    pub fn get_video_context(&self) -> &VideoContentCommandsContext {
+        &self.video_context
+    }
+
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct ContentCommandExecutor {
-
-    tenant_id: String,
-    content_type: ContentType,
-    commands: Vec<ContentCommand>
-
-}
-
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ContentCommandExecutionError {
 
     NoCommandsProvided,
     ContentCommandNotFound(ContentCommandAddress),
-    CommandIdMismatch(i32, i32)
+    CommandIdMismatch(i32, i32),
+    HtmlContentCommandError(HtmlContentCommandError),
+    FilesServiceError(FilesServiceError)
+
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ContentCommandExecutor {
+
+    HtmlCommandExecutor(HtmlContentCommandExecutor),
+    VideoCommandExecutor(VideoContentCommandsExecutor)
 
 }
 
 impl ContentCommandExecutor {
 
-    pub fn new(tenant_id: String,
-               content_type: ContentType,
-               commands: Vec<ContentCommand>) -> ContentCommandExecutor {
-        ContentCommandExecutor {
-            tenant_id,
-            content_type,
-            commands
+    fn get_delegate(&self) -> &dyn ContentCommandExecutorDelegate {
+        match self {
+            ContentCommandExecutor::HtmlCommandExecutor(
+                executor) => executor,
+            ContentCommandExecutor::VideoCommandExecutor(
+                executor) => executor,
         }
     }
 
-    pub fn execute(&self,
+}
+
+impl ContentCommandExecutorDelegate for ContentCommandExecutor {
+
+    fn do_execute(&self,
+                  contexts: &ContentCommandExecutorContexts,
+                  payload: &ValuesPayload,
+                  addresses: &Vec<ContentCommandAddress>)
+        -> Result<ContentCommandResponse, ContentCommandExecutionError> {
+        self.get_delegate().do_execute(contexts, payload, addresses)
+    }
+
+    fn get_content_type(&self) -> ContentType {
+        self.get_delegate().get_content_type()
+    }
+}
+
+pub trait ContentCommandExecutorDelegate {
+
+    fn execute(&self,
                    contexts: &ContentCommandExecutorContexts,
                    payload: &ValuesPayload,
                    addresses: &Vec<ContentCommandAddress>)
@@ -75,77 +103,9 @@ impl ContentCommandExecutor {
                   contexts: &ContentCommandExecutorContexts,
                   payload: &ValuesPayload,
                   addresses: &Vec<ContentCommandAddress>)
-                  -> Result<ContentCommandResponse, ContentCommandExecutionError> {
-        match self.content_type {
-            ContentType::Html => contexts.html_context.execute(
-                payload, &self.commands, addresses),
-            ContentType::Video => contexts.video_context.execute(
-                payload, &self.commands, addresses),
-        }
+                  -> Result<ContentCommandResponse, ContentCommandExecutionError>;
 
-    }
-
-    fn choose(&self, target: &Vec<ContentCommandAddress>)
-        -> Result<Vec<&ContentCommand>, ContentCommandExecutionError> {
-        let mut ret: Vec<&ContentCommand> = vec![];
-        for address in target {
-            let index = address.get_index();
-            match self.commands.get(*index) {
-                None => return Result::Err(
-                    ContentCommandExecutionError::ContentCommandNotFound(address.clone())),
-                Some(command) => {
-                    if !command.matches(address) {
-                        return Result::Err(
-                            ContentCommandExecutionError::CommandIdMismatch(
-                            *command.get_id(), *address.get_id()))
-                    }
-                    ret.push(command);
-                },
-            }
-        }
-        return Result::Ok(ret);
-    }
-
-}
-
-#[derive(Serialize, Deserialize)]
-pub enum ContentCommand {
-
-    HtmlCommand,
-    VideoCommand
-
-}
-
-impl ContentCommandDelegate for ContentCommand {
-
-    fn get_id(&self) -> &i32 {
-        unimplemented!()
-    }
-
-    fn get_content_type(&self) -> ContentType {
-        unimplemented!()
-    }
-
-}
-
-pub trait ContentCommandDelegate {
-
-    fn get_id(&self) -> &i32;
     fn get_content_type(&self) -> ContentType;
-    fn matches(&self,
-               address: &ContentCommandAddress) -> bool {
-        address.get_id() == self.get_id()
-    }
-
-}
-
-pub trait ContentCommandsContext {
-
-    fn execute(&self,
-               payload: &ValuesPayload,
-               commands: &Vec<ContentCommand>,
-               addresses: &Vec<ContentCommandAddress>)
-        -> Result<ContentCommandResponse, ContentCommandExecutionError>;
 
 }
 

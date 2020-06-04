@@ -6,7 +6,7 @@ use dashmap::mapref::one::Ref;
 
 use crate::app::arguments::ArgumentDefinition;
 use crate::app::arguments::extraction::{ArgumentsExtractionInput, ArgumentValueExtractorError, ArgumentValuesExtractionService};
-use crate::app::content::commands::{ContentCommandExecutionError, ContentCommandExecutorContexts};
+use crate::app::content::commands::{ContentCommandExecutionError, ContentCommandExecutorContexts, ContentCommandExecutorDelegate};
 use crate::app::content::responses::ContentCommandResponse;
 use crate::app::decision::SelectionDecision;
 use crate::app::pipeline::core::{ContentPipeline, ContentPipelineRequest, ContentPipelineRequestHeader, ContentPipelineResponse};
@@ -17,9 +17,11 @@ use crate::app::transformations::Transformer;
 use crate::app::transformations::transformer::{TransformationError, TransformationRequest};
 use crate::app::values::ValuesPayload;
 
+use serde::{Serialize, Deserialize};
+
 pub mod cache;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ContentPipelineEvaluationError {
 
     ContentPipelineCacheError(ContentPipelineCacheError),
@@ -120,7 +122,6 @@ impl ContentPipelineEvaluationService {
                 Result::Err(
                     ContentPipelineEvaluationError::ContentCommandExecutionError(err)),
         }
-
     }
 
 }

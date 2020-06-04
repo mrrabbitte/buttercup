@@ -21,6 +21,10 @@ impl Email {
         }
     }
 
+    pub fn get(&self) -> &String {
+        &self.value
+    }
+
 }
 
 #[cfg(test)]

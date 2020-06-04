@@ -26,7 +26,7 @@ impl ContentPipelineService {
         -> Result<ContentPipelineResponse, ContentPipelineEvaluationError> {
         let t0 = Instant::now();
         let result = self.evaluation_service.handle(request);
-        format!("Took: {} [ms]", t0.elapsed().as_millis());
+        println!("Took: {} [μs]", t0.elapsed().as_micros());
         return result;
     }
 
