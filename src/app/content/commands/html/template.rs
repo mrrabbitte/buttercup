@@ -69,8 +69,11 @@ impl AppendHtmlFromTemplateCommand {
             ValueHolder::String(val) => target.write(val.as_bytes()),
             ValueHolder::Email(val) => target.write(val.get().as_bytes()),
             ValueHolder::IpAddress(val) => target.write(val.to_string().as_bytes()),
-            _ => return Result::Err(
-                HtmlContentCommandError::AmbiguousStringConversion(name.clone(), value.clone()))
+            _ => {
+                return Result::Err(
+                    HtmlContentCommandError::AmbiguousStringConversion(
+                        name.clone(), value.clone()));
+            }
         };
         Result::Ok(())
     }
