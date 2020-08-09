@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="6216469a-ce11-44f1-b467-a39aa87c6b3a" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/behavior/node.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/behavior/node/composite.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/behavior/node/composite/parallel.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/behavior/node/composite/selector.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/behavior/node/composite/sequence.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/behavior/node/decorator.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/behavior/node/decorator/decorator.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/behavior/node/leaf.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/behavior/node/leaf/actions.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/behavior/node/leaf/conditions.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/behavior/node/root.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/behavior/tree.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main.rs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="9amge0k8" />
+  </component>
+  <component name="ProjectId" id="1frXBmFT5iFK82zzicuuLyE8QZO" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="flattenPackages" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../prototype_buttercup" />
+    <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.build" />
+  </component>
+  <component name="RustProjectSettings">
+    <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6216469a-ce11-44f1-b467-a39aa87c6b3a" name="Default Changelist" comment="" />
+      <created>1596977051930</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1596977051930</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="779" y="311" width="424" height="491" key="FileChooserDialogImpl" timestamp="1596977082624">
+      <screen x="73" y="27" width="1847" height="1053" />
+    </state>
+    <state x="779" y="311" width="424" height="491" key="FileChooserDialogImpl/73.27.1847.1053@73.27.1847.1053" timestamp="1596977082624" />
+  </component>
+</project>
