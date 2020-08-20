@@ -1,0 +1,9 @@
+[package]
+name = "buttercup"
+version = "0.1.0"
+authors = ["Przemyslaw Gliniecki <pgliniecki@protonmail.ch>"]
+edition = "2018"
+
+[dependencies]
+actix = "0.9.0"
+actix-rt = "1.1"
