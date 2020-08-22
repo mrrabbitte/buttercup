@@ -7,3 +7,27 @@ edition = "2018"
 [dependencies]
 actix = "0.9.0"
 actix-rt = "1.1"
+serde = { version = "1.0.*", features = ["derive"] }
+serde_json = {version = "1.*", features = ["preserve_order"]}
+chrono = {version = "0.4", features = ["serde"]}
+chrono-tz = {version ="0.5", features = ["serde"]}
+tz-search = "0.1"
+strum = "0.18.0"
+strum_macros = "0.18.0"
+num = {version="0.2.*", features = ["serde"]}
+num-rational = "0.2"
+sunrise = "1.0.0"
+url = "2"
+isolang = {version = "1", features = ["serde_serialize"]}
+isocountry = "0.2"
+publicsuffix = "1.5"
+lazy_static = "1"
+fast_chemail = "0.9"
+dashmap = "3.11"
+mockall = "0.7"
+rand_distr = "0.2"
+rand = "0.7"
+uuid = { version = "0.8", features = ["serde", "v4"] }
+ring = "0.16"
+base64 = "0.12"
+regex = "1.3"
