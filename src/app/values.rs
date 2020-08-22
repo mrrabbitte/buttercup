@@ -13,14 +13,16 @@ use strum_macros::{AsRefStr, EnumVariantNames};
 
 use crate::app::values::email::Email;
 use crate::app::values::geolocation::GeoCoordinates;
+use crate::app::values::lists::ValueHoldersList;
 use crate::app::values::wrappers::{LanguageWrapper, TzWrapper, WeekdayWrapper};
 use crate::app::values::zoned_date_time::ZonedDateTime;
 
-pub mod geolocation;
-pub mod zoned_date_time;
-pub mod extractors;
-pub mod wrappers;
 pub mod email;
+pub mod extractors;
+pub mod geolocation;
+pub mod lists;
+pub mod wrappers;
+pub mod zoned_date_time;
 
 #[derive(Serialize, Deserialize, AsRefStr, EnumVariantNames, Eq, Hash, PartialEq, PartialOrd,
     Debug, Clone)]
@@ -40,11 +42,13 @@ pub enum ValueHolder {
     Language(LanguageWrapper),
     Country(CountryCode),
     Email(Email),
-    IpAddress(IpAddr)
+    IpAddress(IpAddr),
+    List(ValueHoldersList)
 
 }
 
-#[derive(AsRefStr, EnumVariantNames, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(AsRefStr, EnumVariantNames,
+    Debug, Clone, Hash, Eq, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum ValueType {
 
     Boolean,
@@ -61,7 +65,8 @@ pub enum ValueType {
     Language,
     Country,
     Email,
-    IpAddress
+    IpAddress,
+    List
 
 }
 

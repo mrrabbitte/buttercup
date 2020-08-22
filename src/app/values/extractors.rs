@@ -16,16 +16,19 @@ use crate::app::values::extractors::number::{DecimalExtractor, IntegerExtractor}
 use crate::app::values::extractors::string::StringExtractor;
 use crate::app::values::geolocation::GeoCoordinatesValueError;
 use crate::app::values::zoned_date_time::ZonedDateTimeParsingError;
+use crate::app::values::lists::ValueHoldersListError;
+use crate::app::values::extractors::lists::ListExtractor;
 
 pub mod boolean;
-pub mod date_time;
-pub mod geolocation;
-pub mod number;
-pub mod string;
-pub mod language;
 pub mod country;
 pub mod email;
+pub mod date_time;
+pub mod geolocation;
 pub mod ip;
+pub mod language;
+pub mod lists;
+pub mod number;
+pub mod string;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum ValueExtractionPolicy {
@@ -47,6 +50,7 @@ pub enum ValueExtractionError {
     ZonedDateTimeParsingError(ValueExtractionPolicy, ZonedDateTimeParsingError),
     CountryCodeParsingError(ValueExtractionPolicy, CountryCodeParsingError),
     EmailParsingError(ValueExtractionPolicy, String),
+    ValueHoldersListError(ValueHoldersListError),
     ValueIsNull
 
 }
@@ -103,6 +107,15 @@ impl<'a> ValueExtractorInput<'a> {
         }
     }
 
+    pub fn from_value(parent_input: &'a ValueExtractorInput,
+                      value: &'a Value) -> ValueExtractorInput<'a> {
+        ValueExtractorInput {
+            value,
+            argument_type: parent_input.argument_type,
+            policy: parent_input.policy
+        }
+    }
+
 }
 
 pub struct ValueExtractorService;
@@ -129,6 +142,7 @@ impl ValueExtractorService {
             ValueType::Country => CountryValueExtractor::extract(input),
             ValueType::Email => EmailValueExtractor::extract(input),
             ValueType::IpAddress => IpAddressValueExtractor::extract(input),
+            ValueType::List => ListExtractor::extract(input)
         };
     }
 
