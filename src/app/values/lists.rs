@@ -11,7 +11,7 @@ pub enum ValueHoldersListError {
 
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub struct ValueHoldersList {
 
     elements: Vec<ValueHolder>,

@@ -12,12 +12,12 @@ use crate::app::values::extractors::email::EmailValueExtractor;
 use crate::app::values::extractors::geolocation::GeoCoordinatesExtractor;
 use crate::app::values::extractors::ip::IpAddressValueExtractor;
 use crate::app::values::extractors::language::LanguageValueExtractor;
+use crate::app::values::extractors::lists::ListExtractor;
 use crate::app::values::extractors::number::{DecimalExtractor, IntegerExtractor};
 use crate::app::values::extractors::string::StringExtractor;
 use crate::app::values::geolocation::GeoCoordinatesValueError;
-use crate::app::values::zoned_date_time::ZonedDateTimeParsingError;
 use crate::app::values::lists::ValueHoldersListError;
-use crate::app::values::extractors::lists::ListExtractor;
+use crate::app::values::zoned_date_time::ZonedDateTimeParsingError;
 
 pub mod boolean;
 pub mod country;
@@ -50,9 +50,19 @@ pub enum ValueExtractionError {
     ZonedDateTimeParsingError(ValueExtractionPolicy, ZonedDateTimeParsingError),
     CountryCodeParsingError(ValueExtractionPolicy, CountryCodeParsingError),
     EmailParsingError(ValueExtractionPolicy, String),
-    ValueHoldersListError(ValueHoldersListError),
     InvalidInputTypeForList,
     ValueIsNull
+
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum ListExtractionError {
+
+    ValueIsNull,
+    InvalidValueType,
+    InvalidInputTypeForList,
+    ListElementExtractionError(ValueExtractionError, usize),
+    ValueHoldersListError(ValueHoldersListError)
 
 }
 
@@ -96,14 +106,6 @@ pub struct ValueExtractorInput<'a> {
 
 }
 
-pub struct ListExtractorInput<'a> {
-
-    value: &'a Value,
-    elements_type: &'a ValueType,
-    elements_policy: &'a ValueExtractionPolicy
-
-}
-
 impl<'a> ValueExtractorInput<'a> {
 
     pub fn new(value: &'a Value,
@@ -113,6 +115,28 @@ impl<'a> ValueExtractorInput<'a> {
             value,
             argument_type,
             policy
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct ListExtractorInput<'a> {
+
+    value: &'a Value,
+    elements_type: &'a ValueType,
+    elements_policy: &'a ValueExtractionPolicy
+
+}
+
+impl<'a> ListExtractorInput<'a> {
+
+    pub fn new(value: &'a Value,
+               elements_type: &'a ValueType,
+               elements_policy: &'a ValueExtractionPolicy) -> ListExtractorInput<'a> {
+        ListExtractorInput {
+            value,
+            elements_type,
+            elements_policy
         }
     }
 }
@@ -145,9 +169,9 @@ impl ValueExtractorService {
         };
     }
 
-    pub fn extract_list(input: &ListExtractorInput) -> Result<ValueHolder, ValueExtractionError> {
+    pub fn extract_list(input: &ListExtractorInput) -> Result<ValueHolder, ListExtractionError> {
         if input.value.is_null() {
-            return Result::Err(ValueExtractionError::ValueIsNull);
+            return Result::Err(ListExtractionError::ValueIsNull);
         }
         return ListExtractor::extract(input);
     }
