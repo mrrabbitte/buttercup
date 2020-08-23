@@ -51,6 +51,7 @@ pub enum ValueExtractionError {
     CountryCodeParsingError(ValueExtractionPolicy, CountryCodeParsingError),
     EmailParsingError(ValueExtractionPolicy, String),
     ValueHoldersListError(ValueHoldersListError),
+    InvalidInputTypeForList,
     ValueIsNull
 
 }
@@ -95,6 +96,14 @@ pub struct ValueExtractorInput<'a> {
 
 }
 
+pub struct ListExtractorInput<'a> {
+
+    value: &'a Value,
+    elements_type: &'a ValueType,
+    elements_policy: &'a ValueExtractionPolicy
+
+}
+
 impl<'a> ValueExtractorInput<'a> {
 
     pub fn new(value: &'a Value,
@@ -106,16 +115,6 @@ impl<'a> ValueExtractorInput<'a> {
             policy
         }
     }
-
-    pub fn from_value(parent_input: &'a ValueExtractorInput,
-                      value: &'a Value) -> ValueExtractorInput<'a> {
-        ValueExtractorInput {
-            value,
-            argument_type: parent_input.argument_type,
-            policy: parent_input.policy
-        }
-    }
-
 }
 
 pub struct ValueExtractorService;
@@ -142,10 +141,16 @@ impl ValueExtractorService {
             ValueType::Country => CountryValueExtractor::extract(input),
             ValueType::Email => EmailValueExtractor::extract(input),
             ValueType::IpAddress => IpAddressValueExtractor::extract(input),
-            ValueType::List => ListExtractor::extract(input)
+            ValueType::List => Result::Err(ValueExtractionError::InvalidInputTypeForList)
         };
     }
 
+    pub fn extract_list(input: &ListExtractorInput) -> Result<ValueHolder, ValueExtractionError> {
+        if input.value.is_null() {
+            return Result::Err(ValueExtractionError::ValueIsNull);
+        }
+        return ListExtractor::extract(input);
+    }
 }
 
 pub trait ValueExtractor {
