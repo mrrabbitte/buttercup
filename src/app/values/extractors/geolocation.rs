@@ -9,9 +9,6 @@ use crate::app::values::ValueHolder;
 
 pub struct GeoCoordinatesExtractor;
 
-const GIVEN_LAT_LONG_NOT_VALID: &str =
-    "Latitude should be in range [-90; 90], longitude should be in range [-180, 180].";
-
 impl ValueExtractor for GeoCoordinatesExtractor {
 
     fn strict_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionError> {

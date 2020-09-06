@@ -18,6 +18,6 @@ impl BehaviorTree {
     }
 
     pub fn tick(&self) {
-        unimplemented!("Not yet implemented!")
+
     }
 }

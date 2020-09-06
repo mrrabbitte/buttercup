@@ -36,6 +36,7 @@ impl Handler<Tick> for Agent {
 
     fn handle(&mut self, msg: Tick, ctx: &mut Context<Agent>) -> Self::Result {
         println!("Got a tick.");
+        println!("{:?}", ctx);
         self.tick()
     }
 
@@ -48,6 +49,17 @@ pub struct AgentAddress {
 
 }
 
+impl AgentAddress {
+
+    pub fn new(id: i32,
+               index: u32) -> AgentAddress {
+        AgentAddress {
+            id,
+            index
+        }
+    }
+
+}
 
 #[cfg(test)]
 mod tests {

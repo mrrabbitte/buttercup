@@ -7,6 +7,8 @@ edition = "2018"
 [dependencies]
 actix = "0.9.0"
 actix-rt = "1.1"
+actix-web = "2.0.0"
+env_logger = "0.7.1"
 serde = { version = "1.0.*", features = ["derive"] }
 serde_json = {version = "1.*", features = ["preserve_order"]}
 chrono = {version = "0.4", features = ["serde"]}
