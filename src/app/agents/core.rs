@@ -2,11 +2,13 @@ use actix::{Actor, Context, Handler, Message};
 
 use crate::app::behavior::tick::{Tick, TickStatus};
 use crate::app::behavior::tree::BehaviorTree;
+use uuid::Uuid;
 
 pub struct Agent {
 
     address: AgentAddress,
-    tree: BehaviorTree
+    tree: BehaviorTree,
+    uuid: Uuid
 
 }
 
@@ -16,12 +18,13 @@ impl Agent {
                tree: BehaviorTree) -> Agent {
         Agent {
             address,
-            tree
+            tree,
+            uuid: Uuid::new_v4()
         }
     }
 
     fn tick(&self) -> TickStatus {
-        println!("Performing tick.");
+        println!("Performing tick: {}", self.uuid);
         TickStatus::Success
     }
 }
