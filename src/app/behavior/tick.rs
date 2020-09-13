@@ -4,11 +4,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::app::agents::core::Agent;
 
+#[derive(Message)]
+#[rtype(result = "Result<TickStatus, TickError>")]
 pub struct Tick;
-
-impl Message for Tick {
-    type Result = TickStatus;
-}
 
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum TickStatus {
@@ -19,11 +17,10 @@ pub enum TickStatus {
 
 }
 
-impl MessageResponse<Agent, Tick> for TickStatus {
+#[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
+pub enum TickError {
 
-    fn handle<R: ResponseChannel<Tick>>(self,
-                                        ctx: &mut <Agent as Actor>::Context,
-                                        tx: Option<R>) {
-        
-    }
+    MissingBehaviorTree
+
 }
+

@@ -23,13 +23,13 @@ async fn example(data: Data<Mutex<Agents>>) -> String {
     let mut response = String::new();
 
     for address in &agents.agents {
-        let response_one = address.send(Tick);
-        let response_two = address.send(Tick);
-        let response_three = address.send(Tick);
+        let response_one = address.send(Tick).await;
+        let response_two = address.send(Tick).await;
+        let response_three = address.send(Tick).await;
         response.push_str(format!("Welcome: {:?}, {:?}, {:?}",
-                                  response_one.await.unwrap_err(),
-                                  response_two.await.unwrap_err(),
-                                  response_three.await.unwrap_err())
+                                  response_one,
+                                  response_two,
+                                  response_three)
             .as_str());
         address.send(Tick).await;
     }
