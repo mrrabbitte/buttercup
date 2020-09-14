@@ -75,6 +75,7 @@ impl AgentAddress {
 mod tests {
     use actix::System;
 
+    use crate::app::address::Address;
     use crate::app::behavior::node::BTNodeAddress;
 
     use super::*;

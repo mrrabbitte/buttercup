@@ -1,4 +1,5 @@
 use crate::app::behavior::node::BTNodeAddress;
+use crate::app::behavior::tick::{TickError, TickStatus};
 
 pub struct BehaviorTree {
 
@@ -17,7 +18,22 @@ impl BehaviorTree {
         }
     }
 
-    pub fn tick(&self) {
-
+    pub fn tick(&self) -> Result<TickStatus, TickError> {
+        Result::Ok(TickStatus::Success)
     }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use crate::app::address::Address;
+    use crate::app::behavior::node::BTNodeAddress;
+
+    #[test]
+    fn test_returns_status() {
+        assert_eq!(Result::Ok(TickStatus::Success),
+                   BehaviorTree::new(1, BTNodeAddress::new(1, 1)).tick())
+    }
+
 }
