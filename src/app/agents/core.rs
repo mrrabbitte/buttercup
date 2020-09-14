@@ -1,4 +1,4 @@
-use actix::{Actor, Context, Handler, Message};
+use actix::{Actor, Context, Handler};
 
 use crate::app::behavior::tick::{Tick, TickStatus, TickError};
 use crate::app::behavior::tree::BehaviorTree;
@@ -32,11 +32,11 @@ impl Agent {
 impl Actor for Agent {
     type Context = Context<Agent>;
 
-    fn started(&mut self, ctx: &mut Context<Self>) {
+    fn started(&mut self, _ctx: &mut Context<Self>) {
         println!("Actor: {} is alive", self.uuid);
     }
 
-    fn stopped(&mut self, ctx: &mut Context<Self>) {
+    fn stopped(&mut self, _ctx: &mut Context<Self>) {
         println!("Actor: {} is stopped", self.uuid);
     }
 }
@@ -44,7 +44,7 @@ impl Actor for Agent {
 impl Handler<Tick> for Agent {
     type Result = Result<TickStatus, TickError>;
 
-    fn handle(&mut self, msg: Tick, ctx: &mut Context<Agent>) -> Self::Result {
+    fn handle(&mut self, _msg: Tick, ctx: &mut Context<Agent>) -> Self::Result {
         println!("Got a tick.");
         println!("{:?}", ctx);
         self.tick()
@@ -73,7 +73,6 @@ impl AgentAddress {
 
 #[cfg(test)]
 mod tests {
-    use actix::System;
 
     use crate::app::address::Address;
     use crate::app::behavior::node::BTNodeAddress;

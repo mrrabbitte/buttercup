@@ -1,4 +1,4 @@
-use isocountry::{CountryCode, CountryCodeParseErr};
+use isocountry::CountryCode;
 use serde_json::Value;
 
 use crate::app::values::extractors::{CountryCodeParsingError, ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};

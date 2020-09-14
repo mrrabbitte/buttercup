@@ -1,9 +1,9 @@
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryFrom;
 use std::str::FromStr;
 
-use serde_json::{Error, Value};
+use serde_json::Value;
 
-use crate::app::values::extractors::{ParsingValueSource, ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
+use crate::app::values::extractors::{ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
 use crate::app::values::geolocation::{GeoCoordinates, GeoCoordinatesValueError};
 use crate::app::values::ValueHolder;
 

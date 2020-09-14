@@ -1,5 +1,3 @@
-use std::error::Error;
-
 use serde_json::Value;
 
 use crate::app::values::email::Email;
@@ -24,7 +22,7 @@ impl ValueExtractor for EmailValueExtractor {
         }
     }
 
-    fn lax_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionError> {
+    fn lax_extract(_input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionError> {
         Result::Err(ValueExtractionError::PolicyNotSupported(ValueExtractionPolicy::Lax))
     }
 

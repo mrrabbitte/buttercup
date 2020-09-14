@@ -1,7 +1,7 @@
 use serde_json::Value;
 
-use crate::app::values::extractors::{ListExtractionError, ListExtractorInput, ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput, ValueExtractorService};
-use crate::app::values::lists::{ValueHoldersList, ValueHoldersListError};
+use crate::app::values::extractors::{ListExtractionError, ListExtractorInput, ValueExtractionError, ValueExtractionPolicy, ValueExtractorInput, ValueExtractorService};
+use crate::app::values::lists::ValueHoldersList;
 use crate::app::values::ValueHolder;
 
 pub struct ListExtractor;
@@ -42,7 +42,6 @@ impl ListExtractor {
 
 #[cfg(test)]
 mod tests {
-    use num::BigInt;
 
     use crate::app::values::ValueType;
 

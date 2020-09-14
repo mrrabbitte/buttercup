@@ -1,7 +1,7 @@
-use std::{thread, time};
+
 use std::sync::Mutex;
 
-use actix::{Actor, Addr, System};
+use actix::{Actor, Addr};
 use actix_web::{App, http, HttpRequest, HttpServer, middleware};
 use actix_web::web::{Data, get, resource};
 use env_logger;

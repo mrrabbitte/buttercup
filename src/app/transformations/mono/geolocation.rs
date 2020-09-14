@@ -7,7 +7,6 @@ use crate::app::values::geolocation::GeoCoordinates;
 use crate::app::values::wrappers::{TzWrapper, Wrapper};
 
 pub struct FindTimeZoneFromGeoCoordinates;
-use num::traits::ToPrimitive;
 
 const INPUT_TYPE: [ValueType; 1] = [ValueType::GeoCoordinates];
 const RESULT_TYPE: ValueType = ValueType::TimeZone;

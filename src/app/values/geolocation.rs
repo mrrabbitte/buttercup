@@ -1,10 +1,8 @@
-use std::collections::HashMap;
 use std::convert::TryFrom;
-use std::ops::Div;
 use std::str::FromStr;
 
 use num::{BigInt, BigRational, FromPrimitive, ToPrimitive};
-use num_rational::Ratio;
+
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 

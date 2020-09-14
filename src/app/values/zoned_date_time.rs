@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use chrono::{NaiveDateTime, ParseError};
+use chrono::NaiveDateTime;
 use chrono_tz::Tz;
 use serde::{Deserialize, Serialize};
 use serde::export::TryFrom;

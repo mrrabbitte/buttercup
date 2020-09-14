@@ -1,8 +1,6 @@
-use actix::{Actor, Message};
-use actix::dev::{MessageResponse, ResponseChannel};
-use serde::{Deserialize, Serialize};
+use actix::Message;
 
-use crate::app::agents::core::Agent;
+use serde::{Deserialize, Serialize};
 
 #[derive(Message)]
 #[rtype(result = "Result<TickStatus, TickError>")]

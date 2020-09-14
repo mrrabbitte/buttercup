@@ -1,4 +1,4 @@
-use std::net::{AddrParseError, IpAddr};
+use std::net::IpAddr;
 use std::str::FromStr;
 
 use serde_json::Value;
@@ -26,7 +26,7 @@ impl ValueExtractor for IpAddressValueExtractor {
         }
     }
 
-    fn lax_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionError> {
+    fn lax_extract(_input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionError> {
         Result::Err(ValueExtractionError::PolicyNotSupported(ValueExtractionPolicy::Lax))
     }
 

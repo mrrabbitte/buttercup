@@ -1,7 +1,6 @@
-use std::any::Any;
 
 use num::{BigInt, BigRational, FromPrimitive};
-use num_rational::Ratio;
+
 use serde_json::Value;
 
 use crate::app::values::extractors::{ParsingValueSource, ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};

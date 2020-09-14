@@ -1,6 +1,5 @@
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime, ParseError, Weekday};
-use chrono_tz::Tz;
-use num::FromPrimitive;
+use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+
 use serde_json::{Number, Value};
 
 use crate::app::values::extractors::{ParsingValueSource, ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
@@ -150,7 +149,7 @@ impl ValueExtractor for LocalTimeExtractor {
         };
     }
 
-    fn lax_extract(input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionError> {
+    fn lax_extract(_input: &ValueExtractorInput) -> Result<ValueHolder, ValueExtractionError> {
         Result::Err(
             ValueExtractionError::PolicyNotSupported(
                 ValueExtractionPolicy::Lax))

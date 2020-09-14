@@ -1,9 +1,8 @@
-use std::cmp::Ordering;
+
 use std::collections::HashMap;
 use std::net::IpAddr;
-use std::slice::Split;
 
-use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, Weekday};
+use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use isocountry::CountryCode;
 use num::bigint::BigInt;
 use num::rational::BigRational;
@@ -107,7 +106,6 @@ impl ValuesPayload {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashSet;
 
     use num::FromPrimitive;
 

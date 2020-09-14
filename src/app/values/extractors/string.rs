@@ -1,7 +1,4 @@
-use std::borrow::Borrow;
-use std::convert::TryInto;
-
-use serde_json::{Error, Value};
+use serde_json::Value;
 
 use crate::app::values::extractors::{ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
 use crate::app::values::ValueHolder;

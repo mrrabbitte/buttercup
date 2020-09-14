@@ -1,6 +1,6 @@
 use isocountry::CountryCodeParseErr;
 use serde::{Deserialize, Serialize};
-use serde_json::{Number, Value};
+use serde_json::Value;
 
 use crate::app::values::{ValueHolder, ValueType};
 use crate::app::values::extractors::boolean::BooleanExtractor;

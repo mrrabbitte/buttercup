@@ -1,10 +1,9 @@
-use chrono::{Datelike, TimeZone, Weekday};
+use chrono::{Datelike, Weekday};
 
 use crate::app::transformations::mono::MonoInputTransformer;
 use crate::app::transformations::transformer::{InputOrder, TransformationError};
 use crate::app::values::{ValueHolder, ValueType};
 use crate::app::values::wrappers::{WeekdayWrapper, Wrapper};
-use crate::app::values::zoned_date_time::ZonedDateTime;
 
 pub struct DayOfWeekFromDateTimeRetrieval;
 
