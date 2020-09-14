@@ -4,10 +4,16 @@ version = "0.1.0"
 authors = ["Przemyslaw Gliniecki <pgliniecki@protonmail.ch>"]
 edition = "2018"
 
+[workspace]
+members = [
+    "buttercup_macros",
+]
+
 [dependencies]
 actix = "0.9.0"
 actix-rt = "1.1"
 actix-web = "2.0.0"
+buttercup_macros = { path = "../buttercup/buttercup_macros" }
 env_logger = "0.7.1"
 serde = { version = "1.0.*", features = ["derive"] }
 serde_json = {version = "1.*", features = ["preserve_order"]}

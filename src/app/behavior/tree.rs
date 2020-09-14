@@ -3,7 +3,7 @@ use crate::app::behavior::node::BTNodeAddress;
 pub struct BehaviorTree {
 
     id: i32,
-    root_node: BTNodeAddress,
+    root_node: BTNodeAddress
 
 }
 

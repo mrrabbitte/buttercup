@@ -1,3 +1,4 @@
+pub mod address;
 pub mod agents;
 pub mod arguments;
 pub mod blackboards;
