@@ -18,7 +18,7 @@ pub enum TickStatus {
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum TickError {
 
-    MissingBehaviorTree
+    MissingBehaviorTreeNode
 
 }
 

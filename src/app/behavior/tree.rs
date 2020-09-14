@@ -1,20 +1,23 @@
-use crate::app::behavior::node::BTNodeAddress;
+use crate::app::behavior::node::{BTNodeAddress, BTNode};
 use crate::app::behavior::tick::{TickError, TickStatus};
 
 pub struct BehaviorTree {
 
     id: i32,
-    root_node: BTNodeAddress
+    nodes: Vec<BTNode>,
+    current_node: BTNodeAddress
 
 }
 
 impl BehaviorTree {
 
     pub fn new(id: i32,
+               nodes: Vec<BTNode>,
                root_node: BTNodeAddress) -> BehaviorTree {
         BehaviorTree {
             id,
-            root_node
+            nodes,
+            current_node: root_node
         }
     }
 
