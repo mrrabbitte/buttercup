@@ -16,8 +16,7 @@ mod app;
 
 async fn example(data: Data<Mutex<Agents>>) -> String {
     let agent = Agent::new(AgentAddress::new(1, 1),
-                           BehaviorTree::new(
-                               1, vec![], BTNodeAddress::new(1, 1)))
+                           BehaviorTree::new(1))
         .start();
     let mut agents = data.lock().unwrap();
     agents.push(agent);

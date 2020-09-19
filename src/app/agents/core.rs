@@ -82,7 +82,7 @@ mod tests {
     #[test]
     fn test_returns_status() {
         assert_eq!(Agent::new(AgentAddress {id: 1, index: 1},
-                              BehaviorTree::new(1, BTNodeAddress::new(1, 1)))
+                              BehaviorTree::new(1))
             .tick(), Result::Ok(TickStatus::Success));
     }
 

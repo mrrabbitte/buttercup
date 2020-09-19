@@ -94,7 +94,6 @@ impl From<CountryCodeParseErr> for CountryCodeParsingError {
             CountryCodeParseErr::InvalidID {..} => CountryCodeParsingError::InvalidCountryId,
         }
     }
-
 }
 
 #[derive(Debug)]

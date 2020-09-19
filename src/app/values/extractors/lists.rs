@@ -54,8 +54,8 @@ mod tests {
 
     #[test]
     fn test_simple_extraction() {
-        extract_and_assert_list(SIMPLE_LIST,
-                                |list| list.get_elements().len() == 5);
+        extract_and_assert_condition(SIMPLE_LIST,
+                                     |list| list.get_elements().len() == 5);
         let result =
             extract(STRING_LIST, &ValueType::String);
 
@@ -73,8 +73,8 @@ mod tests {
 
     #[test]
     fn test_empty_list_extraction() {
-        extract_and_assert_list(EMPTY_LIST,
-                                |list| list.get_elements().is_empty());
+        extract_and_assert_condition(EMPTY_LIST,
+                                     |list| list.get_elements().is_empty());
     }
 
     #[test]
@@ -111,8 +111,8 @@ mod tests {
         extract(input, &ValueType::Integer)
     }
 
-    fn extract_and_assert_list<F>(input: &str,
-                                  func: F) where F: Fn(&ValueHoldersList) -> bool {
+    fn extract_and_assert_condition<F>(input: &str,
+                                       condition: F) where F: Fn(&ValueHoldersList) -> bool {
         let result = extract_integer(input);
 
         assert!(result.is_ok(), "{:?}", result);
@@ -122,7 +122,7 @@ mod tests {
         assert!(
             matches!(
             value_holder,
-            ValueHolder::List(list) if func(&list))
+            ValueHolder::List(list) if condition(&list))
         );
     }
 

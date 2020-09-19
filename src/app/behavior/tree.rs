@@ -1,23 +1,19 @@
-use crate::app::behavior::node::{BTNodeAddress, BTNode};
+use crate::app::behavior::node::{BTNodeAddress, BTNode, BTNodeExecutionContext};
 use crate::app::behavior::tick::{TickError, TickStatus};
 
 pub struct BehaviorTree {
 
     id: i32,
-    nodes: Vec<BTNode>,
-    current_node: BTNodeAddress
+    context: BTNodeExecutionContext
 
 }
 
 impl BehaviorTree {
 
-    pub fn new(id: i32,
-               nodes: Vec<BTNode>,
-               root_node: BTNodeAddress) -> BehaviorTree {
+    pub fn new(id: i32) -> BehaviorTree {
         BehaviorTree {
             id,
-            nodes,
-            current_node: root_node
+            context: BTNodeExecutionContext::new()
         }
     }
 
@@ -36,7 +32,7 @@ mod tests {
     #[test]
     fn test_returns_status() {
         assert_eq!(Result::Ok(TickStatus::Success),
-                   BehaviorTree::new(1, BTNodeAddress::new(1, 1)).tick())
+                   BehaviorTree::new(1).tick())
     }
 
 }
