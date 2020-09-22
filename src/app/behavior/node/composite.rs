@@ -1,4 +1,4 @@
-use crate::app::behavior::node::{BehaviorTreeNode, BTNodeExecutionContext, BTNode};
+use crate::app::behavior::node::{BehaviorTreeNode, BTNode, BTNodeExecutionContext};
 use crate::app::behavior::node::composite::parallel::ParallelCompositeNode;
 use crate::app::behavior::node::composite::selector::SelectorCompositeNode;
 use crate::app::behavior::node::composite::sequence::SequenceCompositeNode;
@@ -18,7 +18,7 @@ pub enum CompositeBTNode {
 
 pub trait CompositeNode: BehaviorTreeNode {
 
-    fn get_children(&self, context: &BTNodeExecutionContext) -> &Vec<BTNode>;
+    fn get_children(&self) -> &Vec<BTNode>;
 
 }
 

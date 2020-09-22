@@ -1,7 +1,7 @@
-use crate::app::behavior::node::{BehaviorTreeNode, BTNodeExecutionContext, BTNode};
-use crate::app::behavior::tick::{TickStatus, TickError};
+use crate::app::behavior::node::{BehaviorTreeNode, BTNode, BTNodeExecutionContext};
 use crate::app::behavior::node::decorator::condition::ConditionDecoratorNode;
 use crate::app::behavior::node::decorator::invert::InvertDecoratorNode;
+use crate::app::behavior::tick::{TickError, TickStatus};
 
 mod condition;
 mod invert;

@@ -1,6 +1,6 @@
-use crate::app::behavior::node::{BehaviorTreeNode, BTNodeExecutionContext, BTNode};
-use crate::app::behavior::tick::{TickStatus, TickError};
+use crate::app::behavior::node::{BehaviorTreeNode, BTNode, BTNodeExecutionContext};
 use crate::app::behavior::node::composite::CompositeNode;
+use crate::app::behavior::tick::{TickError, TickStatus};
 
 pub struct ParallelCompositeNode;
 
@@ -12,7 +12,7 @@ impl BehaviorTreeNode for ParallelCompositeNode {
 
 impl CompositeNode for ParallelCompositeNode {
 
-    fn get_children(&self, context: &BTNodeExecutionContext) -> &Vec<BTNode> {
+    fn get_children(&self) -> &Vec<BTNode> {
         unimplemented!()
     }
 }

@@ -1,6 +1,6 @@
-use crate::app::behavior::node::action::logging::PrintLogActionNode;
 use crate::app::behavior::node::{BehaviorTreeNode, BTNodeExecutionContext};
-use crate::app::behavior::tick::{TickStatus, TickError};
+use crate::app::behavior::node::action::logging::PrintLogActionNode;
+use crate::app::behavior::tick::{TickError, TickStatus};
 
 mod logging;
 
