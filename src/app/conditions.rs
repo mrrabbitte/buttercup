@@ -188,6 +188,16 @@ mod tests {
                                 EqualsRelationalExpression::new(
                                     RelationalExpressionSpecification::LiteralAndName(
                                         ValueHolder::String(FIRST_VALUE.to_owned()),
+                                        FIRST_VALUE_NAME.to_owned()
+                                    )
+                                )
+                            )
+                        ),
+                        ConditionExpression::RelationExpression(
+                            RelationalExpression::Equals(
+                                EqualsRelationalExpression::new(
+                                    RelationalExpressionSpecification::LiteralAndName(
+                                        ValueHolder::String(FIRST_VALUE.to_owned()),
                                         SECOND_VALUE_NAME.to_owned()
                                     )
                                 )
