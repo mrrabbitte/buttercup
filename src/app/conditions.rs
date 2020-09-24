@@ -24,6 +24,10 @@ impl ConditionExpressionWrapper {
         }
     }
 
+    pub fn unpack(self) -> Box<dyn Fn(&ValuesPayload) -> bool> {
+        self.predicate
+    }
+
 }
 
 pub enum LogicalExpression {
@@ -167,7 +171,44 @@ mod tests {
             )
         );
 
-        let predicate = condition.get();
+        let predicate = ConditionExpressionWrapper::new(condition).unpack();
+
+        assert_eq!(predicate(&first_values_payload()), true);
+        assert_eq!(predicate(&second_values_payload()), false);
+    }
+
+    #[test]
+    fn test_evaluates_correctly_for_equals_name_literal() {
+        let condition = ConditionExpression::LogicalExpression(
+            Box::new(
+                LogicalExpression::And(
+                    vec![
+                        ConditionExpression::RelationExpression(
+                            RelationalExpression::Equals(
+                                EqualsRelationalExpression::new(
+                                    RelationalExpressionSpecification::LiteralAndName(
+                                        ValueHolder::String(FIRST_VALUE.to_owned()),
+                                        SECOND_VALUE_NAME.to_owned()
+                                    )
+                                )
+                            )
+                        ),
+                        ConditionExpression::RelationExpression(
+                            RelationalExpression::Equals(
+                                EqualsRelationalExpression::new(
+                                    RelationalExpressionSpecification::NameAndLiteral(
+                                        THIRD_VALUE_NAME.to_owned(),
+                                        ValueHolder::Integer(BigInt::from(THIRD_VALUE))
+                                    )
+                                )
+                            )
+                        )
+                    ]
+                )
+            )
+        );
+
+        let predicate = ConditionExpressionWrapper::new(condition).unpack();
 
         assert_eq!(predicate(&first_values_payload()), true);
         assert_eq!(predicate(&second_values_payload()), false);
