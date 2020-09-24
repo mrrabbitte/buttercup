@@ -19,8 +19,8 @@ impl EqualsRelationalExpression {
 
 impl ValuesPayloadPredicateSupplier for EqualsRelationalExpression {
 
-    fn get(&self) -> Box<dyn Fn(&ValuesPayload) -> bool + '_> {
-        match &self.specification {
+    fn get(self) -> Box<dyn Fn(&ValuesPayload) -> bool> {
+        match self.specification {
             RelationalExpressionSpecification::NameAndName(first, second) =>
                 Box::new(move |payload|
                     match (payload.get(&first), payload.get(&second)) {
@@ -30,7 +30,7 @@ impl ValuesPayloadPredicateSupplier for EqualsRelationalExpression {
             RelationalExpressionSpecification::NameAndLiteral(name, literal) =>
                 Box::new(move |payload|
                     match payload.get(&name) {
-                        Some(left) => left.eq(literal),
+                        Some(left) => left.eq(&literal),
                         _ => false
                     }),
             RelationalExpressionSpecification::LiteralAndName(literal, name) =>

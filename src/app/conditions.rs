@@ -10,10 +10,26 @@ pub enum ConditionExpression {
 
 }
 
+pub struct ConditionExpressionWrapper {
+
+    predicate: Box<dyn Fn(&ValuesPayload) -> bool>
+
+}
+
+impl ConditionExpressionWrapper {
+
+    pub fn new(condition: ConditionExpression) -> ConditionExpressionWrapper {
+        ConditionExpressionWrapper {
+            predicate: condition.get()
+        }
+    }
+
+}
+
 pub enum LogicalExpression {
 
-    And(ConditionExpression, ConditionExpression),
-    Or(ConditionExpression, ConditionExpression),
+    And(Vec<ConditionExpression>),
+    Or(Vec<ConditionExpression>),
     Not(ConditionExpression)
 
 }
@@ -34,13 +50,13 @@ pub enum RelationalExpressionSpecification {
 
 pub trait ValuesPayloadPredicateSupplier {
 
-    fn get(&self) -> Box<dyn Fn(&ValuesPayload) -> bool + '_>;
+    fn get(self) -> Box<dyn Fn(&ValuesPayload) -> bool>;
 
 }
 
 impl ValuesPayloadPredicateSupplier for ConditionExpression {
 
-    fn get(&self) -> Box<dyn Fn(&ValuesPayload) -> bool + '_> {
+    fn get(self) -> Box<dyn Fn(&ValuesPayload) -> bool> {
         match self {
             ConditionExpression::RelationExpression(expr) => expr.get(),
             ConditionExpression::LogicalExpression(expr) => expr.get()
@@ -50,33 +66,66 @@ impl ValuesPayloadPredicateSupplier for ConditionExpression {
 }
 
 impl ValuesPayloadPredicateSupplier for LogicalExpression {
-    fn get(&self) -> Box<dyn Fn(&ValuesPayload) -> bool + '_> {
+    fn get(self) -> Box<dyn Fn(&ValuesPayload) -> bool> {
         match self {
-            LogicalExpression::And(first, second) =>
-                Box::new(move |payload| first.get()(payload) && second.get()(payload)),
-            LogicalExpression::Or(first, second) =>
-                Box::new(move |payload| first.get()(payload) || second.get()(payload)),
-            LogicalExpression::Not(expr) =>
-                Box::new(move |payload| !expr.get()(payload))
+            LogicalExpression::And(expressions) => {
+                let expr_funcs: Vec<Box<dyn Fn(&ValuesPayload) -> bool>> = to_funcs(expressions);
+                Box::new(move |payload|
+                    {
+                        for expr in &expr_funcs {
+                            if !expr(payload) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                )
+            },
+            LogicalExpression::Or(expressions) => {
+                let expr_funcs: Vec<Box<dyn Fn(&ValuesPayload) -> bool>> = to_funcs(expressions);
+                Box::new(move |payload|
+                    {
+                        for expr in &expr_funcs {
+                            if expr(payload) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    })
+            },
+            LogicalExpression::Not(expr) => {
+                let expr_func = expr.get();
+                Box::new(move |payload| !expr_func(payload))
+            }
+
         }
     }
 }
 
 impl ValuesPayloadPredicateSupplier for RelationalExpression {
-    fn get(&self) -> Box<dyn Fn(&ValuesPayload) -> bool+ '_> {
+    fn get(self) -> Box<dyn Fn(&ValuesPayload) -> bool> {
         match self {
             RelationalExpression::Equals(equals) => equals.get()
         }
     }
 }
 
+fn to_funcs(expressions: Vec<ConditionExpression>) -> Vec<Box<dyn Fn(&ValuesPayload) -> bool>> {
+    let mut ret = Vec::new();
+    for expr in expressions {
+        ret.push(expr.get());
+    }
+    ret
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
-    use num::FromPrimitive;
-    use crate::app::values::ValueHolder;
 
     use num::bigint::BigInt;
+    use num::FromPrimitive;
+
+    use crate::app::values::ValueHolder;
 
     use super::*;
 
@@ -94,24 +143,26 @@ mod tests {
         let condition = ConditionExpression::LogicalExpression(
             Box::new(
                 LogicalExpression::Or(
-                    ConditionExpression::RelationExpression(
-                        RelationalExpression::Equals(
-                            EqualsRelationalExpression::new(
-                                RelationalExpressionSpecification::NameAndName(
-                                    FIRST_VALUE_NAME.to_owned(), SECOND_VALUE_NAME.to_owned()
+                    vec![
+                        ConditionExpression::RelationExpression(
+                            RelationalExpression::Equals(
+                                EqualsRelationalExpression::new(
+                                    RelationalExpressionSpecification::NameAndName(
+                                        FIRST_VALUE_NAME.to_owned(), SECOND_VALUE_NAME.to_owned()
+                                    )
+                                )
+                            )
+                        ),
+                        ConditionExpression::RelationExpression(
+                            RelationalExpression::Equals(
+                                EqualsRelationalExpression::new(
+                                    RelationalExpressionSpecification::NameAndName(
+                                        THIRD_VALUE_NAME.to_owned(), FIRST_VALUE_NAME.to_owned()
+                                    )
                                 )
                             )
                         )
-                    ),
-                    ConditionExpression::RelationExpression(
-                        RelationalExpression::Equals(
-                            EqualsRelationalExpression::new(
-                                RelationalExpressionSpecification::NameAndName(
-                                    THIRD_VALUE_NAME.to_owned(), FIRST_VALUE_NAME.to_owned()
-                                )
-                            )
-                        )
-                    )
+                    ]
                 )
             )
         );
