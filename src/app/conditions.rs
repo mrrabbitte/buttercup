@@ -1,7 +1,10 @@
-use crate::app::conditions::value::EqualsRelationalExpression;
+use std::collections::HashSet;
+use std::iter::FromIterator;
+
+use crate::app::conditions::relational::{EqualsRelationalExpression, GreaterThanRelationalExpression};
 use crate::app::values::{ValueHolder, ValuesPayload};
 
-pub mod value;
+pub mod relational;
 
 pub enum ConditionExpression {
 
@@ -12,15 +15,18 @@ pub enum ConditionExpression {
 
 pub struct ConditionExpressionWrapper {
 
-    predicate: Box<dyn Fn(&ValuesPayload) -> bool>
+    predicate: Box<dyn Fn(&ValuesPayload) -> bool>,
+    value_names: HashSet<String>
 
 }
 
 impl ConditionExpressionWrapper {
 
     pub fn new(condition: ConditionExpression) -> ConditionExpressionWrapper {
+        let value_names = HashSet::from_iter(condition.get_value_names());
         ConditionExpressionWrapper {
-            predicate: condition.get()
+            predicate: condition.get_predicate(),
+            value_names
         }
     }
 
@@ -40,7 +46,8 @@ pub enum LogicalExpression {
 
 pub enum RelationalExpression {
 
-    Equals(EqualsRelationalExpression)
+    Equals(EqualsRelationalExpression),
+    GreaterThan(GreaterThanRelationalExpression)
 
 }
 
@@ -52,28 +59,54 @@ pub enum RelationalExpressionSpecification {
 
 }
 
+impl RelationalExpressionSpecification {
+
+    pub fn get_value_names(&self) -> Vec<String> {
+        match self {
+            RelationalExpressionSpecification::NameAndName(first, second) =>
+                vec![first.clone(), second.clone()],
+            RelationalExpressionSpecification::NameAndLiteral(name, _) =>
+                vec![name.clone()],
+            RelationalExpressionSpecification::LiteralAndName(_, name) =>
+                vec![name.clone()]
+        }
+    }
+
+}
+
 pub trait ValuesPayloadPredicateSupplier {
 
-    fn get(self) -> Box<dyn Fn(&ValuesPayload) -> bool>;
+    fn get_predicate(self) -> Box<dyn Fn(&ValuesPayload) -> bool>;
+    fn get_value_names(&self) -> Vec<String>;
 
 }
 
 impl ValuesPayloadPredicateSupplier for ConditionExpression {
 
-    fn get(self) -> Box<dyn Fn(&ValuesPayload) -> bool> {
+    fn get_predicate(self) -> Box<dyn Fn(&ValuesPayload) -> bool> {
         match self {
-            ConditionExpression::RelationExpression(expr) => expr.get(),
-            ConditionExpression::LogicalExpression(expr) => expr.get()
+            ConditionExpression::RelationExpression(expr) => expr.get_predicate(),
+            ConditionExpression::LogicalExpression(expr) => expr.get_predicate()
+        }
+    }
+
+    fn get_value_names(&self) -> Vec<String> {
+        match self {
+            ConditionExpression::RelationExpression(expr) =>
+                expr.get_value_names(),
+            ConditionExpression::LogicalExpression(expr) =>
+                expr.get_value_names()
         }
     }
 
 }
 
 impl ValuesPayloadPredicateSupplier for LogicalExpression {
-    fn get(self) -> Box<dyn Fn(&ValuesPayload) -> bool> {
+    fn get_predicate(self) -> Box<dyn Fn(&ValuesPayload) -> bool> {
         match self {
             LogicalExpression::And(expressions) => {
-                let expr_funcs: Vec<Box<dyn Fn(&ValuesPayload) -> bool>> = to_funcs(expressions);
+                let expr_funcs: Vec<Box<dyn Fn(&ValuesPayload) -> bool>> =
+                    to_predicates(expressions);
                 Box::new(move |payload|
                     {
                         for expr in &expr_funcs {
@@ -86,7 +119,8 @@ impl ValuesPayloadPredicateSupplier for LogicalExpression {
                 )
             },
             LogicalExpression::Or(expressions) => {
-                let expr_funcs: Vec<Box<dyn Fn(&ValuesPayload) -> bool>> = to_funcs(expressions);
+                let expr_funcs: Vec<Box<dyn Fn(&ValuesPayload) -> bool>> =
+                    to_predicates(expressions);
                 Box::new(move |payload|
                     {
                         for expr in &expr_funcs {
@@ -98,26 +132,57 @@ impl ValuesPayloadPredicateSupplier for LogicalExpression {
                     })
             },
             LogicalExpression::Not(expr) => {
-                let expr_func = expr.get();
+                let expr_func = expr.get_predicate();
                 Box::new(move |payload| !expr_func(payload))
             }
 
         }
     }
-}
 
-impl ValuesPayloadPredicateSupplier for RelationalExpression {
-    fn get(self) -> Box<dyn Fn(&ValuesPayload) -> bool> {
+    fn get_value_names(&self) -> Vec<String> {
         match self {
-            RelationalExpression::Equals(equals) => equals.get()
+            LogicalExpression::And(expressions) =>
+                to_value_names(expressions),
+            LogicalExpression::Or(expressions) =>
+                to_value_names(expressions),
+            LogicalExpression::Not(expr) => expr.get_value_names()
         }
     }
 }
 
-fn to_funcs(expressions: Vec<ConditionExpression>) -> Vec<Box<dyn Fn(&ValuesPayload) -> bool>> {
+impl ValuesPayloadPredicateSupplier for RelationalExpression {
+    fn get_predicate(self) -> Box<dyn Fn(&ValuesPayload) -> bool> {
+        match self {
+            RelationalExpression::Equals(expr) =>
+                expr.get_predicate(),
+            RelationalExpression::GreaterThan(expr) =>
+                expr.get_predicate()
+        }
+    }
+
+    fn get_value_names(&self) -> Vec<String> {
+        match self {
+            RelationalExpression::Equals(expr) =>
+                expr.get_value_names(),
+            RelationalExpression::GreaterThan(expr) =>
+                expr.get_value_names()
+        }
+    }
+}
+
+fn to_predicates(expressions: Vec<ConditionExpression>)
+                 -> Vec<Box<dyn Fn(&ValuesPayload) -> bool>> {
     let mut ret = Vec::new();
     for expr in expressions {
-        ret.push(expr.get());
+        ret.push(expr.get_predicate());
+    }
+    ret
+}
+
+fn to_value_names(expressions: &Vec<ConditionExpression>) -> Vec<String> {
+    let mut ret = Vec::new();
+    for expr in expressions {
+        ret.extend(expr.get_value_names());
     }
     ret
 }
