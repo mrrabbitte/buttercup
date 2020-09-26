@@ -1,4 +1,3 @@
-
 use std::collections::HashMap;
 use std::net::IpAddr;
 
@@ -78,7 +77,7 @@ impl ValueType {
 
 }
 
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, Eq, PartialEq, Debug, Clone)]
 pub struct ValuesPayload {
 
     values: HashMap<String, ValueHolder>
@@ -106,7 +105,6 @@ impl ValuesPayload {
 
 #[cfg(test)]
 mod tests {
-
     use num::FromPrimitive;
 
     use super::*;
