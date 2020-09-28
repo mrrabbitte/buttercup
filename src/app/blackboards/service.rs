@@ -8,14 +8,12 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::app::values::{ValueHolder, ValuesPayload};
+use std::sync::{Arc, RwLock, PoisonError, RwLockReadGuard};
+use std::ops::Deref;
 
-/// Note: There is no notion of transaction and values are
-/// put and get up to the first failure, hence any behavior
-/// that needs such guarantees should be based on Agents
-/// polling for data.
 pub struct BlackboardService {
 
-    local_blackboards: DashMap<Uuid, DB>
+    local_blackboard_paths: DashMap<Uuid, Arc<RwLock<DB>>>
 
 }
 
@@ -26,47 +24,39 @@ pub enum BlackboardError {
     BlackboardOfGivenIdNotFound(Uuid),
     DeserializeError(String),
     DestroyError(String),
+    LockPoisonedError,
     SerializeError(String)
 
 }
 
 impl BlackboardService {
 
-    pub fn new(local_blackboards: DashMap<Uuid, DB>) -> BlackboardService {
+    pub fn new(local_blackboard_paths: DashMap<Uuid, Arc<RwLock<DB>>>) -> BlackboardService {
         BlackboardService {
-            local_blackboards
+            local_blackboard_paths
         }
     }
 
     pub fn get_values(&self,
                       blackboard_id: &Uuid,
                       value_names: &Vec<&String>) -> Result<ValuesPayload, BlackboardError> {
-        match self.local_blackboards.get(blackboard_id) {
+        match self.local_blackboard_paths.get(blackboard_id) {
             None => Result::Err(
                 BlackboardError::BlackboardOfGivenIdNotFound(*blackboard_id)),
-            Some(db) => self.do_get_values(db.value(), value_names)
-        }
-    }
-
-    pub fn destroy(&self,
-                   blackboard_id: &Uuid) -> Result<(), BlackboardError> {
-        match self.local_blackboards.remove(blackboard_id) {
-            None => Result::Err(
-                BlackboardError::BlackboardOfGivenIdNotFound(*blackboard_id)),
-            Some(kv) => {
-                match DB::destroy(&Options::default(), kv.1.path()) {
-                    Ok(_) => Result::Ok(()),
-                    Err(err) =>
-                        Result::Err(BlackboardError::DestroyError(err.into_string()))
+            Some(kv) =>
+                match kv.value().as_ref().read() {
+                    Ok(db) =>
+                        self.do_get_values(*db, value_names),
+                    Err(_) =>
+                        Result::Err(BlackboardError::LockPoisonedError)
                 }
-            }
         }
     }
 
     pub fn put_values(&self,
                       blackboard_id: &Uuid,
                       payload: &ValuesPayload) -> Result<(), BlackboardError> {
-        match self.local_blackboards.get(blackboard_id) {
+        match self.local_blackboard_paths.get(blackboard_id) {
             None => Result::Err(
                 BlackboardError::BlackboardOfGivenIdNotFound(*blackboard_id)),
             Some(db) => self.do_put_values(db.value(), payload)
@@ -75,7 +65,7 @@ impl BlackboardService {
 
     #[inline(always)]
     fn do_get_values(&self,
-                     db: &DB,
+                     db: DB,
                      value_names: &Vec<&String>) -> Result<ValuesPayload, BlackboardError> {
         let mut ret: HashMap<String, ValueHolder> = HashMap::new();
         for value_name in value_names {
@@ -100,7 +90,7 @@ impl BlackboardService {
 
     #[inline(always)]
     fn do_put_values(&self,
-                     db: &DB,
+                     db: DB,
                      payload: &ValuesPayload) -> Result<(), BlackboardError> {
         for kv in payload.get_values().iter() {
             match bincode::serialize(kv.1) {
@@ -129,7 +119,7 @@ mod tests {
     use super::*;
 
     const FIRST_DB_UUID: u128 = 1;
-    const SECOND_DB_UUID: u128 = 1;
+    const SECOND_DB_UUID: u128 = 2;
 
     #[test]
     fn test_puts_and_gets_values_from_db() {
@@ -159,10 +149,15 @@ mod tests {
 
     fn build_service() -> BlackboardService {
         let mut dbs = DashMap::new();
+        let mut opts = Options::default();
+        opts.increase_parallelism(3);
+        opts.create_if_missing(true);
         dbs.insert(Uuid::from_u128(FIRST_DB_UUID),
-                   DB::open_default(format!("test_temp/{}.rocksdb", FIRST_DB_UUID)).unwrap());
-        // dbs.insert(Uuid::from_u128(SECOND_DB_UUID),
-        //            DB::open_default(format!("temp/{}.rocksdb", SECOND_DB_UUID)).unwrap());
+                   DB::open(&opts, format!("test_temp/{}.rocksdb", FIRST_DB_UUID))
+                       .unwrap());
+        dbs.insert(Uuid::from_u128(SECOND_DB_UUID),
+                    DB::open_default(format!("test_temp/{}.rocksdb", SECOND_DB_UUID))
+                        .unwrap());
         BlackboardService::new(dbs)
     }
 
