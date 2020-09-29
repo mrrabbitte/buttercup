@@ -1,4 +1,7 @@
 use std::collections::HashMap;
+use std::ops::Deref;
+use std::path::Path;
+use std::sync::{Arc, PoisonError, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 use bincode::ErrorKind;
 use dashmap::DashMap;
@@ -8,8 +11,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::app::values::{ValueHolder, ValuesPayload};
-use std::sync::{Arc, RwLock, PoisonError, RwLockReadGuard};
-use std::ops::Deref;
+use std::ffi::OsString;
 
 pub struct BlackboardService {
 
@@ -37,6 +39,14 @@ impl BlackboardService {
         }
     }
 
+    pub fn destroy(&self,
+                   blackboard_id: &Uuid) -> Result<(), BlackboardError> {
+        match self.get_path_to_destroy(blackboard_id) {
+            Ok(path) => self.do_destroy(path),
+            Err(err) => Result::Err(err)
+        }
+    }
+
     pub fn get_values(&self,
                       blackboard_id: &Uuid,
                       value_names: &Vec<&String>) -> Result<ValuesPayload, BlackboardError> {
@@ -46,7 +56,7 @@ impl BlackboardService {
             Some(kv) =>
                 match kv.value().as_ref().read() {
                     Ok(db) =>
-                        self.do_get_values(*db, value_names),
+                        self.do_get_values(db, value_names),
                     Err(_) =>
                         Result::Err(BlackboardError::LockPoisonedError)
                 }
@@ -59,13 +69,26 @@ impl BlackboardService {
         match self.local_blackboard_paths.get(blackboard_id) {
             None => Result::Err(
                 BlackboardError::BlackboardOfGivenIdNotFound(*blackboard_id)),
-            Some(db) => self.do_put_values(db.value(), payload)
+            Some(kv) =>
+                match kv.value().as_ref().write() {
+                    Ok(db) => self.do_put_values(db, payload),
+                    Err(_) => Result::Err(BlackboardError::LockPoisonedError)
+                }
+        }
+    }
+
+    #[inline(always)]
+    fn do_destroy(&self,
+                  path: OsString) -> Result<(), BlackboardError> {
+        match DB::destroy(&Options::default(), path) {
+            Ok(_) => Result::Ok(()),
+            Err(err) => Result::Err(BlackboardError::DestroyError(err.into_string()))
         }
     }
 
     #[inline(always)]
     fn do_get_values(&self,
-                     db: DB,
+                     db: RwLockReadGuard<DB>,
                      value_names: &Vec<&String>) -> Result<ValuesPayload, BlackboardError> {
         let mut ret: HashMap<String, ValueHolder> = HashMap::new();
         for value_name in value_names {
@@ -90,7 +113,7 @@ impl BlackboardService {
 
     #[inline(always)]
     fn do_put_values(&self,
-                     db: DB,
+                     db: RwLockWriteGuard<DB>,
                      payload: &ValuesPayload) -> Result<(), BlackboardError> {
         for kv in payload.get_values().iter() {
             match bincode::serialize(kv.1) {
@@ -108,6 +131,23 @@ impl BlackboardService {
         Result::Ok(())
     }
 
+    #[inline(always)]
+    fn get_path_to_destroy(&self, blackboard_id: &Uuid) -> Result<OsString, BlackboardError> {
+        match self.local_blackboard_paths.remove(blackboard_id) {
+            None => Result::Err(
+                BlackboardError::BlackboardOfGivenIdNotFound(*blackboard_id)),
+            Some(kv) =>
+                {
+                    match kv.1.as_ref().write() {
+                        Ok(db) =>
+                            Result::Ok(db.path().to_path_buf().into_os_string()),
+                        Err(_) =>
+                            Result::Err(BlackboardError::LockPoisonedError)
+                    }
+                }
+        }
+    }
+
 }
 
 #[cfg(test)]
@@ -121,44 +161,84 @@ mod tests {
     const FIRST_DB_UUID: u128 = 1;
     const SECOND_DB_UUID: u128 = 2;
 
-    #[test]
-    fn test_puts_and_gets_values_from_db() {
-        let service = build_service();
-        let mut values = HashMap::new();
-        values.insert("something".to_string(), ValueHolder::String("dsfs".to_string()));
-        let payload = ValuesPayload::new(values);
-        let value_names = Vec::from_iter(payload.get_values().keys().into_iter());
-        service.put_values(
-            &Uuid::from_u128(FIRST_DB_UUID),
-            &payload);
-        let retrieved =
-            service.get_values(&Uuid::from_u128(FIRST_DB_UUID),
-                           &Vec::from_iter(payload.get_values().keys().into_iter()));
+    const SOME_KEY: &str = "some_key";
+    const OTHER_KEY: &str = "other_key";
 
-        assert_eq!(payload, retrieved.unwrap());
+    const SOME_VALUE: &str = "some_value";
+    const OTHER_VALUE: &str = "other_value";
 
-        service.destroy(&Uuid::from_u128(FIRST_DB_UUID)).unwrap();
+    lazy_static! {
+       static ref SERVICE: BlackboardService = {
+         let mut dbs = DashMap::new();
+         dbs.insert(Uuid::from_u128(FIRST_DB_UUID),
+                   Arc::new(
+                       RwLock::new(
+                           DB::open_default(format!("temp_test/{}.rocksdb", FIRST_DB_UUID))
+                       .unwrap())));
+         dbs.insert(Uuid::from_u128(SECOND_DB_UUID),
+                    Arc::new(
+                        RwLock::new(
+                            DB::open_default(
+                                format!("temp_test/{}.rocksdb", SECOND_DB_UUID))
+                        .unwrap())));
+         BlackboardService::new(dbs)
+       };
     }
 
-    // #[test]
-    // fn test_puts_and_gets_values_for_different_dbs() {
-    //     let service = build_service();
-    //
-    //     cleanup();
-    // }
+    #[test]
+    fn test_puts_and_gets_values_from_db() {
+        let mut values = HashMap::new();
+        values.insert(SOME_KEY.to_owned(), ValueHolder::String(SOME_VALUE.to_owned()));
+        let payload = ValuesPayload::new(values);
+        let value_names = Vec::from_iter(
+            payload.get_values().keys().into_iter());
+        SERVICE.put_values(
+            &Uuid::from_u128(FIRST_DB_UUID), &payload)
+            .unwrap();
+        let retrieved =
+            SERVICE.get_values(&Uuid::from_u128(FIRST_DB_UUID),
+                               &Vec::from_iter(
+                                   payload.get_values().keys().into_iter()))
+                .unwrap();
 
-    fn build_service() -> BlackboardService {
-        let mut dbs = DashMap::new();
-        let mut opts = Options::default();
-        opts.increase_parallelism(3);
-        opts.create_if_missing(true);
-        dbs.insert(Uuid::from_u128(FIRST_DB_UUID),
-                   DB::open(&opts, format!("test_temp/{}.rocksdb", FIRST_DB_UUID))
-                       .unwrap());
-        dbs.insert(Uuid::from_u128(SECOND_DB_UUID),
-                    DB::open_default(format!("test_temp/{}.rocksdb", SECOND_DB_UUID))
-                        .unwrap());
-        BlackboardService::new(dbs)
+        assert_eq!(payload, retrieved);
+    }
+
+    #[test]
+    fn test_puts_and_gets_values_for_different_dbs() {
+        let mut values = HashMap::new();
+        values.insert(OTHER_KEY.to_owned(), ValueHolder::String(OTHER_VALUE.to_owned()));
+        let payload = ValuesPayload::new(values);
+        let value_names = Vec::from_iter(
+            payload.get_values().keys().into_iter());
+        SERVICE.put_values(
+            &Uuid::from_u128(FIRST_DB_UUID), &payload)
+            .unwrap();
+        let retrieved =
+            SERVICE.get_values(&Uuid::from_u128(FIRST_DB_UUID),
+                               &Vec::from_iter(
+                                   payload.get_values().keys().into_iter()))
+                .unwrap();
+
+        assert_eq!(payload, retrieved);
+
+        let mut values_for_second = HashMap::new();
+        values_for_second.insert(SOME_KEY.to_owned(),
+                                 ValueHolder::String(SOME_VALUE.to_owned()));
+        let payload_for_second = ValuesPayload::new(values_for_second);
+        let value_names = Vec::from_iter(
+            payload_for_second.get_values().keys().into_iter());
+        SERVICE.put_values(
+            &Uuid::from_u128(SECOND_DB_UUID), &payload_for_second)
+            .unwrap();
+        let retrieved_for_second =
+            SERVICE.get_values(&Uuid::from_u128(SECOND_DB_UUID),
+                               &Vec::from_iter(
+                                   payload_for_second.get_values().keys().into_iter()))
+                .unwrap();
+
+        assert_eq!(payload_for_second, retrieved_for_second);
+        assert_ne!(retrieved, retrieved_for_second);
     }
 
 }

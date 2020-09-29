@@ -120,7 +120,6 @@ mod tests {
                    ValueHolder::Decimal(BigRational::from_f64(0.321422).unwrap()));
         assert_ne!(ValueHolder::Decimal(BigRational::from_f64(0.0).unwrap()),
                    ValueHolder::Integer(BigInt::from(0)));
-
     }
 
 }
