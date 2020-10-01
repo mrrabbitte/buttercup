@@ -1,16 +1,16 @@
-use crate::app::behavior::node::{BehaviorTreeNode, BTNode, BTNodeExecutionContext};
-use crate::app::behavior::node::composite::CompositeNode;
+use crate::app::behavior::context::BTNodeExecutionContext;
+use crate::app::behavior::node::{BehaviorTreeNode, BTNode, BTNodeAddress};
 use crate::app::behavior::tick::{TickError, TickStatus};
 
-pub struct SelectorCompositeNode {
+pub struct FallbackCompositeNode {
 
     children: Vec<BTNode>
 
 }
 
-impl BehaviorTreeNode for SelectorCompositeNode {
+impl BehaviorTreeNode for FallbackCompositeNode {
     fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
-        for child in self.get_children() {
+        for child in &self.children {
             match child.tick(context) {
                 Ok(status) => match status {
                     TickStatus::Success => return Result::Ok(TickStatus::Success),
@@ -21,11 +21,5 @@ impl BehaviorTreeNode for SelectorCompositeNode {
             }
         }
         return Result::Ok(TickStatus::Failure);
-    }
-}
-
-impl CompositeNode for SelectorCompositeNode {
-    fn get_children(&self) -> &Vec<BTNode> {
-        unimplemented!()
     }
 }

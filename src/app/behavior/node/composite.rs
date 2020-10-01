@@ -1,6 +1,7 @@
-use crate::app::behavior::node::{BehaviorTreeNode, BTNode, BTNodeExecutionContext};
+use crate::app::behavior::context::BTNodeExecutionContext;
+use crate::app::behavior::node::{BehaviorTreeNode, BTNode};
 use crate::app::behavior::node::composite::parallel::ParallelCompositeNode;
-use crate::app::behavior::node::composite::selector::SelectorCompositeNode;
+use crate::app::behavior::node::composite::selector::FallbackCompositeNode;
 use crate::app::behavior::node::composite::sequence::SequenceCompositeNode;
 use crate::app::behavior::tick::{TickError, TickStatus};
 
@@ -11,14 +12,8 @@ mod sequence;
 pub enum CompositeBTNode {
 
     Parallel(ParallelCompositeNode),
-    Selector(SelectorCompositeNode),
+    Fallback(FallbackCompositeNode),
     Sequence(SequenceCompositeNode)
-
-}
-
-pub trait CompositeNode: BehaviorTreeNode {
-
-    fn get_children(&self) -> &Vec<BTNode>;
 
 }
 
@@ -27,7 +22,7 @@ impl BehaviorTreeNode for CompositeBTNode {
     fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match &self {
             CompositeBTNode::Parallel(node) => node.tick(context),
-            CompositeBTNode::Selector(node) => node.tick(context),
+            CompositeBTNode::Fallback(node) => node.tick(context),
             CompositeBTNode::Sequence(node) => node.tick(context),
         }
     }
@@ -39,9 +34,9 @@ impl From<ParallelCompositeNode> for CompositeBTNode {
     }
 }
 
-impl From<SelectorCompositeNode> for CompositeBTNode {
-    fn from(node: SelectorCompositeNode) -> Self {
-        CompositeBTNode::Selector(node)
+impl From<FallbackCompositeNode> for CompositeBTNode {
+    fn from(node: FallbackCompositeNode) -> Self {
+        CompositeBTNode::Fallback(node)
     }
 }
 

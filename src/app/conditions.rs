@@ -34,6 +34,10 @@ impl ConditionExpressionWrapper {
         self.predicate
     }
 
+    pub fn get_value_names_cloned(&self) -> HashSet<String> {
+        self.value_names.iter().cloned().collect()
+    }
+
 }
 
 pub enum LogicalExpression {

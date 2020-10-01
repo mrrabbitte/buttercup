@@ -7,10 +7,15 @@ use crate::app::behavior::node::action::ActionBTNode;
 use crate::app::behavior::node::composite::CompositeBTNode;
 use crate::app::behavior::node::decorator::DecoratorBTNode;
 use crate::app::behavior::tick::{TickError, TickStatus};
+use crate::app::blackboards::service::{BlackboardService, BlackboardError};
+use uuid::Uuid;
+use std::sync::Arc;
+use crate::app::values::ValuesPayload;
+use crate::app::behavior::context::BTNodeExecutionContext;
 
 mod action;
-mod decorator;
 mod composite;
+mod decorator;
 
 #[derive(Address, Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub struct BTNodeAddress {
@@ -25,16 +30,6 @@ pub enum BTNode {
     Action(ActionBTNode),
     Composite(CompositeBTNode),
     Decorator(DecoratorBTNode)
-
-}
-
-pub struct BTNodeExecutionContext;
-
-impl BTNodeExecutionContext {
-
-    pub fn new() -> BTNodeExecutionContext {
-        BTNodeExecutionContext {}
-    }
 
 }
 

@@ -1,5 +1,6 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::net::IpAddr;
+use std::ops::Deref;
 
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use isocountry::CountryCode;
@@ -80,15 +81,18 @@ impl ValueType {
 #[derive(Serialize, Deserialize, Eq, PartialEq, Debug, Clone)]
 pub struct ValuesPayload {
 
-    values: HashMap<String, ValueHolder>
+    values: HashMap<String, ValueHolder>,
+    keys: HashSet<String>
 
 }
 
 impl ValuesPayload {
 
     pub fn new(values: HashMap<String, ValueHolder>) -> ValuesPayload {
+        let keys = values.keys().cloned().collect();
         ValuesPayload {
-            values
+            values,
+            keys
         }
     }
 
@@ -99,6 +103,10 @@ impl ValuesPayload {
     pub fn get(&self,
                key: &String) -> Option<&ValueHolder> {
         self.values.get(key)
+    }
+
+    pub fn get_value_names(&self) -> &HashSet<String> {
+        &self.keys
     }
 
 }

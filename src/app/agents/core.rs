@@ -78,11 +78,20 @@ mod tests {
     use crate::app::behavior::node::BTNodeAddress;
 
     use super::*;
+    use crate::app::behavior::context::BTNodeExecutionContext;
+    use std::sync::Arc;
+    use crate::app::blackboards::service::BlackboardService;
+    use dashmap::DashMap;
 
     #[test]
     fn test_returns_status() {
         assert_eq!(Agent::new(AgentAddress {id: 1, index: 1},
-                              BehaviorTree::new(1))
+                              BehaviorTree::new(1,
+                                                BTNodeExecutionContext::new(
+                                                    Uuid::from_u128(1),
+                                                    Arc::new(
+                                                        BlackboardService::new(
+                                                            DashMap::new())))))
             .tick(), Result::Ok(TickStatus::Success));
     }
 

@@ -1,4 +1,5 @@
-use crate::app::behavior::node::{BehaviorTreeNode, BTNode, BTNodeExecutionContext};
+use crate::app::behavior::node::{BehaviorTreeNode, BTNode};
+use crate::app::behavior::context::BTNodeExecutionContext;
 use crate::app::behavior::node::decorator::condition::ConditionDecoratorNode;
 use crate::app::behavior::node::decorator::invert::InvertDecoratorNode;
 use crate::app::behavior::tick::{TickError, TickStatus};
@@ -10,12 +11,6 @@ pub enum DecoratorBTNode {
 
     Condition(ConditionDecoratorNode),
     Invert(InvertDecoratorNode)
-
-}
-
-pub trait DecoratorNode: BehaviorTreeNode {
-
-    fn get_child(&self, context: &BTNodeExecutionContext) -> &BTNode;
 
 }
 

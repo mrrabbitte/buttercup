@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::ops::Deref;
 use std::path::Path;
 use std::sync::{Arc, PoisonError, RwLock, RwLockReadGuard, RwLockWriteGuard};
@@ -49,7 +49,7 @@ impl BlackboardService {
 
     pub fn get_values(&self,
                       blackboard_id: &Uuid,
-                      value_names: &Vec<&String>) -> Result<ValuesPayload, BlackboardError> {
+                      value_names: &HashSet<String>) -> Result<ValuesPayload, BlackboardError> {
         match self.local_blackboard_paths.get(blackboard_id) {
             None => Result::Err(
                 BlackboardError::BlackboardOfGivenIdNotFound(*blackboard_id)),
@@ -89,7 +89,7 @@ impl BlackboardService {
     #[inline(always)]
     fn do_get_values(&self,
                      db: RwLockReadGuard<DB>,
-                     value_names: &Vec<&String>) -> Result<ValuesPayload, BlackboardError> {
+                     value_names: &HashSet<String>) -> Result<ValuesPayload, BlackboardError> {
         let mut ret: HashMap<String, ValueHolder> = HashMap::new();
         for value_name in value_names {
             match db.get(value_name) {
@@ -190,15 +190,13 @@ mod tests {
         let mut values = HashMap::new();
         values.insert(SOME_KEY.to_owned(), ValueHolder::String(SOME_VALUE.to_owned()));
         let payload = ValuesPayload::new(values);
-        let value_names = Vec::from_iter(
-            payload.get_values().keys().into_iter());
         SERVICE.put_values(
             &Uuid::from_u128(FIRST_DB_UUID), &payload)
             .unwrap();
         let retrieved =
             SERVICE.get_values(&Uuid::from_u128(FIRST_DB_UUID),
-                               &Vec::from_iter(
-                                   payload.get_values().keys().into_iter()))
+                               &HashSet::from_iter(
+                                   payload.get_value_names().clone()))
                 .unwrap();
 
         assert_eq!(payload, retrieved);
@@ -209,15 +207,13 @@ mod tests {
         let mut values = HashMap::new();
         values.insert(OTHER_KEY.to_owned(), ValueHolder::String(OTHER_VALUE.to_owned()));
         let payload = ValuesPayload::new(values);
-        let value_names = Vec::from_iter(
-            payload.get_values().keys().into_iter());
         SERVICE.put_values(
             &Uuid::from_u128(FIRST_DB_UUID), &payload)
             .unwrap();
         let retrieved =
             SERVICE.get_values(&Uuid::from_u128(FIRST_DB_UUID),
-                               &Vec::from_iter(
-                                   payload.get_values().keys().into_iter()))
+                               &HashSet::from_iter(
+                                   payload.get_value_names().clone()))
                 .unwrap();
 
         assert_eq!(payload, retrieved);
@@ -226,15 +222,13 @@ mod tests {
         values_for_second.insert(SOME_KEY.to_owned(),
                                  ValueHolder::String(SOME_VALUE.to_owned()));
         let payload_for_second = ValuesPayload::new(values_for_second);
-        let value_names = Vec::from_iter(
-            payload_for_second.get_values().keys().into_iter());
         SERVICE.put_values(
             &Uuid::from_u128(SECOND_DB_UUID), &payload_for_second)
             .unwrap();
         let retrieved_for_second =
             SERVICE.get_values(&Uuid::from_u128(SECOND_DB_UUID),
-                               &Vec::from_iter(
-                                   payload_for_second.get_values().keys().into_iter()))
+                               &HashSet::from_iter(
+                                   payload_for_second.get_value_names().clone()))
                 .unwrap();
 
         assert_eq!(payload_for_second, retrieved_for_second);

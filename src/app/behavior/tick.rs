@@ -1,6 +1,7 @@
 use actix::Message;
 
 use serde::{Deserialize, Serialize};
+use crate::app::blackboards::service::BlackboardError;
 
 #[derive(Message)]
 #[rtype(result = "Result<TickStatus, TickError>")]
@@ -18,6 +19,7 @@ pub enum TickStatus {
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum TickError {
 
+    BlackboardError(BlackboardError),
     MissingBehaviorTreeNode
 
 }

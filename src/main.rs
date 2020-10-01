@@ -1,25 +1,33 @@
-
 #[macro_use]
 extern crate lazy_static;
 
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 use actix::{Actor, Addr};
 use actix_web::{App, http, HttpRequest, HttpServer, middleware};
 use actix_web::web::{Data, get, resource};
+use dashmap::DashMap;
 use env_logger;
+use uuid::Uuid;
 
 use crate::app::address::Address;
 use crate::app::agents::core::{Agent, AgentAddress};
+use crate::app::behavior::context::BTNodeExecutionContext;
 use crate::app::behavior::node::BTNodeAddress;
 use crate::app::behavior::tick::Tick;
 use crate::app::behavior::tree::BehaviorTree;
+use crate::app::blackboards::service::BlackboardService;
 
 mod app;
 
 async fn example(data: Data<Mutex<Agents>>) -> String {
     let agent = Agent::new(AgentAddress::new(1, 1),
-                           BehaviorTree::new(1))
+                           BehaviorTree::new(1,
+                                             BTNodeExecutionContext::new(
+                                                 Uuid::from_u128(1),
+                                                 Arc::new(
+                                                     BlackboardService::new(
+                                                         DashMap::new())))))
         .start();
     let mut agents = data.lock().unwrap();
     agents.push(agent);
