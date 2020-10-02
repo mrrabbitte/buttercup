@@ -196,7 +196,7 @@ mod tests {
         let retrieved =
             SERVICE.get_values(&Uuid::from_u128(FIRST_DB_UUID),
                                &HashSet::from_iter(
-                                   payload.get_value_names().clone()))
+                                   payload.get_keys().clone()))
                 .unwrap();
 
         assert_eq!(payload, retrieved);
@@ -213,7 +213,7 @@ mod tests {
         let retrieved =
             SERVICE.get_values(&Uuid::from_u128(FIRST_DB_UUID),
                                &HashSet::from_iter(
-                                   payload.get_value_names().clone()))
+                                   payload.get_keys().clone()))
                 .unwrap();
 
         assert_eq!(payload, retrieved);
@@ -228,7 +228,7 @@ mod tests {
         let retrieved_for_second =
             SERVICE.get_values(&Uuid::from_u128(SECOND_DB_UUID),
                                &HashSet::from_iter(
-                                   payload_for_second.get_value_names().clone()))
+                                   payload_for_second.get_keys().clone()))
                 .unwrap();
 
         assert_eq!(payload_for_second, retrieved_for_second);

@@ -105,7 +105,7 @@ impl ValuesPayload {
         self.values.get(key)
     }
 
-    pub fn get_value_names(&self) -> &HashSet<String> {
+    pub fn get_keys(&self) -> &HashSet<String> {
         &self.keys
     }
 
