@@ -6,7 +6,7 @@ pub struct PrintLogActionNode;
 
 impl BehaviorTreeNode for PrintLogActionNode {
 
-    fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         println!("I'm here!");
         Result::Ok(TickStatus::Success)
     }

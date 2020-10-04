@@ -522,6 +522,7 @@ dependencies = [
  "dashmap",
  "env_logger",
  "fast_chemail",
+ "futures-channel",
  "isocountry",
  "isolang",
  "lazy_static",

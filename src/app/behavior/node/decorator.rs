@@ -15,8 +15,8 @@ pub enum DecoratorBTNode {
 }
 
 impl BehaviorTreeNode for DecoratorBTNode {
-    fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
-        match &self {
+    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+        match self {
             DecoratorBTNode::Condition(node) => node.tick(context),
             DecoratorBTNode::Invert(node) => node.tick(context),
         }

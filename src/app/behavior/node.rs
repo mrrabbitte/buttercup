@@ -35,14 +35,14 @@ pub enum BTNode {
 
 pub trait BehaviorTreeNode {
 
-    fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError>;
+    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError>;
 
 }
 
 impl BehaviorTreeNode for BTNode {
 
-    fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
-        match &self {
+    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+        match self {
             BTNode::Action(node) => node.tick(context),
             BTNode::Composite(node) => node.tick(context),
             BTNode::Decorator(node) => node.tick(context),

@@ -13,7 +13,7 @@ pub struct ParallelCompositeNode {
 }
 
 impl BehaviorTreeNode for ParallelCompositeNode {
-    fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         unimplemented!()
     }
 }

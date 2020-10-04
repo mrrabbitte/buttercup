@@ -32,7 +32,7 @@ impl ConditionDecoratorNode {
 }
 
 impl BehaviorTreeNode for ConditionDecoratorNode {
-    fn tick(&self,
+    fn tick(&mut self,
             context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match context.get_values(&self.value_names) {
             Ok(payload) => {

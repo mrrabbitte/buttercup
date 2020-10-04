@@ -13,8 +13,8 @@ pub enum ActionBTNode {
 
 impl BehaviorTreeNode for ActionBTNode {
 
-    fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
-        match &self {
+    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+        match self {
             ActionBTNode::PrintLog(node) => node.tick(context)
         }
     }

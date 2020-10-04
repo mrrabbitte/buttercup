@@ -4,20 +4,21 @@ use crate::app::behavior::tick::{TickError, TickStatus};
 
 pub struct InvertDecoratorNode {
 
+    address: BTNodeAddress,
     child: Box<BTNode>
 
 }
 
 impl BehaviorTreeNode for InvertDecoratorNode {
 
-    fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match self.child.tick(context) {
             Ok(status) =>
                 Result::Ok(
                     match status {
                         TickStatus::Success => TickStatus::Failure,
                         TickStatus::Failure => TickStatus::Success,
-                        TickStatus::Running(addr) => TickStatus::Running(addr)
+                        TickStatus::Running(_) => TickStatus::Running(self.address.clone())
                     }
                 ),
             Err(err) =>

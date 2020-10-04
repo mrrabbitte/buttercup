@@ -19,8 +19,8 @@ pub enum CompositeBTNode {
 
 impl BehaviorTreeNode for CompositeBTNode {
 
-    fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
-        match &self {
+    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+        match self {
             CompositeBTNode::Parallel(node) => node.tick(context),
             CompositeBTNode::Fallback(node) => node.tick(context),
             CompositeBTNode::Sequence(node) => node.tick(context),

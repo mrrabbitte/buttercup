@@ -4,23 +4,29 @@ use crate::app::behavior::tick::{TickError, TickStatus};
 
 pub struct FallbackCompositeNode {
 
-    children: Vec<BTNode>
-
+    address: BTNodeAddress,
+    children: Vec<BTNode>,
+    current_idx: usize
 }
 
 impl BehaviorTreeNode for FallbackCompositeNode {
-    fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
-        for child in &self.children {
+    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+        for child in &mut self.children[self.current_idx..] {
+            self.current_idx += 1;
             match child.tick(context) {
                 Ok(status) => match status {
-                    TickStatus::Success => return Result::Ok(TickStatus::Success),
+                    TickStatus::Success => {
+                        self.current_idx = 0;
+                        return Result::Ok(TickStatus::Success);
+                    },
                     TickStatus::Failure => {},
-                    TickStatus::Running(addr) =>
-                        return Result::Ok(TickStatus::Running(addr)),
+                    TickStatus::Running(_) =>
+                        return Result::Ok(TickStatus::Running(self.address.clone())),
                 },
                 Err(err) => {},
             }
         }
+        self.current_idx = 0;
         return Result::Ok(TickStatus::Failure);
     }
 }
