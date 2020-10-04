@@ -16,7 +16,8 @@ impl BehaviorTreeNode for SequenceCompositeNode {
                 Ok(status) => match status {
                     TickStatus::Success => {},
                     TickStatus::Failure => return Result::Ok(TickStatus::Failure),
-                    TickStatus::Running => return Result::Ok(TickStatus::Running),
+                    TickStatus::Running(addr) =>
+                        return Result::Ok(TickStatus::Running(addr)),
                 },
                 Err(err) => return Result::Err(err),
             }

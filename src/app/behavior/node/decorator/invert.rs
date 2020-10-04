@@ -17,7 +17,7 @@ impl BehaviorTreeNode for InvertDecoratorNode {
                     match status {
                         TickStatus::Success => TickStatus::Failure,
                         TickStatus::Failure => TickStatus::Success,
-                        TickStatus::Running => TickStatus::Running
+                        TickStatus::Running(addr) => TickStatus::Running(addr)
                     }
                 ),
             Err(err) =>

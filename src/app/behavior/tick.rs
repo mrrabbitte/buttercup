@@ -2,6 +2,7 @@ use actix::Message;
 
 use serde::{Deserialize, Serialize};
 use crate::app::blackboards::service::BlackboardError;
+use crate::app::behavior::node::BTNodeAddress;
 
 #[derive(Message)]
 #[rtype(result = "Result<TickStatus, TickError>")]
@@ -12,7 +13,7 @@ pub enum TickStatus {
 
     Success,
     Failure,
-    Running
+    Running(BTNodeAddress)
 
 }
 

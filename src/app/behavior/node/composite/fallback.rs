@@ -15,7 +15,8 @@ impl BehaviorTreeNode for FallbackCompositeNode {
                 Ok(status) => match status {
                     TickStatus::Success => return Result::Ok(TickStatus::Success),
                     TickStatus::Failure => {},
-                    TickStatus::Running => return Result::Ok(TickStatus::Running),
+                    TickStatus::Running(addr) =>
+                        return Result::Ok(TickStatus::Running(addr)),
                 },
                 Err(err) => {},
             }
