@@ -6,6 +6,7 @@ use crate::app::behavior::node::composite::parallel::ParallelCompositeNode;
 use crate::app::behavior::node::composite::fallback::FallbackCompositeNode;
 use crate::app::behavior::node::composite::sequence::SequenceCompositeNode;
 use crate::app::behavior::tick::{TickError, TickStatus};
+use std::sync::Arc;
 
 mod parallel;
 mod fallback;

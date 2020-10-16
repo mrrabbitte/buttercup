@@ -11,6 +11,7 @@ use actix_web::guard::Guard;
 use std::ops::Deref;
 use std::iter::FromIterator;
 use std::future::Future;
+use std::sync::Arc;
 
 pub struct ConditionDecoratorNode {
 

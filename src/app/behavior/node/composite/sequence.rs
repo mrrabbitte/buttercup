@@ -3,6 +3,7 @@ use crate::app::behavior::node::{BehaviorTreeNode, BTNode, BTNodeAddress};
 use async_trait::async_trait;
 
 use crate::app::behavior::tick::{TickError, TickStatus};
+use std::sync::Arc;
 
 pub struct SequenceCompositeNode {
 
