@@ -1,37 +1,33 @@
 use crate::app::behavior::context::BTNodeExecutionContext;
 use crate::app::behavior::node::{BehaviorTreeNode, BTNode, BTNodeAddress};
+use async_trait::async_trait;
+
 use crate::app::behavior::tick::{TickError, TickStatus};
 
 pub struct SequenceCompositeNode {
 
     address: BTNodeAddress,
     children: Vec<BTNode>,
-    current_idx: usize
 
 }
 
+#[async_trait(?Send)]
 impl BehaviorTreeNode for SequenceCompositeNode {
 
-    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
-        for child in &mut self.children[self.current_idx..] {
-            self.current_idx += 1;
-            match child.tick(context) {
+    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+        for child in &self.children {
+            match child.tick(context).await {
                 Ok(status) => match status {
                     TickStatus::Success => {},
                     TickStatus::Failure => {
-                        self.current_idx = 0;
                         return Result::Ok(TickStatus::Failure);
                     },
-                    TickStatus::Running(addr) =>
-                        return Result::Ok(TickStatus::Running(addr)),
                 },
                 Err(err) => {
-                    self.current_idx = 0;
                     return Result::Err(err);
                 },
             }
         }
-        self.current_idx = 0;
         Result::Ok(TickStatus::Success)
     }
 }

@@ -1,17 +1,21 @@
+use async_trait::async_trait;
+
+use std::future::Future;
+use std::sync::Arc;
+
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use buttercup_macros::Address;
 
 use crate::app::address::Address;
+use crate::app::behavior::context::BTNodeExecutionContext;
 use crate::app::behavior::node::action::ActionBTNode;
 use crate::app::behavior::node::composite::CompositeBTNode;
 use crate::app::behavior::node::decorator::DecoratorBTNode;
 use crate::app::behavior::tick::{TickError, TickStatus};
-use crate::app::blackboards::service::{BlackboardService, BlackboardError};
-use uuid::Uuid;
-use std::sync::Arc;
+use crate::app::blackboards::service::{BlackboardError, BlackboardService};
 use crate::app::values::ValuesPayload;
-use crate::app::behavior::context::BTNodeExecutionContext;
 
 mod action;
 mod composite;
@@ -33,19 +37,21 @@ pub enum BTNode {
 
 }
 
+#[async_trait(?Send)]
 pub trait BehaviorTreeNode {
 
-    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError>;
+    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError>;
 
 }
 
+#[async_trait(?Send)]
 impl BehaviorTreeNode for BTNode {
 
-    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match self {
-            BTNode::Action(node) => node.tick(context),
-            BTNode::Composite(node) => node.tick(context),
-            BTNode::Decorator(node) => node.tick(context),
+            BTNode::Action(node) => node.tick(context).await,
+            BTNode::Composite(node) => node.tick(context).await,
+            BTNode::Decorator(node) => node.tick(context).await,
         }
     }
 

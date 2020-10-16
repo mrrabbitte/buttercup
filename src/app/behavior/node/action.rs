@@ -1,6 +1,8 @@
+use async_trait::async_trait;
+
+use crate::app::behavior::context::BTNodeExecutionContext;
 use crate::app::behavior::node::{BehaviorTreeNode, BTNodeAddress};
 use crate::app::behavior::node::action::logging::PrintLogActionNode;
-use crate::app::behavior::context::BTNodeExecutionContext;
 use crate::app::behavior::tick::{TickError, TickStatus};
 
 mod logging;
@@ -11,11 +13,12 @@ pub enum ActionBTNode {
 
 }
 
+#[async_trait(?Send)]
 impl BehaviorTreeNode for ActionBTNode {
 
-    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match self {
-            ActionBTNode::PrintLog(node) => node.tick(context)
+            ActionBTNode::PrintLog(node) => node.tick(context).await
         }
     }
 

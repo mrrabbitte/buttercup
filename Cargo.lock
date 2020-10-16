@@ -514,6 +514,7 @@ dependencies = [
  "actix",
  "actix-rt",
  "actix-web",
+ "async-trait",
  "base64 0.12.3",
  "bincode",
  "buttercup_macros",

@@ -1,3 +1,5 @@
+use async_trait::async_trait;
+
 use crate::app::behavior::node::{BehaviorTreeNode, BTNode};
 use crate::app::behavior::context::BTNodeExecutionContext;
 use crate::app::behavior::node::decorator::condition::ConditionDecoratorNode;
@@ -14,13 +16,16 @@ pub enum DecoratorBTNode {
 
 }
 
+#[async_trait(?Send)]
 impl BehaviorTreeNode for DecoratorBTNode {
-    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+
+    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match self {
-            DecoratorBTNode::Condition(node) => node.tick(context),
-            DecoratorBTNode::Invert(node) => node.tick(context),
+            DecoratorBTNode::Condition(node) => node.tick(context).await,
+            DecoratorBTNode::Invert(node) => node.tick(context).await,
         }
     }
+
 }
 
 impl From<ConditionDecoratorNode> for DecoratorBTNode {

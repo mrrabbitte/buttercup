@@ -1,3 +1,5 @@
+use async_trait::async_trait;
+
 use std::future::Future;
 
 use actix_rt::Arbiter;
@@ -12,8 +14,9 @@ pub struct ParallelCompositeNode {
 
 }
 
+#[async_trait(?Send)]
 impl BehaviorTreeNode for ParallelCompositeNode {
-    fn tick(&mut self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+    fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         unimplemented!()
     }
 }

@@ -1,3 +1,5 @@
+use async_trait::async_trait;
+
 use crate::app::behavior::node::{BehaviorTreeNode, BTNode, BTNodeAddress};
 use crate::app::behavior::tick::{TickStatus, TickError};
 use crate::app::conditions::ConditionExpressionWrapper;
@@ -8,6 +10,7 @@ use crate::app::blackboards::service::{BlackboardService, BlackboardError};
 use actix_web::guard::Guard;
 use std::ops::Deref;
 use std::iter::FromIterator;
+use std::future::Future;
 
 pub struct ConditionDecoratorNode {
 
@@ -31,17 +34,19 @@ impl ConditionDecoratorNode {
 
 }
 
+#[async_trait(?Send)]
 impl BehaviorTreeNode for ConditionDecoratorNode {
-    fn tick(&mut self,
-            context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+
+    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match context.get_values(&self.value_names) {
             Ok(payload) => {
                 if self.predicate.deref()(&payload) {
-                    return self.child.tick(context);
+                    return self.child.tick(context).await;
                 }
                 return Result::Ok(TickStatus::Failure);
             }
             Err(err) => Result::Err(TickError::BlackboardError(err))
         }
     }
+
 }
