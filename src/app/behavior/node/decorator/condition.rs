@@ -12,6 +12,7 @@ use std::ops::Deref;
 use std::iter::FromIterator;
 use std::future::Future;
 use std::sync::Arc;
+use crate::app::behavior::node::decorator::DecoratorBTNode;
 
 pub struct ConditionDecoratorNode {
 
@@ -37,7 +38,6 @@ impl ConditionDecoratorNode {
 
 #[async_trait(?Send)]
 impl BehaviorTreeNode for ConditionDecoratorNode {
-
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match context.get_values(&self.value_names) {
             Ok(payload) => {
@@ -49,5 +49,10 @@ impl BehaviorTreeNode for ConditionDecoratorNode {
             Err(err) => Result::Err(TickError::BlackboardError(err))
         }
     }
+}
 
+impl From<ConditionDecoratorNode> for BTNode {
+    fn from(node: ConditionDecoratorNode) -> Self {
+        BTNode::Decorator(DecoratorBTNode::Condition(node))
+    }
 }
