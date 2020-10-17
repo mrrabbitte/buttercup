@@ -108,6 +108,8 @@ mod tests {
     use crate::app::blackboards::service::BlackboardService;
 
     use super::*;
+    use crate::app::behavior::node::action::wait::WaitDurationActionNode;
+    use std::time::Duration;
 
     #[actix_rt::test]
     async fn test_finishes_based_on_minimal_number_of_successes() {
@@ -124,7 +126,7 @@ mod tests {
                 Arc::new( BlackboardService::new(dbs)));
         let children: Vec<BTNode> = vec![
             PrintLogActionNode::new(1).into(),
-            PrintLogActionNode::new(2).into(),
+            WaitDurationActionNode::new(2, Duration::from_millis(10)).into(),
             PrintLogActionNode::new(3).into(),
             PrintLogActionNode::new(4).into()];
         match ParallelCompositeNode::new(5, children, 3)
