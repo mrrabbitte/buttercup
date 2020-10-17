@@ -169,7 +169,7 @@ mod tests {
 
     lazy_static! {
        static ref SERVICE: BlackboardService = {
-         let mut dbs = DashMap::new();
+         let dbs = DashMap::new();
          dbs.insert(Uuid::from_u128(FIRST_DB_UUID),
                    Arc::new(
                        RwLock::new(
