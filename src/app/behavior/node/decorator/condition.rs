@@ -16,6 +16,7 @@ use crate::app::behavior::node::decorator::DecoratorBTNode;
 
 pub struct ConditionDecoratorNode {
 
+    id: i32,
     child: Box<BTNode>,
     predicate: Box<dyn Fn(&ValuesPayload) -> bool>,
     value_names: HashSet<String>
@@ -24,10 +25,12 @@ pub struct ConditionDecoratorNode {
 
 impl ConditionDecoratorNode {
 
-    pub fn new(child: Box<BTNode>,
+    pub fn new(id: i32,
+               child: Box<BTNode>,
                condition: ConditionExpressionWrapper) -> ConditionDecoratorNode {
         let value_names = condition.get_value_names_cloned();
         ConditionDecoratorNode {
+            id,
             child,
             predicate: condition.unpack(),
             value_names
@@ -46,7 +49,7 @@ impl BehaviorTreeNode for ConditionDecoratorNode {
                 }
                 return Result::Ok(TickStatus::Failure);
             }
-            Err(err) => Result::Err(TickError::BlackboardError(err))
+            Err(err) => Result::Err(TickError::BlackboardError(self.id, err))
         }
     }
 }
