@@ -98,37 +98,30 @@ impl From<ParallelCompositeNode> for BTNode {
 #[cfg(test)]
 mod tests {
     use std::sync::RwLock;
+    use std::time::Duration;
 
     use actix_web::test;
     use dashmap::DashMap;
-    use rocksdb::DB;
     use uuid::Uuid;
 
     use crate::app::behavior::node::action::logging::PrintLogActionNode;
+    use crate::app::behavior::node::action::wait::WaitDurationActionNode;
     use crate::app::blackboards::service::BlackboardService;
 
     use super::*;
-    use crate::app::behavior::node::action::wait::WaitDurationActionNode;
-    use std::time::Duration;
 
     #[actix_rt::test]
     async fn test_finishes_based_on_minimal_number_of_successes() {
         let db_uuid = Uuid::new_v4();
-        let mut dbs = DashMap::new();
-        dbs.insert(db_uuid,
-                   Arc::new(
-                       RwLock::new(
-                           DB::open_default(format!("temp_test/{}.rocksdb", db_uuid))
-                               .unwrap())));
         let context =
             BTNodeExecutionContext::new(
                 db_uuid.clone(),
-                Arc::new( BlackboardService::new(dbs)));
+                Arc::new( BlackboardService::new(DashMap::new())));
         let children: Vec<BTNode> = vec![
-            PrintLogActionNode::new(1).into(),
+            PrintLogActionNode::new(1, "I am one.".to_string()).into(),
             WaitDurationActionNode::new(2, Duration::from_millis(10)).into(),
-            PrintLogActionNode::new(3).into(),
-            PrintLogActionNode::new(4).into()];
+            PrintLogActionNode::new(3, "I am two.".to_string()).into(),
+            PrintLogActionNode::new(4, "I am four.".to_string()).into()];
         match ParallelCompositeNode::new(5, children, 3)
             .unwrap()
             .tick(&context)

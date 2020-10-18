@@ -10,14 +10,15 @@ use std::thread;
 
 pub struct PrintLogActionNode {
 
-    id: i32
+    id: i32,
+    message: String
 
 }
 
 impl PrintLogActionNode {
 
-    pub fn new(id: i32) -> PrintLogActionNode {
-        PrintLogActionNode { id }
+    pub fn new(id: i32, message: String) -> PrintLogActionNode {
+        PrintLogActionNode { id, message }
     }
 
 }
@@ -25,7 +26,7 @@ impl PrintLogActionNode {
 #[async_trait(?Send)]
 impl BehaviorTreeNode for PrintLogActionNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
-        println!("[{}] I'm here!", self.id);
+        println!("[{}] {}", self.id, self.message);
         Result::Ok(TickStatus::Success)
     }
 }
