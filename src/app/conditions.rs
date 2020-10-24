@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::iter::FromIterator;
 
-use crate::app::conditions::relational::{EqualsRelationalExpression, GreaterThanRelationalExpression};
+use crate::app::conditions::relational::{EqualsRelationalExpression, GreaterThanOrEqualsRelationalExpression, GreaterThanRelationalExpression, LessThanOrEqualsRelationalExpression, LessThanRelationalExpression, NotEqualsRelationalExpression};
 use crate::app::values::{ValueHolder, ValuesPayload};
 
 pub mod relational;
@@ -51,7 +51,11 @@ pub enum LogicalExpression {
 pub enum RelationalExpression {
 
     Equals(EqualsRelationalExpression),
-    GreaterThan(GreaterThanRelationalExpression)
+    GreaterThan(GreaterThanRelationalExpression),
+    GreaterThanOrEquals(GreaterThanOrEqualsRelationalExpression),
+    LessThan(LessThanRelationalExpression),
+    LessThanOrEquals(LessThanOrEqualsRelationalExpression),
+    NotEquals(NotEqualsRelationalExpression)
 
 }
 
@@ -160,6 +164,14 @@ impl ValuesPayloadPredicateSupplier for RelationalExpression {
             RelationalExpression::Equals(expr) =>
                 expr.get_predicate(),
             RelationalExpression::GreaterThan(expr) =>
+                expr.get_predicate(),
+            RelationalExpression::LessThan(expr) =>
+                expr.get_predicate(),
+            RelationalExpression::GreaterThanOrEquals(expr) =>
+                expr.get_predicate(),
+            RelationalExpression::LessThanOrEquals(expr) =>
+                expr.get_predicate(),
+            RelationalExpression::NotEquals(expr) =>
                 expr.get_predicate()
         }
     }
@@ -169,6 +181,14 @@ impl ValuesPayloadPredicateSupplier for RelationalExpression {
             RelationalExpression::Equals(expr) =>
                 expr.get_value_names(),
             RelationalExpression::GreaterThan(expr) =>
+                expr.get_value_names(),
+            RelationalExpression::LessThan(expr) =>
+                expr.get_value_names(),
+            RelationalExpression::GreaterThanOrEquals(expr) =>
+                expr.get_value_names(),
+            RelationalExpression::LessThanOrEquals(expr) =>
+                expr.get_value_names(),
+            RelationalExpression::NotEquals(expr) =>
                 expr.get_value_names()
         }
     }
