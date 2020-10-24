@@ -1,6 +1,8 @@
 use crate::app::conditions::{RelationalExpressionSpecification, ValuesPayloadPredicateSupplier};
 use crate::app::values::{ValueHolder, ValuesPayload};
 
+use buttercup_macros::RelationalExpression;
+
 pub struct EqualsRelationalExpression {
 
     specification: RelationalExpressionSpecification
@@ -40,7 +42,9 @@ impl ValuesPayloadPredicateSupplier for GreaterThanRelationalExpression {
         RelationalExpressions::build_predicate(
             self.specification,
             Box::new(
-                |left, right| left.gt(right)))
+                |left, right| left.gt(right)
+            )
+        )
     }
 
     fn get_value_names(&self) -> Vec<String> {
@@ -48,6 +52,14 @@ impl ValuesPayloadPredicateSupplier for GreaterThanRelationalExpression {
     }
 }
 
+
+#[derive(RelationalExpression)]
+#[predicate(lt)]
+pub struct LessThanRelationalExpression {
+
+    specification: RelationalExpressionSpecification
+
+}
 
 struct RelationalExpressions;
 
