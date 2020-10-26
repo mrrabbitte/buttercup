@@ -15,7 +15,7 @@ use std::ffi::OsString;
 
 pub struct BlackboardService {
 
-    local_blackboard_paths: DashMap<Uuid, Arc<RwLock<DB>>>
+    local_blackboards: DashMap<Uuid, Arc<RwLock<DB>>>
 
 }
 
@@ -35,7 +35,7 @@ impl BlackboardService {
 
     pub fn new(local_blackboard_paths: DashMap<Uuid, Arc<RwLock<DB>>>) -> BlackboardService {
         BlackboardService {
-            local_blackboard_paths
+            local_blackboards: local_blackboard_paths
         }
     }
 
@@ -50,7 +50,7 @@ impl BlackboardService {
     pub fn get_values(&self,
                       blackboard_id: &Uuid,
                       value_names: &HashSet<String>) -> Result<ValuesPayload, BlackboardError> {
-        match self.local_blackboard_paths.get(blackboard_id) {
+        match self.local_blackboards.get(blackboard_id) {
             None => Result::Err(
                 BlackboardError::BlackboardOfGivenIdNotFound(*blackboard_id)),
             Some(kv) =>
@@ -66,7 +66,7 @@ impl BlackboardService {
     pub fn put_values(&self,
                       blackboard_id: &Uuid,
                       payload: &ValuesPayload) -> Result<(), BlackboardError> {
-        match self.local_blackboard_paths.get(blackboard_id) {
+        match self.local_blackboards.get(blackboard_id) {
             None => Result::Err(
                 BlackboardError::BlackboardOfGivenIdNotFound(*blackboard_id)),
             Some(kv) =>
@@ -133,7 +133,7 @@ impl BlackboardService {
 
     #[inline(always)]
     fn get_path_to_destroy(&self, blackboard_id: &Uuid) -> Result<OsString, BlackboardError> {
-        match self.local_blackboard_paths.remove(blackboard_id) {
+        match self.local_blackboards.remove(blackboard_id) {
             None => Result::Err(
                 BlackboardError::BlackboardOfGivenIdNotFound(*blackboard_id)),
             Some(kv) =>
@@ -148,6 +148,12 @@ impl BlackboardService {
         }
     }
 
+}
+
+impl Default for BlackboardService {
+    fn default() -> Self {
+        BlackboardService::new(DashMap::new())
+    }
 }
 
 #[cfg(test)]

@@ -101,24 +101,15 @@ mod tests {
     use std::time::Duration;
 
     use actix_web::test;
-    use dashmap::DashMap;
-    use uuid::Uuid;
 
     use crate::app::behavior::node::action::logging::PrintLogActionNode;
     use crate::app::behavior::node::action::wait::WaitDurationActionNode;
-    use crate::app::blackboards::service::BlackboardService;
 
     use super::*;
 
     #[actix_rt::test]
     async fn test_finishes_based_on_minimal_number_of_successes() {
-        let db_uuid = Uuid::new_v4();
-        let context =
-            BTNodeExecutionContext::new(
-                db_uuid.clone(),
-                Arc::new(
-                    BlackboardService::new(
-                        DashMap::new())));
+        let context = Default::default();
         let children: Vec<BTNode> = vec![
             PrintLogActionNode::new(1, "I am one.".to_string()).into(),
             WaitDurationActionNode::new(2, Duration::from_millis(10)).into(),

@@ -4,21 +4,27 @@ use crate::app::blackboards::service::{BlackboardService, BlackboardError};
 use crate::app::values::ValuesPayload;
 use crate::app::behavior::node::{BTNodeAddress, BTNode};
 use std::collections::HashSet;
+use crate::app::behavior::context::reactive::ReactiveService;
+
+pub(crate) mod reactive;
 
 pub struct BTNodeExecutionContext {
 
     blackboard_id: Uuid,
-    blackboard_service: Arc<BlackboardService>
+    blackboard_service: Arc<BlackboardService>,
+    reactive_service: Arc<ReactiveService>
 
 }
 
 impl BTNodeExecutionContext {
 
     pub fn new(blackboard_id: Uuid,
-               blackboard_service: Arc<BlackboardService>) -> BTNodeExecutionContext {
+               blackboard_service: Arc<BlackboardService>,
+               reactive_service: Arc<ReactiveService>) -> BTNodeExecutionContext {
         BTNodeExecutionContext {
             blackboard_id,
-            blackboard_service
+            blackboard_service,
+            reactive_service
         }
     }
 
@@ -37,3 +43,13 @@ impl BTNodeExecutionContext {
     }
 
 }
+
+impl Default for BTNodeExecutionContext {
+    fn default() -> Self {
+        BTNodeExecutionContext::new(
+            Uuid::new_v4(),
+            Arc::new(Default::default()),
+            Arc::new(Default::default()))
+    }
+}
+

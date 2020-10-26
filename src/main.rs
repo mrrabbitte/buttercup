@@ -25,11 +25,7 @@ async fn example(data: Data<Mutex<Agents>>) -> String {
     let n_agents = agents.len() as i32;
     let agent = Agent::new(AgentAddress::new(n_agents, n_agents as u32),
                            BehaviorTree::new(n_agents,
-                                             Arc::new(BTNodeExecutionContext::new(
-                                                 Uuid::from_u128(1),
-                                                 Arc::new(
-                                                     BlackboardService::new(
-                                                         DashMap::new())))),
+                                             Arc::new(Default::default()),
                                              PrintLogActionNode::new(
                                                  n_agents, "hello".to_owned())
                                                  .into()));
