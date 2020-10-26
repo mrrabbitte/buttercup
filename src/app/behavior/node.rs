@@ -17,9 +17,9 @@ use crate::app::behavior::tick::{TickError, TickStatus};
 use crate::app::blackboards::service::{BlackboardError, BlackboardService};
 use crate::app::values::ValuesPayload;
 
-mod action;
-mod composite;
-mod decorator;
+pub(crate) mod action;
+pub(crate) mod composite;
+pub(crate) mod decorator;
 
 #[derive(Address, Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub struct BTNodeAddress {

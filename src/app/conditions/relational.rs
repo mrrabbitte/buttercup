@@ -50,4 +50,3 @@ pub struct NotEqualsRelationalExpression {
     specification: RelationalExpressionSpecification
 
 }
-

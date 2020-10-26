@@ -1,26 +1,30 @@
+use std::sync::Arc;
+
 use crate::app::behavior::context::BTNodeExecutionContext;
-use crate::app::behavior::node::{BTNode, BTNodeAddress};
+use crate::app::behavior::node::{BehaviorTreeNode, BTNode, BTNodeAddress};
 use crate::app::behavior::tick::{TickError, TickStatus};
 
 pub struct BehaviorTree {
 
     id: i32,
-    context: BTNodeExecutionContext
-
+    context: Arc<BTNodeExecutionContext>,
+    root: BTNode
 }
 
 impl BehaviorTree {
 
     pub fn new(id: i32,
-               context: BTNodeExecutionContext) -> BehaviorTree {
+               context: Arc<BTNodeExecutionContext>,
+               root: BTNode) -> BehaviorTree {
         BehaviorTree {
             id,
-            context
+            context,
+            root
         }
     }
 
-    pub fn tick(&self) -> Result<TickStatus, TickError> {
-        Result::Ok(TickStatus::Success)
+    pub async fn tick(&self) -> Result<TickStatus, TickError> {
+        self.root.tick(self.context.as_ref()).await
     }
 }
 
@@ -32,21 +36,26 @@ mod tests {
     use uuid::Uuid;
 
     use crate::app::address::Address;
+    use crate::app::behavior::node::action::logging::PrintLogActionNode;
     use crate::app::behavior::node::BTNodeAddress;
     use crate::app::blackboards::service::BlackboardService;
 
     use super::*;
 
-    #[test]
-    fn test_returns_status() {
+    #[actix_rt::test]
+    async fn test_returns_status() {
+
         assert_eq!(Result::Ok(TickStatus::Success),
                    BehaviorTree::new(1,
-                                     BTNodeExecutionContext::new(
+                                     Arc::new(BTNodeExecutionContext::new(
                                          Uuid::from_u128(1),
                                          Arc::new(
                                              BlackboardService::new(
-                                                 DashMap::new()))))
-                       .tick())
+                                                 DashMap::new())))),
+                                     PrintLogActionNode::new(
+                                         1, "hello".to_owned())
+                                         .into())
+                       .tick().await)
     }
 
 }

@@ -1,6 +1,6 @@
 
 use quote::quote;
-use syn::{Attribute, Meta, NestedMeta, Lit, LitStr, PathSegment, Ident};
+use syn::{Attribute, Meta, NestedMeta, Ident};
 use proc_macro::TokenStream;
 
 pub fn impl_macro_derive(ast: &syn::DeriveInput) -> TokenStream {
@@ -15,7 +15,7 @@ pub fn impl_macro_derive(ast: &syn::DeriveInput) -> TokenStream {
         }
 
         impl ValuesPayloadPredicateSupplier for #name {
-            fn get_predicate(self) -> Box<dyn Fn(&ValuesPayload) -> bool> {
+            fn get_predicate(self) -> Box<dyn Fn(&ValuesPayload) -> bool + Send + Sync> {
                 match self.specification {
                     RelationalExpressionSpecification::NameAndName(first, second) =>
                         Box::new(move |payload|

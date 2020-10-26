@@ -1,8 +1,10 @@
-use actix::{Actor, Context, Handler};
+use std::future::Future;
 
-use crate::app::behavior::tick::{Tick, TickStatus, TickError};
-use crate::app::behavior::tree::BehaviorTree;
+use actix::{Actor, Context, Handler, ResponseActFuture};
 use uuid::Uuid;
+
+use crate::app::behavior::tick::{TickError, TickStatus};
+use crate::app::behavior::tree::BehaviorTree;
 
 pub struct Agent {
 
@@ -23,33 +25,10 @@ impl Agent {
         }
     }
 
-    fn tick(&self) -> Result<TickStatus, TickError> {
+    pub(crate) async fn tick(&self) -> Result<TickStatus, TickError> {
         println!("Performing tick: {}", self.uuid);
-        Result::Ok(TickStatus::Success)
+        self.tree.tick().await
     }
-}
-
-impl Actor for Agent {
-    type Context = Context<Agent>;
-
-    fn started(&mut self, _ctx: &mut Context<Self>) {
-        println!("Actor: {} is alive", self.uuid);
-    }
-
-    fn stopped(&mut self, _ctx: &mut Context<Self>) {
-        println!("Actor: {} is stopped", self.uuid);
-    }
-}
-
-impl Handler<Tick> for Agent {
-    type Result = Result<TickStatus, TickError>;
-
-    fn handle(&mut self, _msg: Tick, ctx: &mut Context<Agent>) -> Self::Result {
-        println!("Got a tick.");
-        println!("{:?}", ctx);
-        self.tick()
-    }
-
 }
 
 pub struct AgentAddress {
@@ -73,26 +52,31 @@ impl AgentAddress {
 
 #[cfg(test)]
 mod tests {
-
-    use crate::app::address::Address;
-    use crate::app::behavior::node::BTNodeAddress;
-
-    use super::*;
-    use crate::app::behavior::context::BTNodeExecutionContext;
     use std::sync::Arc;
-    use crate::app::blackboards::service::BlackboardService;
+
     use dashmap::DashMap;
 
-    #[test]
-    fn test_returns_status() {
+    use crate::app::address::Address;
+    use crate::app::behavior::context::BTNodeExecutionContext;
+    use crate::app::behavior::node::action::logging::PrintLogActionNode;
+    use crate::app::behavior::node::BTNodeAddress;
+    use crate::app::blackboards::service::BlackboardService;
+
+    use super::*;
+
+    #[actix_rt::test]
+    async fn test_returns_status() {
         assert_eq!(Agent::new(AgentAddress {id: 1, index: 1},
                               BehaviorTree::new(1,
-                                                BTNodeExecutionContext::new(
+                                                Arc::new(BTNodeExecutionContext::new(
                                                     Uuid::from_u128(1),
                                                     Arc::new(
                                                         BlackboardService::new(
-                                                            DashMap::new())))))
-            .tick(), Result::Ok(TickStatus::Success));
+                                                            DashMap::new())))),
+                                                PrintLogActionNode::new(
+                                                    1, "hello".to_owned())
+                                                    .into()))
+            .tick().await, Result::Ok(TickStatus::Success));
     }
 
 }

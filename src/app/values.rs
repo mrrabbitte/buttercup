@@ -46,6 +46,45 @@ pub enum ValueHolder {
 
 }
 
+impl ValueHolder {
+
+    pub fn contains(&self,
+                    other: &ValueHolder) -> bool {
+        match (self, other) {
+            (ValueHolder::String(this), ValueHolder::String(other)) =>
+                this.contains(other),
+            (ValueHolder::List(list), _) =>
+                list.get_value_type().matches(other)
+                    && list.get_elements().contains(other),
+            (_, _) => false
+        }
+    }
+
+    pub fn ends_with(&self,
+                     other: &ValueHolder) -> bool {
+        match (self, other) {
+            (ValueHolder::String(this), ValueHolder::String(other)) =>
+                this.ends_with(other),
+            (_, _) => false
+        }
+    }
+
+    pub fn is_in(&self,
+                 other:&ValueHolder) -> bool {
+        other.contains(self)
+    }
+
+    pub fn starts_with(&self,
+                       other: &ValueHolder) -> bool {
+        match (self, other) {
+            (ValueHolder::String(this), ValueHolder::String(other)) =>
+                this.starts_with(other),
+            (_, _) => false
+        }
+    }
+
+}
+
 #[derive(AsRefStr, EnumVariantNames,
     Debug, Clone, Hash, Eq, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum ValueType {

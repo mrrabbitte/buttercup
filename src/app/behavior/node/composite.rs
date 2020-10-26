@@ -9,9 +9,9 @@ use crate::app::behavior::node::composite::parallel::ParallelCompositeNode;
 use crate::app::behavior::node::composite::sequence::SequenceCompositeNode;
 use crate::app::behavior::tick::{TickError, TickStatus};
 
-mod parallel;
-mod fallback;
-mod sequence;
+pub(crate) mod parallel;
+pub(crate) mod fallback;
+pub(crate) mod sequence;
 
 pub enum CompositeBTNode {
 

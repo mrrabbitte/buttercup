@@ -13,51 +13,58 @@ use uuid::Uuid;
 use crate::app::address::Address;
 use crate::app::agents::core::{Agent, AgentAddress};
 use crate::app::behavior::context::BTNodeExecutionContext;
+use crate::app::behavior::node::action::logging::PrintLogActionNode;
 use crate::app::behavior::node::BTNodeAddress;
-use crate::app::behavior::tick::Tick;
 use crate::app::behavior::tree::BehaviorTree;
 use crate::app::blackboards::service::BlackboardService;
 
 mod app;
 
 async fn example(data: Data<Mutex<Agents>>) -> String {
-    let agent = Agent::new(AgentAddress::new(1, 1),
-                           BehaviorTree::new(1,
-                                             BTNodeExecutionContext::new(
+    let mut agents = data.lock().unwrap();
+    let n_agents = agents.len() as i32;
+    let agent = Agent::new(AgentAddress::new(n_agents, n_agents as u32),
+                           BehaviorTree::new(n_agents,
+                                             Arc::new(BTNodeExecutionContext::new(
                                                  Uuid::from_u128(1),
                                                  Arc::new(
                                                      BlackboardService::new(
-                                                         DashMap::new())))))
-        .start();
-    let mut agents = data.lock().unwrap();
+                                                         DashMap::new())))),
+                                             PrintLogActionNode::new(
+                                                 n_agents, "hello".to_owned())
+                                                 .into()));
     agents.push(agent);
 
     let mut response = String::new();
 
-    for address in &agents.agents {
-        let response_one = address.send(Tick).await;
-        let response_two = address.send(Tick).await;
-        let response_three = address.send(Tick).await;
+    for agent in &agents.agents {
+        let response_one = agent.tick().await;
+        let response_two = agent.tick().await;
+        let response_three = agent.tick().await;
         response.push_str(format!("Welcome: {:?}, {:?}, {:?}",
                                   response_one,
                                   response_two,
                                   response_three)
             .as_str());
-        address.send(Tick).await;
+        agent.tick().await;
     }
     response.to_owned()
 }
 
 pub struct Agents {
 
-    agents: Vec<Addr<Agent>>
+    agents: Vec<Agent>
 
 }
 
 impl Agents {
 
-    pub fn push(&mut self, addr: Addr<Agent>) {
-        self.agents.push(addr)
+    pub fn push(&mut self, agent: Agent) {
+        self.agents.push(agent)
+    }
+
+    pub fn len(&self) -> usize {
+        self.agents.len()
     }
 }
 

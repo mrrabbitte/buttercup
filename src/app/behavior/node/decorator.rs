@@ -8,8 +8,8 @@ use crate::app::behavior::node::decorator::condition::ConditionDecoratorNode;
 use crate::app::behavior::node::decorator::invert::InvertDecoratorNode;
 use crate::app::behavior::tick::{TickError, TickStatus};
 
-mod condition;
-mod invert;
+pub(crate) mod condition;
+pub(crate) mod invert;
 
 pub enum DecoratorBTNode {
 

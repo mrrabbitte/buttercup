@@ -18,7 +18,7 @@ pub struct ConditionDecoratorNode {
 
     id: i32,
     child: Box<BTNode>,
-    predicate: Box<dyn Fn(&ValuesPayload) -> bool>,
+    predicate: Box<dyn Fn(&ValuesPayload)  -> bool + Send + Sync>,
     value_names: HashSet<String>
 
 }
