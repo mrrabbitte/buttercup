@@ -3,6 +3,7 @@ use std::sync::{Mutex, MutexGuard, PoisonError};
 use dashmap::DashMap;
 use dashmap::mapref::one::Ref;
 use futures::future::AbortHandle;
+use serde::{Deserialize, Serialize};
 
 pub struct ReactiveService {
 
@@ -10,6 +11,7 @@ pub struct ReactiveService {
 
 }
 
+#[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum ReactiveServiceError {
 
     AbortEntryNotFound(i32),

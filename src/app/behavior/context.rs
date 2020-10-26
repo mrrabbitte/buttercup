@@ -42,6 +42,10 @@ impl BTNodeExecutionContext {
         self.blackboard_service.put_values(&self.blackboard_id, payload)
     }
 
+    pub fn get_reactive_service(&self) -> &Arc<ReactiveService> {
+        &self.reactive_service
+    }
+
 }
 
 impl Default for BTNodeExecutionContext {
