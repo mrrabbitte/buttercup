@@ -116,7 +116,9 @@ mod tests {
         let context =
             BTNodeExecutionContext::new(
                 db_uuid.clone(),
-                Arc::new( BlackboardService::new(DashMap::new())));
+                Arc::new(
+                    BlackboardService::new(
+                        DashMap::new())));
         let children: Vec<BTNode> = vec![
             PrintLogActionNode::new(1, "I am one.".to_string()).into(),
             WaitDurationActionNode::new(2, Duration::from_millis(10)).into(),

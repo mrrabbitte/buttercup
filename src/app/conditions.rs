@@ -4,7 +4,7 @@ use std::iter::FromIterator;
 use crate::app::conditions::relational::{EqualsRelationalExpression, GreaterThanOrEqualsRelationalExpression, GreaterThanRelationalExpression, LessThanOrEqualsRelationalExpression, LessThanRelationalExpression, NotEqualsRelationalExpression};
 use crate::app::values::{ValueHolder, ValuesPayload};
 
-pub mod relational;
+pub (crate) mod relational;
 
 pub enum ConditionExpression {
 
