@@ -22,6 +22,13 @@ pub struct ConditionExpressionWrapper {
 
 impl ConditionExpressionWrapper {
 
+    pub fn always_true() -> ConditionExpressionWrapper {
+        ConditionExpressionWrapper {
+            predicate: Box::new(|payload| true),
+            value_names: HashSet::new()
+        }
+    }
+
     pub fn new(condition: ConditionExpression) -> ConditionExpressionWrapper {
         let value_names = HashSet::from_iter(condition.get_value_names());
         ConditionExpressionWrapper {

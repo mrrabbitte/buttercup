@@ -115,3 +115,9 @@ impl BehaviorTreeNode for ReactiveConditionDecoratorNode {
         }
     }
 }
+
+impl From<ReactiveConditionDecoratorNode> for BTNode {
+    fn from(node: ReactiveConditionDecoratorNode) -> Self {
+        BTNode::Decorator(DecoratorBTNode::ReactiveCondition(node))
+    }
+}

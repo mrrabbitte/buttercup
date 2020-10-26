@@ -1,10 +1,12 @@
-use uuid::Uuid;
-use std::sync::Arc;
-use crate::app::blackboards::service::{BlackboardService, BlackboardError};
-use crate::app::values::ValuesPayload;
-use crate::app::behavior::node::{BTNodeAddress, BTNode};
 use std::collections::HashSet;
+use std::sync::Arc;
+
+use uuid::Uuid;
+
 use crate::app::behavior::context::reactive::ReactiveService;
+use crate::app::behavior::node::{BTNode, BTNodeAddress};
+use crate::app::blackboards::service::{BlackboardError, BlackboardService};
+use crate::app::values::ValuesPayload;
 
 pub(crate) mod reactive;
 
@@ -34,6 +36,9 @@ impl BTNodeExecutionContext {
 
     pub fn get_values(&self,
                       value_names: &HashSet<String>) -> Result<ValuesPayload, BlackboardError> {
+        if value_names.is_empty() {
+            return Result::Ok(ValuesPayload::empty());
+        }
         self.blackboard_service.get_values(&self.blackboard_id, value_names)
     }
 

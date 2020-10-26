@@ -2,6 +2,7 @@
 extern crate lazy_static;
 
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 
 use actix::{Actor, Addr};
 use actix_web::{App, http, HttpRequest, HttpServer, middleware};
@@ -13,12 +14,36 @@ use uuid::Uuid;
 use crate::app::address::Address;
 use crate::app::agents::core::{Agent, AgentAddress};
 use crate::app::behavior::context::BTNodeExecutionContext;
+use crate::app::behavior::node::{BehaviorTreeNode, BTNodeAddress};
 use crate::app::behavior::node::action::logging::PrintLogActionNode;
-use crate::app::behavior::node::BTNodeAddress;
+use crate::app::behavior::node::action::wait::WaitDurationActionNode;
+use crate::app::behavior::node::decorator::condition::ReactiveConditionDecoratorNode;
 use crate::app::behavior::tree::BehaviorTree;
 use crate::app::blackboards::service::BlackboardService;
+use crate::app::conditions::ConditionExpressionWrapper;
 
 mod app;
+
+async fn reactive_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
+    let node = ReactiveConditionDecoratorNode::new(
+        1,
+        Box::new(
+            WaitDurationActionNode::new(
+                2,
+                Duration::from_millis(10000))
+                .into()),
+        ConditionExpressionWrapper::always_true());
+
+    data.get_reactive_service().initialize_nodes(&vec![1]);
+
+    format!("Got: {:?}", node.tick(data.as_ref()).await)
+}
+
+async fn abort_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
+    data.get_reactive_service().abort(&1);
+
+    "Aborted".to_owned()
+}
 
 async fn example(data: Data<Mutex<Agents>>) -> String {
     let mut agents = data.lock().unwrap();
@@ -71,15 +96,26 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
 
     let agents_data =  Data::new(Mutex::new(Agents{ agents: vec![]}));
+    let context =
+        Data::new(Arc::new(BTNodeExecutionContext::default()));
 
     HttpServer::new(move || {
         App::new()
             .app_data(agents_data.clone())
+            .app_data(context.clone())
             .service(
                 resource("/test")
                     .route(
                         get().to(example))
             )
+            .service(
+                resource("/tick")
+                    .route(
+                        get().to(reactive_tick)))
+            .service(
+                resource("/abort")
+                    .route(
+                        get().to(abort_tick)))
             .wrap(middleware::Logger::default())
     })
         .bind("127.0.0.1:7777")?.run().await

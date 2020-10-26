@@ -135,6 +135,13 @@ impl ValuesPayload {
         }
     }
 
+    pub fn empty() -> ValuesPayload {
+        ValuesPayload {
+            values: HashMap::new(),
+            keys: HashSet::new()
+        }
+    }
+
     pub fn get_values(&self) -> &HashMap<String, ValueHolder> {
         &self.values
     }
