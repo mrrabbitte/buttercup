@@ -4,12 +4,14 @@ use async_trait::async_trait;
 
 use crate::app::behavior::context::BTNodeExecutionContext;
 use crate::app::behavior::node::{BehaviorTreeNode, BTNode};
-use crate::app::behavior::node::decorator::condition::{ConditionDecoratorNode, ReactiveConditionDecoratorNode};
+use crate::app::behavior::node::decorator::condition::ConditionDecoratorNode;
 use crate::app::behavior::node::decorator::invert::InvertDecoratorNode;
+use crate::app::behavior::node::decorator::reactive::ReactiveConditionDecoratorNode;
 use crate::app::behavior::tick::{TickError, TickStatus};
 
 pub(crate) mod condition;
 pub(crate) mod invert;
+pub (crate) mod reactive;
 
 pub enum DecoratorBTNode {
 

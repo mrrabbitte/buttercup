@@ -17,7 +17,7 @@ use crate::app::behavior::context::BTNodeExecutionContext;
 use crate::app::behavior::node::{BehaviorTreeNode, BTNodeAddress};
 use crate::app::behavior::node::action::logging::PrintLogActionNode;
 use crate::app::behavior::node::action::wait::WaitDurationActionNode;
-use crate::app::behavior::node::decorator::condition::ReactiveConditionDecoratorNode;
+use crate::app::behavior::node::decorator::reactive::ReactiveConditionDecoratorNode;
 use crate::app::behavior::tree::BehaviorTree;
 use crate::app::blackboards::service::BlackboardService;
 use crate::app::conditions::ConditionExpressionWrapper;
@@ -34,7 +34,7 @@ async fn reactive_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
                 .into()),
         ConditionExpressionWrapper::always_true());
 
-    data.get_reactive_service().initialize_nodes(&vec![1]);
+    data.get_reactive_service().initialize_node(&1);
 
     format!("Got: {:?}", node.tick(data.as_ref()).await)
 }

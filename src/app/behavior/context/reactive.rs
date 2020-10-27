@@ -25,17 +25,13 @@ impl ReactiveService {
         ReactiveService { abort_handles: DashMap::new() }
     }
 
-    pub fn cleanup_nodes(&self, bt_node_ids: &Vec<i32>) {
-        for id in bt_node_ids {
-            self.abort_handles.remove(id);
-        }
+    pub fn cleanup_node(&self, bt_node_id: &i32) {
+        self.abort_handles.remove(bt_node_id);
     }
 
-    pub fn initialize_nodes(&self,
-                            bt_node_ids: &Vec<i32>) {
-        for id in bt_node_ids {
-            self.abort_handles.insert(*id, AbortEntry::new(*id));
-        }
+    pub fn initialize_node(&self,
+                           bt_node_id: &i32) {
+        self.abort_handles.insert(*bt_node_id, AbortEntry::new(*bt_node_id));
     }
 
     pub fn register(&self,
