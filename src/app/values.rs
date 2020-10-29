@@ -28,21 +28,21 @@ pub mod zoned_date_time;
 pub enum ValueHolder {
 
     Boolean(bool),
-    String(String),
-    Decimal(BigRational),
-    Integer(BigInt),
-    LocalDateTime(NaiveDateTime),
-    LocalDate(NaiveDate),
-    LocalTime(NaiveTime),
-    DayOfWeek(WeekdayWrapper),
-    TimeZone(TzWrapper),
-    ZonedDateTime(ZonedDateTime),
-    GeoCoordinates(GeoCoordinates),
-    Language(LanguageWrapper),
     Country(CountryCode),
+    Decimal(BigRational),
+    DayOfWeek(WeekdayWrapper),
     Email(Email),
+    GeoCoordinates(GeoCoordinates),
+    Integer(BigInt),
     IpAddress(IpAddr),
-    List(ValueHoldersList)
+    Language(LanguageWrapper),
+    List(ValueHoldersList),
+    LocalDate(NaiveDate),
+    LocalDateTime(NaiveDateTime),
+    LocalTime(NaiveTime),
+    TimeZone(TzWrapper),
+    String(String),
+    ZonedDateTime(ZonedDateTime),
 
 }
 
@@ -90,21 +90,21 @@ impl ValueHolder {
 pub enum ValueType {
 
     Boolean,
-    String,
-    Decimal,
-    Integer,
-    LocalDateTime,
-    LocalDate,
-    LocalTime,
-    DayOfWeek,
-    TimeZone,
-    ZonedDateTime,
-    GeoCoordinates,
-    Language,
     Country,
+    Decimal,
+    DayOfWeek,
     Email,
+    GeoCoordinates,
+    Integer,
     IpAddress,
-    List
+    Language,
+    List,
+    LocalDate,
+    LocalDateTime,
+    LocalTime,
+    TimeZone,
+    String,
+    ZonedDateTime,
 
 }
 
