@@ -7,8 +7,8 @@ use isocountry::CountryCode;
 use num::bigint::BigInt;
 use num::rational::BigRational;
 use serde::{Deserialize, Serialize};
-use strum::VariantNames;
-use strum_macros::{AsRefStr, EnumVariantNames};
+use strum::{VariantNames, IntoEnumIterator};
+use strum_macros::{AsRefStr, EnumIter, EnumVariantNames};
 
 use crate::app::values::email::Email;
 use crate::app::values::geolocation::GeoCoordinates;
@@ -85,7 +85,7 @@ impl ValueHolder {
 
 }
 
-#[derive(AsRefStr, EnumVariantNames,
+#[derive(AsRefStr, EnumVariantNames, EnumIter,
     Debug, Clone, Hash, Eq, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum ValueType {
 
@@ -108,7 +108,15 @@ pub enum ValueType {
 
 }
 
+lazy_static! {
+        static ref ALL_VALUE_TYPES: Vec<ValueType> = ValueType::iter().collect();
+}
+
 impl ValueType {
+
+    pub fn all_value_types() -> &'static Vec<ValueType> {
+        &ALL_VALUE_TYPES
+    }
 
     fn matches(&self,
                value_holder: &ValueHolder) -> bool {
