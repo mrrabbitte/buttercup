@@ -1,8 +1,8 @@
 use std::collections::HashSet;
 use std::iter::FromIterator;
 
-use crate::app::conditions::relational::{EqualsRelationalExpression, GreaterThanOrEqualsRelationalExpression, GreaterThanRelationalExpression, LessThanOrEqualsRelationalExpression, LessThanRelationalExpression, NotEqualsRelationalExpression};
-use crate::app::values::{ValueHolder, ValuesPayload};
+use crate::app::conditions::relational::{ContainsRelationalExpression, EndsWithRelationalExpression, EqualsRelationalExpression, GreaterThanOrEqualsRelationalExpression, GreaterThanRelationalExpression, IsInRelationalExpression, LessThanOrEqualsRelationalExpression, LessThanRelationalExpression, NotEqualsRelationalExpression, StartsWithRelationalExpression};
+use crate::app::values::{ValueHolder, ValuesPayload, ValueType};
 
 pub (crate) mod relational;
 
@@ -57,12 +57,35 @@ pub enum LogicalExpression {
 
 pub enum RelationalExpression {
 
+    Contains(ContainsRelationalExpression),
+    EndsWith(EndsWithRelationalExpression),
     Equals(EqualsRelationalExpression),
     GreaterThan(GreaterThanRelationalExpression),
     GreaterThanOrEquals(GreaterThanOrEqualsRelationalExpression),
+    IsIn(IsInRelationalExpression),
     LessThan(LessThanRelationalExpression),
     LessThanOrEquals(LessThanOrEqualsRelationalExpression),
-    NotEquals(NotEqualsRelationalExpression)
+    NotEquals(NotEqualsRelationalExpression),
+    StartsWith(StartsWithRelationalExpression)
+
+}
+
+lazy_static! {
+
+    static ref LISTS_AND_STRINGS: Vec<ValueType> = vec![ValueType::String, ValueType::List];
+    static ref STRING_ONLY: Vec<ValueType> = vec![ValueType::String];
+
+}
+
+impl RelationalExpression {
+
+    pub fn get_allowed_value_types(&self) -> &Vec<ValueType> {
+        match self {
+            RelationalExpression::Contains(_) | RelationalExpression::IsIn(_) => &LISTS_AND_STRINGS,
+            RelationalExpression::StartsWith(_) | RelationalExpression::EndsWith(_) => &STRING_ONLY,
+            _ => ValueType::all_value_types()
+        }
+    }
 
 }
 
@@ -168,34 +191,50 @@ impl ValuesPayloadPredicateSupplier for LogicalExpression {
 impl ValuesPayloadPredicateSupplier for RelationalExpression {
     fn get_predicate(self) -> Box<dyn Fn(&ValuesPayload) -> bool + Send + Sync> {
         match self {
+            RelationalExpression::Contains(expr) =>
+                expr.get_predicate(),
+            RelationalExpression::EndsWith(expr) =>
+                expr.get_predicate(),
             RelationalExpression::Equals(expr) =>
                 expr.get_predicate(),
             RelationalExpression::GreaterThan(expr) =>
                 expr.get_predicate(),
-            RelationalExpression::LessThan(expr) =>
-                expr.get_predicate(),
             RelationalExpression::GreaterThanOrEquals(expr) =>
+                expr.get_predicate(),
+            RelationalExpression::IsIn(expr) =>
+                expr.get_predicate(),
+            RelationalExpression::LessThan(expr) =>
                 expr.get_predicate(),
             RelationalExpression::LessThanOrEquals(expr) =>
                 expr.get_predicate(),
             RelationalExpression::NotEquals(expr) =>
+                expr.get_predicate(),
+            RelationalExpression::StartsWith(expr) =>
                 expr.get_predicate()
         }
     }
 
     fn get_value_names(&self) -> Vec<String> {
         match self {
+            RelationalExpression::Contains(expr) =>
+                expr.get_value_names(),
+            RelationalExpression::EndsWith(expr) =>
+                expr.get_value_names(),
             RelationalExpression::Equals(expr) =>
                 expr.get_value_names(),
             RelationalExpression::GreaterThan(expr) =>
                 expr.get_value_names(),
-            RelationalExpression::LessThan(expr) =>
-                expr.get_value_names(),
             RelationalExpression::GreaterThanOrEquals(expr) =>
+                expr.get_value_names(),
+            RelationalExpression::IsIn(expr) =>
+                expr.get_value_names(),
+            RelationalExpression::LessThan(expr) =>
                 expr.get_value_names(),
             RelationalExpression::LessThanOrEquals(expr) =>
                 expr.get_value_names(),
             RelationalExpression::NotEquals(expr) =>
+                expr.get_value_names(),
+            RelationalExpression::StartsWith(expr) =>
                 expr.get_value_names()
         }
     }
