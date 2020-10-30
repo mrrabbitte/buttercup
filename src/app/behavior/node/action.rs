@@ -10,6 +10,8 @@ use crate::app::behavior::node::action::wait::WaitDurationActionNode;
 pub mod logging;
 pub mod wait;
 
+#[derive(Derivative)]
+#[derivative(Debug)]
 pub enum ActionBTNode {
 
     PrintLog(PrintLogActionNode),

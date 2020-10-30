@@ -17,10 +17,13 @@ use crate::app::blackboards::service::{BlackboardError, BlackboardService};
 use crate::app::conditions::ConditionExpressionWrapper;
 use crate::app::values::ValuesPayload;
 
+#[derive(Derivative)]
+#[derivative(Debug)]
 pub struct ReactiveConditionDecoratorNode {
 
     id: i32,
     child: Box<BTNode>,
+    #[derivative(Debug="ignore")]
     predicate: Box<dyn Fn(&ValuesPayload)  -> bool + Send + Sync>,
     value_names: HashSet<String>
 

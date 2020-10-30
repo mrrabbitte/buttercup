@@ -1,6 +1,9 @@
 #[macro_use]
 extern crate lazy_static;
 
+#[macro_use]
+extern crate derivative;
+
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
@@ -17,6 +20,7 @@ use crate::app::behavior::context::BTNodeExecutionContext;
 use crate::app::behavior::node::{BehaviorTreeNode, BTNodeAddress};
 use crate::app::behavior::node::action::logging::PrintLogActionNode;
 use crate::app::behavior::node::action::wait::WaitDurationActionNode;
+use crate::app::behavior::node::composite::fallback::FallbackCompositeNode;
 use crate::app::behavior::node::decorator::reactive::ReactiveConditionDecoratorNode;
 use crate::app::behavior::tree::BehaviorTree;
 use crate::app::blackboards::service::BlackboardService;
@@ -25,22 +29,30 @@ use crate::app::conditions::ConditionExpressionWrapper;
 mod app;
 
 async fn reactive_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
-    let node = ReactiveConditionDecoratorNode::new(
-        1,
-        Box::new(
-            WaitDurationActionNode::new(
+    let node = FallbackCompositeNode::new(
+        1, vec![
+            ReactiveConditionDecoratorNode::new(
                 2,
-                Duration::from_millis(10000))
-                .into()),
-        ConditionExpressionWrapper::always_true());
+                Box::new(
+                    WaitDurationActionNode::new(
+                        3,
+                        Duration::from_millis(10000))
+                        .into()),
+                ConditionExpressionWrapper::always_true())
+                .into(),
+            PrintLogActionNode::new(
+                4,
+                "Looks like reactive node returned failure, so cool!.".to_string())
+                .into()]
+    );
 
-    data.get_reactive_service().initialize_node(&1);
+    data.get_reactive_service().initialize_node(&2);
 
     format!("Got: {:?}", node.tick(data.as_ref()).await)
 }
 
 async fn abort_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
-    data.get_reactive_service().abort(&1);
+    data.get_reactive_service().abort(&2);
 
     "Aborted".to_owned()
 }

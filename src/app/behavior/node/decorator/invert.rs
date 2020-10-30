@@ -7,9 +7,11 @@ use crate::app::behavior::node::{BehaviorTreeNode, BTNode, BTNodeAddress};
 use crate::app::behavior::node::decorator::DecoratorBTNode;
 use crate::app::behavior::tick::{TickError, TickStatus};
 
+#[derive(Derivative)]
+#[derivative(Debug)]
 pub struct InvertDecoratorNode {
 
-    address: BTNodeAddress,
+    id: i32,
     child: Box<BTNode>
 
 }

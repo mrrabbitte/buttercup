@@ -7,6 +7,8 @@ use crate::app::behavior::node::{BehaviorTreeNode, BTNode, BTNodeAddress};
 use crate::app::behavior::node::composite::CompositeBTNode;
 use crate::app::behavior::tick::{TickError, TickStatus};
 
+#[derive(Derivative)]
+#[derivative(Debug)]
 pub struct SequenceCompositeNode {
 
     address: BTNodeAddress,

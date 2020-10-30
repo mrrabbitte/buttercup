@@ -1,20 +1,36 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
 
 use crate::app::behavior::context::BTNodeExecutionContext;
 use crate::app::behavior::node::{BehaviorTreeNode, BTNode, BTNodeAddress};
-use crate::app::behavior::tick::{TickError, TickStatus};
-use std::sync::Arc;
 use crate::app::behavior::node::composite::CompositeBTNode;
+use crate::app::behavior::tick::{TickError, TickStatus};
 
+#[derive(Derivative)]
+#[derivative(Debug)]
 pub struct FallbackCompositeNode {
 
-    address: BTNodeAddress,
+    id: i32,
     children: Vec<BTNode>
+}
+
+impl FallbackCompositeNode {
+
+    pub fn new(id: i32,
+               children: Vec<BTNode>) -> FallbackCompositeNode {
+        FallbackCompositeNode {
+            id,
+            children
+        }
+    }
+
 }
 
 #[async_trait(?Send)]
 impl BehaviorTreeNode for FallbackCompositeNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+        let mut errs = Vec::new();
         for child in &self.children {
             match child.tick(context).await {
                 Ok(status) => match status {
@@ -23,10 +39,13 @@ impl BehaviorTreeNode for FallbackCompositeNode {
                     },
                     TickStatus::Failure => {},
                 },
-                Err(_) => {},
+                Err(err) => errs.push((*err.get_node_id(), err)),
             }
         }
-        return Result::Ok(TickStatus::Failure);
+        if errs.is_empty() {
+            return Result::Ok(TickStatus::Failure);
+        }
+        return Result::Err(TickError::CompositeError(self.id, errs));
     }
 }
 
