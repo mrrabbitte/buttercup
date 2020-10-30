@@ -7,7 +7,7 @@ use isocountry::CountryCode;
 use num::bigint::BigInt;
 use num::rational::BigRational;
 use serde::{Deserialize, Serialize};
-use strum::{VariantNames, IntoEnumIterator};
+use strum::{IntoEnumIterator, VariantNames};
 use strum_macros::{AsRefStr, EnumIter, EnumVariantNames};
 
 use crate::app::values::email::Email;
@@ -15,6 +15,7 @@ use crate::app::values::geolocation::GeoCoordinates;
 use crate::app::values::lists::ValueHoldersList;
 use crate::app::values::wrappers::{LanguageWrapper, TzWrapper, WeekdayWrapper};
 use crate::app::values::zoned_date_time::ZonedDateTime;
+use std::time::Duration;
 
 pub mod email;
 pub mod extractors;
@@ -29,8 +30,9 @@ pub enum ValueHolder {
 
     Boolean(bool),
     Country(CountryCode),
-    Decimal(BigRational),
     DayOfWeek(WeekdayWrapper),
+    Decimal(BigRational),
+    Duration(Duration),
     Email(Email),
     GeoCoordinates(GeoCoordinates),
     Integer(BigInt),
@@ -91,8 +93,9 @@ pub enum ValueType {
 
     Boolean,
     Country,
-    Decimal,
     DayOfWeek,
+    Decimal,
+    Duration,
     Email,
     GeoCoordinates,
     Integer,

@@ -18,17 +18,18 @@ use crate::app::values::extractors::string::StringExtractor;
 use crate::app::values::geolocation::GeoCoordinatesValueError;
 use crate::app::values::lists::ValueHoldersListError;
 use crate::app::values::zoned_date_time::ZonedDateTimeParsingError;
+use crate::app::values::extractors::date_time::duration::DurationExtractor;
 
-pub mod boolean;
-pub mod country;
-pub mod email;
-pub mod date_time;
-pub mod geolocation;
-pub mod ip;
-pub mod language;
-pub mod lists;
-pub mod number;
-pub mod string;
+pub(crate) mod boolean;
+pub(crate) mod country;
+pub(crate) mod date_time;
+pub(crate) mod email;
+pub(crate) mod geolocation;
+pub(crate) mod ip;
+pub(crate) mod language;
+pub(crate) mod lists;
+pub(crate) mod number;
+pub(crate) mod string;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum ValueExtractionPolicy {
@@ -164,7 +165,8 @@ impl ValueExtractorService {
             ValueType::Country => CountryValueExtractor::extract(input),
             ValueType::Email => EmailValueExtractor::extract(input),
             ValueType::IpAddress => IpAddressValueExtractor::extract(input),
-            ValueType::List => Result::Err(ValueExtractionError::InvalidInputTypeForList)
+            ValueType::Duration => DurationExtractor::extract(input),
+            ValueType::List => Result::Err(ValueExtractionError::InvalidInputTypeForList),
         };
     }
 
