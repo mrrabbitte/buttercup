@@ -8,6 +8,8 @@ use crate::app::behavior::node::{BehaviorTreeNode, BTNode};
 use crate::app::behavior::node::action::ActionBTNode;
 use crate::app::behavior::tick::{TickError, TickStatus};
 
+#[derive(Derivative)]
+#[derivative(Debug)]
 pub struct WaitDurationActionNode {
 
     id: i32,

@@ -8,6 +8,8 @@ use crate::app::behavior::node::action::ActionBTNode;
 use crate::app::behavior::tick::{TickError, TickStatus};
 use std::thread;
 
+#[derive(Derivative)]
+#[derivative(Debug)]
 pub struct PrintLogActionNode {
 
     id: i32,
