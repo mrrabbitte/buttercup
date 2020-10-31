@@ -13,6 +13,8 @@ pub(crate) mod parallel;
 pub(crate) mod fallback;
 pub(crate) mod sequence;
 
+#[derive(Derivative)]
+#[derivative(Debug)]
 pub enum CompositeBTNode {
 
     Parallel(ParallelCompositeNode),

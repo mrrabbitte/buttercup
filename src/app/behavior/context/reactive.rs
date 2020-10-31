@@ -96,10 +96,11 @@ impl AbortEntry {
 
     fn abort(&self) -> Result<(), ReactiveServiceError> {
         match self.handles.lock() {
-            Ok(handlers) => {
+            Ok(mut handlers) => {
                 for handle in handlers.iter() {
                     handle.abort();
                 }
+                handlers.clear();
                 Result::Ok(())
             },
             Err(err) =>

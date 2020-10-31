@@ -13,6 +13,8 @@ pub(crate) mod condition;
 pub(crate) mod invert;
 pub (crate) mod reactive;
 
+#[derive(Derivative)]
+#[derivative(Debug)]
 pub enum DecoratorBTNode {
 
     Condition(ConditionDecoratorNode),

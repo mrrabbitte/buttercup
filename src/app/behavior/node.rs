@@ -29,6 +29,8 @@ pub struct BTNodeAddress {
 
 }
 
+#[derive(Derivative)]
+#[derivative(Debug)]
 pub enum BTNode {
 
     Action(ActionBTNode),
