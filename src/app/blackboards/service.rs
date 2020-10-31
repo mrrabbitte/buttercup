@@ -1,4 +1,5 @@
 use std::collections::{HashMap, HashSet};
+use std::ffi::OsString;
 use std::ops::Deref;
 use std::path::Path;
 use std::sync::{Arc, PoisonError, RwLock, RwLockReadGuard, RwLockWriteGuard};
@@ -11,7 +12,6 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::app::values::{ValueHolder, ValuesPayload};
-use std::ffi::OsString;
 
 pub struct BlackboardService {
 
@@ -44,6 +44,22 @@ impl BlackboardService {
         match self.get_path_to_destroy(blackboard_id) {
             Ok(path) => self.do_destroy(path),
             Err(err) => Result::Err(err)
+        }
+    }
+
+    pub fn get_value(&self,
+                     blackboard_id: &Uuid,
+                     value_name: &String) -> Result<Option<ValueHolder>, BlackboardError> {
+        match self.local_blackboards.get(blackboard_id) {
+            None => Result::Err(
+                BlackboardError::BlackboardOfGivenIdNotFound(*blackboard_id)),
+            Some(kv) =>
+                match kv.value().as_ref().read() {
+                    Ok(db) =>
+                        self.do_get_value(&db, value_name),
+                    Err(_) =>
+                        Result::Err(BlackboardError::LockPoisonedError)
+                }
         }
     }
 
@@ -92,25 +108,38 @@ impl BlackboardService {
                      value_names: &HashSet<String>) -> Result<ValuesPayload, BlackboardError> {
         let mut ret: HashMap<String, ValueHolder> = HashMap::new();
         for value_name in value_names {
-            match db.get(value_name) {
-                Ok(Some(value)) =>
-                    match bincode::deserialize(value.as_slice()) {
-                        Ok(value_holder) =>
-                            {
-                                ret.insert((*value_name).to_string(), value_holder);
-                            },
-                        Err(e) =>
-                            return Result::Err(
-                                BlackboardError::DeserializeError(format!("{}", e)))
+            match self.do_get_value(&db, value_name) {
+                Ok(value_holder_opt) =>
+                    match value_holder_opt {
+                        None => {},
+                        Some(value_holder) => {
+                            ret.insert((*value_name).to_string(), value_holder);
+                        }
                     },
-                Ok(None) => {},
-                Err(e) =>
-                    return Result::Err(BlackboardError::AccessError(e.into_string())),
+                Err(err) => return Result::Err(err)
             }
         }
         Result::Ok(ValuesPayload::new(ret))
     }
 
+    #[inline(always)]
+    fn do_get_value(&self,
+                    db: &RwLockReadGuard<DB>,
+                    value_name: &String) -> Result<Option<ValueHolder>, BlackboardError> {
+        match db.get(value_name) {
+            Ok(Some(value)) =>
+                match bincode::deserialize(value.as_slice()) {
+                    Ok(value_holder) => Result::Ok(Option::Some(value_holder)),
+                    Err(e) =>
+                        Result::Err(
+                            BlackboardError::DeserializeError(format!("{}", e)))
+                },
+            Ok(None) => Result::Ok(Option::None),
+            Err(e) =>
+                Result::Err(
+                    BlackboardError::AccessError(e.into_string())),
+        }
+    }
     #[inline(always)]
     fn do_put_values(&self,
                      db: RwLockWriteGuard<DB>,

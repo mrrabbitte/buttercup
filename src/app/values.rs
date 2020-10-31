@@ -16,6 +16,8 @@ use crate::app::values::lists::ValueHoldersList;
 use crate::app::values::wrappers::{LanguageWrapper, TzWrapper, WeekdayWrapper};
 use crate::app::values::zoned_date_time::ZonedDateTime;
 use std::time::Duration;
+use std::convert::TryFrom;
+use crate::app::variables::VariableName;
 
 pub mod email;
 pub mod extractors;
@@ -46,6 +48,17 @@ pub enum ValueHolder {
     String(String),
     ZonedDateTime(ZonedDateTime),
 
+}
+
+impl TryFrom<ValueHolder> for Duration {
+    type Error = ();
+
+    fn try_from(value: ValueHolder) -> Result<Self, Self::Error> {
+        match value {
+            ValueHolder::Duration(duration) => Result::Ok(duration),
+            _ => Result::Err(())
+        }
+    }
 }
 
 impl ValueHolder {
@@ -167,6 +180,8 @@ impl ValuesPayload {
     }
 
 }
+
+
 
 #[cfg(test)]
 mod tests {
