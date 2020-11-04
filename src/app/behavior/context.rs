@@ -6,7 +6,7 @@ use uuid::Uuid;
 use crate::app::behavior::context::reactive::ReactiveService;
 use crate::app::behavior::node::{BTNode, BTNodeAddress};
 use crate::app::blackboards::service::{BlackboardError, BlackboardService};
-use crate::app::values::ValuesPayload;
+use crate::app::values::{ValueHolder, ValuesPayload};
 
 pub(crate) mod reactive;
 
@@ -40,6 +40,11 @@ impl BTNodeExecutionContext {
             return Result::Ok(ValuesPayload::empty());
         }
         self.blackboard_service.get_values(&self.blackboard_id, value_names)
+    }
+
+    pub fn get_value(&self,
+                     value_name: &String) -> Result<Option<ValueHolder>, BlackboardError> {
+        self.blackboard_service.get_value(&self.blackboard_id, value_name)
     }
 
     pub fn put_values(&self,

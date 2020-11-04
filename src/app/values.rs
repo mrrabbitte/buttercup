@@ -1,13 +1,15 @@
 use std::collections::{HashMap, HashSet};
+use std::convert::TryFrom;
 use std::net::IpAddr;
 use std::ops::Deref;
+use std::time::Duration;
 
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use isocountry::CountryCode;
 use num::bigint::BigInt;
 use num::rational::BigRational;
 use serde::{Deserialize, Serialize};
-use strum::{VariantNames, IntoEnumIterator};
+use strum::{IntoEnumIterator, VariantNames};
 use strum_macros::{AsRefStr, EnumIter, EnumVariantNames};
 
 use crate::app::values::email::Email;
@@ -15,6 +17,7 @@ use crate::app::values::geolocation::GeoCoordinates;
 use crate::app::values::lists::ValueHoldersList;
 use crate::app::values::wrappers::{LanguageWrapper, TzWrapper, WeekdayWrapper};
 use crate::app::values::zoned_date_time::ZonedDateTime;
+use crate::app::variables::VariableName;
 
 pub mod email;
 pub mod extractors;
@@ -28,21 +31,22 @@ pub mod zoned_date_time;
 pub enum ValueHolder {
 
     Boolean(bool),
-    String(String),
-    Decimal(BigRational),
-    Integer(BigInt),
-    LocalDateTime(NaiveDateTime),
-    LocalDate(NaiveDate),
-    LocalTime(NaiveTime),
-    DayOfWeek(WeekdayWrapper),
-    TimeZone(TzWrapper),
-    ZonedDateTime(ZonedDateTime),
-    GeoCoordinates(GeoCoordinates),
-    Language(LanguageWrapper),
     Country(CountryCode),
+    DayOfWeek(WeekdayWrapper),
+    Decimal(BigRational),
+    Duration(Duration),
     Email(Email),
+    GeoCoordinates(GeoCoordinates),
+    Integer(BigInt),
     IpAddress(IpAddr),
-    List(ValueHoldersList)
+    Language(LanguageWrapper),
+    List(ValueHoldersList),
+    LocalDate(NaiveDate),
+    LocalDateTime(NaiveDateTime),
+    LocalTime(NaiveTime),
+    TimeZone(TzWrapper),
+    String(String),
+    ZonedDateTime(ZonedDateTime),
 
 }
 
@@ -85,26 +89,38 @@ impl ValueHolder {
 
 }
 
+impl TryFrom<ValueHolder> for Duration {
+    type Error = ();
+
+    fn try_from(value: ValueHolder) -> Result<Self, Self::Error> {
+        match value {
+            ValueHolder::Duration(duration) => Result::Ok(duration),
+            _ => Result::Err(())
+        }
+    }
+}
+
 #[derive(AsRefStr, EnumVariantNames, EnumIter,
     Debug, Clone, Hash, Eq, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum ValueType {
 
     Boolean,
-    String,
-    Decimal,
-    Integer,
-    LocalDateTime,
-    LocalDate,
-    LocalTime,
-    DayOfWeek,
-    TimeZone,
-    ZonedDateTime,
-    GeoCoordinates,
-    Language,
     Country,
+    DayOfWeek,
+    Decimal,
+    Duration,
     Email,
+    GeoCoordinates,
+    Integer,
     IpAddress,
-    List
+    Language,
+    List,
+    LocalDate,
+    LocalDateTime,
+    LocalTime,
+    TimeZone,
+    String,
+    ZonedDateTime,
 
 }
 
@@ -164,6 +180,8 @@ impl ValuesPayload {
     }
 
 }
+
+
 
 #[cfg(test)]
 mod tests {

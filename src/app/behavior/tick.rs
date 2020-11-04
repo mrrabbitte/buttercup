@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use crate::app::behavior::context::reactive::ReactiveServiceError;
 use crate::app::behavior::node::BTNodeAddress;
 use crate::app::blackboards::service::BlackboardError;
+use crate::app::variables::VariableValueAccessError;
 
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum TickStatus {
@@ -24,6 +25,7 @@ pub enum TickError {
     BlackboardError(i32, BlackboardError),
     CompositeError(i32, Vec<(i32, TickError)>),
     ReactiveServiceError(i32, ReactiveServiceError),
+    VariableValueAccessError(i32, VariableValueAccessError)
 
 }
 
@@ -34,7 +36,8 @@ impl TickError {
             TickError::AbortedExecution(id) => id,
             TickError::BlackboardError(id, _) => id,
             TickError::CompositeError(id, _) => id,
-            TickError::ReactiveServiceError(id, _) => id
+            TickError::ReactiveServiceError(id, _) => id,
+            TickError::VariableValueAccessError(id, _) => id
         }
     }
 
