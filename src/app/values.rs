@@ -1,5 +1,5 @@
 use std::collections::{HashMap, HashSet};
-use std::convert::TryInto;
+use std::convert::TryFrom;
 use std::net::IpAddr;
 use std::ops::Deref;
 use std::time::Duration;
@@ -89,11 +89,11 @@ impl ValueHolder {
 
 }
 
-impl TryInto<Duration> for ValueHolder {
+impl TryFrom<ValueHolder> for Duration {
     type Error = ();
 
-    fn try_into(self) -> Result<Duration, Self::Error> {
-        match self {
+    fn try_from(value: ValueHolder) -> Result<Self, Self::Error> {
+        match value {
             ValueHolder::Duration(duration) => Result::Ok(duration),
             _ => Result::Err(())
         }

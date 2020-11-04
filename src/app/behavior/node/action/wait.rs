@@ -1,4 +1,5 @@
 use std::convert::TryInto;
+use std::ops::Deref;
 use std::rc::Rc;
 use std::time::Duration;
 
@@ -11,7 +12,7 @@ use crate::app::behavior::node::action::ActionBTNode;
 use crate::app::behavior::tick::{TickError, TickStatus};
 use crate::app::blackboards::service::BlackboardError;
 use crate::app::values::ValueHolder;
-use crate::app::variables::VariableSpecification;
+use crate::app::variables::{VariableSpecification, VariableValueAccessError};
 
 #[derive(Derivative)]
 #[derivative(Debug)]
@@ -28,7 +29,8 @@ impl WaitDurationActionNode {
                duration: Duration) -> WaitDurationActionNode {
         WaitDurationActionNode {
             id,
-            duration: VariableSpecification::Literal(Rc::new(duration)) }
+            duration: duration.into()
+        }
     }
 
 }
@@ -36,12 +38,14 @@ impl WaitDurationActionNode {
 #[async_trait(?Send)]
 impl BehaviorTreeNode for WaitDurationActionNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
-        match self.duration {
-            VariableSpecification::Literal(_) => {}
-            VariableSpecification::VariableName(_) => {}
+        match self.duration.get_value(context) {
+            Ok(duration) => {
+                task::sleep(duration.deref().clone()).await;
+                Result::Ok(TickStatus::Success)
+            }
+            Err(err) =>
+                Result::Err(TickError::VariableValueAccessError(self.id, err))
         }
-        task::sleep(self.duration).await;
-        Result::Ok(TickStatus::Success)
     }
 }
 
