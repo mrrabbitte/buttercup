@@ -3,9 +3,9 @@ use std::str::FromStr;
 
 use serde_json::Value;
 
-use crate::app::values::extractors::{ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
-use crate::app::values::geolocation::{GeoCoordinates, GeoCoordinatesValueError};
-use crate::app::values::ValueHolder;
+use crate::extractors::{ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
+use crate::geolocation::GeoCoordinates;
+use crate::ValueHolder;
 
 pub struct GeoCoordinatesExtractor;
 
@@ -52,7 +52,8 @@ mod tests {
     use num::FromPrimitive;
     use num_rational::BigRational;
 
-    use crate::app::values::ValueType;
+    use crate::geolocation::GeoCoordinatesValueError;
+    use crate::ValueType;
 
     use super::*;
 

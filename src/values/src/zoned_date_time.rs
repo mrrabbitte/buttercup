@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use serde::export::TryFrom;
 use serde_json::Value;
 
-use crate::app::values::wrappers::{TzWrapper, Wrapper};
+use crate::wrappers::{TzWrapper, Wrapper};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, Hash, PartialEq, PartialOrd)]
 pub struct ZonedDateTime {

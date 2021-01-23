@@ -5,4 +5,4 @@ authors = ["Przemyslaw Gliniecki <pgliniecki@protonmail.ch>"]
 edition = "2018"
 
 [dependencies]
-buttercup_macros = { path = "src/macros" }
+buttercup_conditions_macros = { path = "src/macros" }

@@ -1,5 +1,3 @@
-use core::fmt;
-
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 

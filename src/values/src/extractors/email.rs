@@ -1,8 +1,8 @@
 use serde_json::Value;
 
-use crate::app::values::email::Email;
-use crate::app::values::extractors::{ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
-use crate::app::values::ValueHolder;
+use crate::email::Email;
+use crate::extractors::{ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
+use crate::ValueHolder;
 
 pub struct EmailValueExtractor;
 

@@ -671,7 +671,78 @@ dependencies = [
 ]
 
 [[package]]
-name = "buttercup_server"
+name = "buttercup_agents"
+version = "0.1.0"
+
+[[package]]
+name = "buttercup_blackboards"
+version = "0.1.0"
+
+[[package]]
+name = "buttercup_bts"
+version = "0.1.0"
+
+[[package]]
+name = "buttercup_conditions"
+version = "0.1.0"
+dependencies = [
+ "buttercup_conditions_macros",
+]
+
+[[package]]
+name = "buttercup_conditions_macros"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "buttercup_endpoints"
+version = "0.1.0"
+
+[[package]]
+name = "buttercup_transformations"
+version = "0.1.0"
+
+[[package]]
+name = "buttercup_values"
+version = "0.1.0"
+dependencies = [
+ "async-std",
+ "async-trait",
+ "base64 0.12.3",
+ "bincode",
+ "chrono",
+ "chrono-tz",
+ "dashmap",
+ "derivative",
+ "fast_chemail",
+ "futures",
+ "futures-channel",
+ "isocountry",
+ "isolang",
+ "lazy_static",
+ "mockall",
+ "num",
+ "num-rational",
+ "publicsuffix",
+ "rand 0.7.3",
+ "rand_distr",
+ "regex",
+ "ring",
+ "rocksdb",
+ "serde",
+ "serde_json",
+ "strum",
+ "strum_macros",
+ "tz-search",
+ "url",
+ "uuid",
+]
+
+[[package]]
+name = "buttercup_variables"
 version = "0.1.0"
 
 [[package]]

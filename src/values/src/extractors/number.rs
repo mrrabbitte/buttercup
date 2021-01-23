@@ -3,8 +3,8 @@ use num::{BigInt, BigRational, FromPrimitive};
 
 use serde_json::Value;
 
-use crate::app::values::extractors::{ParsingValueSource, ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
-use crate::app::values::ValueHolder;
+use crate::extractors::{ParsingValueSource, ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
+use crate::ValueHolder;
 
 pub struct DecimalExtractor;
 
@@ -130,7 +130,7 @@ impl ValueExtractor for IntegerExtractor {
 mod tests {
     use std::str::FromStr;
 
-    use crate::app::values::ValueType;
+    use crate::ValueType;
 
     use super::*;
 

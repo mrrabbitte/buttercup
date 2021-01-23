@@ -1,4 +1,4 @@
-use crate::app::values::{ValueHolder, ValueType};
+use crate::{ValueHolder, ValueType};
 
 use strum_macros::{AsRefStr, EnumVariantNames};
 use serde::{Deserialize, Serialize};

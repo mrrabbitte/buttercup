@@ -1,7 +1,7 @@
 use serde_json::Value;
 
-use crate::app::values::extractors::{ParsingValueSource, ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
-use crate::app::values::ValueHolder;
+use crate::extractors::{ParsingValueSource, ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
+use crate::ValueHolder;
 
 pub struct BooleanExtractor;
 

@@ -1,7 +1,9 @@
+#[macro_use]
+extern crate lazy_static;
+
 use std::collections::{HashMap, HashSet};
 use std::convert::TryFrom;
 use std::net::IpAddr;
-use std::ops::Deref;
 use std::time::Duration;
 
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
@@ -9,15 +11,14 @@ use isocountry::CountryCode;
 use num::bigint::BigInt;
 use num::rational::BigRational;
 use serde::{Deserialize, Serialize};
-use strum::{IntoEnumIterator, VariantNames};
+use strum::IntoEnumIterator;
 use strum_macros::{AsRefStr, EnumIter, EnumVariantNames};
 
-use crate::app::values::email::Email;
-use crate::app::values::geolocation::GeoCoordinates;
-use crate::app::values::lists::ValueHoldersList;
-use crate::app::values::wrappers::{LanguageWrapper, TzWrapper, WeekdayWrapper};
-use crate::app::values::zoned_date_time::ZonedDateTime;
-use crate::app::variables::VariableName;
+use crate::email::Email;
+use crate::geolocation::GeoCoordinates;
+use crate::lists::ValueHoldersList;
+use crate::wrappers::{LanguageWrapper, TzWrapper, WeekdayWrapper};
+use crate::zoned_date_time::ZonedDateTime;
 
 pub mod email;
 pub mod extractors;
@@ -186,6 +187,7 @@ impl ValuesPayload {
 #[cfg(test)]
 mod tests {
     use num::FromPrimitive;
+    use strum::VariantNames;
 
     use super::*;
 

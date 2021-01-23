@@ -3,9 +3,9 @@ use chrono::Weekday;
 use num::FromPrimitive;
 use serde_json::Value;
 
-use crate::app::values::extractors::{ParsingValueSource, ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
-use crate::app::values::ValueHolder;
-use crate::app::values::wrappers::{WeekdayWrapper, Wrapper};
+use crate::extractors::{ParsingValueSource, ValueExtractionError, ValueExtractionPolicy, ValueExtractor, ValueExtractorInput};
+use crate::ValueHolder;
+use crate::wrappers::{WeekdayWrapper, Wrapper};
 
 pub struct DayOfWeekExtractor;
 
