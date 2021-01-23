@@ -40,7 +40,7 @@ impl BehaviorTreeNode for WaitDurationActionNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match self.duration.get_value(context) {
             Ok(duration) => {
-                task::sleep(duration.deref().clone()).await;
+                task::sleep(duration.as_ref().clone()).await;
                 Result::Ok(TickStatus::Success)
             }
             Err(err) =>
