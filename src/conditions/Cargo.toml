@@ -1,0 +1,8 @@
+[package]
+name = "buttercup_conditions"
+version = "0.1.0"
+authors = ["Przemyslaw Gliniecki <pgliniecki@protonmail.ch>"]
+edition = "2018"
+
+[dependencies]
+buttercup_macros = { path = "src/macros" }
