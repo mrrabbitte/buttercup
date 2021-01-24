@@ -687,6 +687,10 @@ name = "buttercup_conditions"
 version = "0.1.0"
 dependencies = [
  "buttercup_conditions_macros",
+ "buttercup_values",
+ "lazy_static",
+ "num",
+ "num-rational",
 ]
 
 [[package]]

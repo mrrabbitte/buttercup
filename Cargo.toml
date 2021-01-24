@@ -10,6 +10,7 @@ members = [
     "src/blackboards",
     "src/bts",
     "src/conditions",
+    "src/conditions/src/macros",
     "src/endpoints",
     "src/transformations",
     "src/values",

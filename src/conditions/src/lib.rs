@@ -1,10 +1,14 @@
-pub mod relational;
+#[macro_use]
+extern crate lazy_static;
 
 use std::collections::HashSet;
 use std::iter::FromIterator;
 
-use crate::app::conditions::relational::{ContainsRelationalExpression, EndsWithRelationalExpression, EqualsRelationalExpression, GreaterThanOrEqualsRelationalExpression, GreaterThanRelationalExpression, IsInRelationalExpression, LessThanOrEqualsRelationalExpression, LessThanRelationalExpression, NotEqualsRelationalExpression, StartsWithRelationalExpression};
-use crate::app::values::{ValueHolder, ValuesPayload, ValueType};
+use buttercup_values::{ValueHolder, ValuesPayload, ValueType};
+
+use crate::relational::{ContainsRelationalExpression, EndsWithRelationalExpression, EqualsRelationalExpression, GreaterThanOrEqualsRelationalExpression, GreaterThanRelationalExpression, IsInRelationalExpression, LessThanOrEqualsRelationalExpression, LessThanRelationalExpression, NotEqualsRelationalExpression, StartsWithRelationalExpression};
+
+pub mod relational;
 
 pub enum ConditionExpression {
 
@@ -259,12 +263,12 @@ fn to_value_names(expressions: &Vec<ConditionExpression>) -> Vec<String> {
 
 #[cfg(test)]
 mod tests {
+
     use std::collections::HashMap;
 
+    use buttercup_values::ValueHolder;
     use num::bigint::BigInt;
     use num::FromPrimitive;
-
-    use crate::app::values::ValueHolder;
 
     use super::*;
 

@@ -1,7 +1,7 @@
-use crate::app::conditions::{RelationalExpressionSpecification, ValuesPayloadPredicateSupplier};
-use crate::app::values::{ValueHolder, ValuesPayload};
+use buttercup_conditions_macros::RelationalExpression;
+use buttercup_values::{ValueHolder, ValuesPayload};
 
-use buttercup_macros::RelationalExpression;
+use crate::{RelationalExpressionSpecification, ValuesPayloadPredicateSupplier};
 
 #[derive(RelationalExpression)]
 #[predicate(contains)]
