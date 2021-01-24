@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
+use buttercup_values::{ValueHolder, ValuesPayload};
+use buttercup_values::geolocation::GeoCoordinates;
 use serde::{Deserialize, Serialize};
 
-use crate::app::transformations::di::DiInputTransformation;
-use crate::app::transformations::mono::MonoInputTransformation;
-use crate::app::values::{ValueHolder, ValuesPayload};
-use crate::app::values::geolocation::GeoCoordinates;
+use crate::di::DiInputTransformation;
+use crate::mono::MonoInputTransformation;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum InputOrder {

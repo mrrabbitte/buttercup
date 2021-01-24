@@ -704,34 +704,32 @@ version = "0.1.0"
 [[package]]
 name = "buttercup_transformations"
 version = "0.1.0"
+dependencies = [
+ "buttercup_values",
+ "chrono",
+ "chrono-tz",
+ "serde",
+ "serde_json",
+ "strum",
+ "strum_macros",
+ "sunrise",
+ "tz-search",
+]
 
 [[package]]
 name = "buttercup_values"
 version = "0.1.0"
 dependencies = [
- "async-std",
- "async-trait",
- "base64 0.12.3",
  "bincode",
  "chrono",
  "chrono-tz",
- "dashmap",
- "derivative",
  "fast_chemail",
- "futures",
- "futures-channel",
  "isocountry",
  "isolang",
  "lazy_static",
- "mockall",
  "num",
  "num-rational",
  "publicsuffix",
- "rand 0.7.3",
- "rand_distr",
- "regex",
- "ring",
- "rocksdb",
  "serde",
  "serde_json",
  "strum",
