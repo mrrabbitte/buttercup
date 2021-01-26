@@ -677,6 +677,16 @@ version = "0.1.0"
 [[package]]
 name = "buttercup_blackboards"
 version = "0.1.0"
+dependencies = [
+ "bincode",
+ "buttercup_values",
+ "dashmap",
+ "lazy_static",
+ "rocksdb",
+ "serde",
+ "serde_json",
+ "uuid",
+]
 
 [[package]]
 name = "buttercup_bts"
