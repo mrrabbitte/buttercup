@@ -1,16 +1,48 @@
+#[macro_use]
+extern crate derivative;
+
 use std::convert::{TryFrom, TryInto};
 use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 
-use crate::app::behavior::context::BTNodeExecutionContext;
-use crate::app::blackboards::service::BlackboardError;
-use crate::app::values::{ValueHolder, ValuesPayload, ValueType};
+use buttercup_values::ValueHolder;
 
-pub type VariableName = String;
+#[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
+pub struct VariableName {
 
-#[derive(Derivative)]
-#[derivative(Debug)]
+    value: String
+
+}
+
+impl VariableName {
+
+    pub fn new(value: String) -> VariableName {
+        VariableName {
+            value
+        }
+    }
+
+    pub fn get_value(&self) -> &str {
+        &self.value
+    }
+
+}
+
+impl From<String> for VariableName {
+    fn from(value: String) -> Self {
+        VariableName::new(value)
+    }
+}
+
+pub trait VariableService {
+
+    fn get_variable_value_by_name(&self,
+                                  name: &VariableName)
+                                  -> Result<Option<ValueHolder>, VariableValueAccessError>;
+
+}
+
 pub enum VariableSpecification<T: TryFrom<ValueHolder> + Copy> {
 
     Literal(Arc<T>),
@@ -19,9 +51,32 @@ pub enum VariableSpecification<T: TryFrom<ValueHolder> + Copy> {
 }
 
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
+pub struct VariableServiceErrorReport {
+
+    message: String,
+    reason: String,
+    variable_name: VariableName
+
+}
+
+impl VariableServiceErrorReport {
+
+    pub fn new(message: String,
+               reason: String,
+               variable_name: VariableName) -> VariableServiceErrorReport {
+        VariableServiceErrorReport {
+            message,
+            reason,
+            variable_name
+        }
+    }
+
+}
+
+#[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum VariableValueAccessError {
 
-    BlackboardError(BlackboardError),
+    VariableServiceError(VariableServiceErrorReport),
     ValueHolderConversionError,
     VariableOfGivenNameNotFound(VariableName),
 
@@ -41,19 +96,19 @@ impl<T: TryFrom<ValueHolder> + Copy> From<VariableName> for VariableSpecificatio
 
 impl<T: TryFrom<ValueHolder> + Copy> VariableSpecification<T> {
 
-    pub fn get_value(&self,
-                     context: &BTNodeExecutionContext) -> Result<Arc<T>, VariableValueAccessError> {
+    pub fn get_value<S: VariableService>(&self,
+                                         service: &S)
+                                         -> Result<Arc<T>, VariableValueAccessError> {
         match self {
             VariableSpecification::Literal(value) =>
                 Result::Ok(value.clone()),
             VariableSpecification::VariableName(variable_name) =>
-                match context.get_value(variable_name) {
+                match service.get_variable_value_by_name(variable_name) {
                     Ok(variable_holder_opt) =>
                         VariableSpecification::try_get_value_from(
                             variable_holder_opt,
                             variable_name),
-                    Err(err) =>
-                        Result::Err(VariableValueAccessError::BlackboardError(err))
+                    Err(err) => Result::Err(err)
                 }
         }
     }

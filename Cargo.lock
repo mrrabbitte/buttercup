@@ -765,6 +765,12 @@ dependencies = [
 [[package]]
 name = "buttercup_variables"
 version = "0.1.0"
+dependencies = [
+ "buttercup_values",
+ "derivative",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "byteorder"
