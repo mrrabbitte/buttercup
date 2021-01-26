@@ -681,6 +681,10 @@ version = "0.1.0"
 [[package]]
 name = "buttercup_bts"
 version = "0.1.0"
+dependencies = [
+ "buttercup_conditions",
+ "buttercup_values",
+]
 
 [[package]]
 name = "buttercup_conditions"
@@ -704,6 +708,11 @@ dependencies = [
 [[package]]
 name = "buttercup_endpoints"
 version = "0.1.0"
+dependencies = [
+ "buttercup_values",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "buttercup_transformations"
