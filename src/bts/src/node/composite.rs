@@ -9,9 +9,9 @@ use crate::node::composite::parallel::ParallelCompositeNode;
 use crate::node::composite::sequence::SequenceCompositeNode;
 use crate::tick::{TickError, TickStatus};
 
-pub(crate) mod parallel;
-pub(crate) mod fallback;
-pub(crate) mod sequence;
+pub mod parallel;
+pub mod fallback;
+pub mod sequence;
 
 #[derive(Derivative)]
 #[derivative(Debug)]
