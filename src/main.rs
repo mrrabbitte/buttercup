@@ -1,9 +1,3 @@
-#[macro_use]
-extern crate lazy_static;
-
-#[macro_use]
-extern crate derivative;
-
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
@@ -14,19 +8,16 @@ use dashmap::DashMap;
 use env_logger;
 use uuid::Uuid;
 
-use crate::app::address::Address;
-use crate::app::agents::core::{Agent, AgentAddress};
-use crate::app::behavior::context::BTNodeExecutionContext;
-use crate::app::behavior::node::{BehaviorTreeNode, BTNodeAddress};
-use crate::app::behavior::node::action::logging::PrintLogActionNode;
-use crate::app::behavior::node::action::wait::WaitDurationActionNode;
-use crate::app::behavior::node::composite::fallback::FallbackCompositeNode;
-use crate::app::behavior::node::decorator::reactive::ReactiveConditionDecoratorNode;
-use crate::app::behavior::tree::BehaviorTree;
-use crate::app::blackboards::service::BlackboardService;
-use crate::app::conditions::ConditionExpressionWrapper;
-
-mod app;
+use buttercup_agents::{Agent, AgentAddress};
+use buttercup_blackboards::BlackboardService;
+use buttercup_bts::context::BTNodeExecutionContext;
+use buttercup_bts::node::action::logging::PrintLogActionNode;
+use buttercup_bts::node::action::wait::WaitDurationActionNode;
+use buttercup_bts::node::BehaviorTreeNode;
+use buttercup_bts::node::composite::fallback::FallbackCompositeNode;
+use buttercup_bts::node::decorator::reactive::ReactiveConditionDecoratorNode;
+use buttercup_bts::tree::BehaviorTree;
+use buttercup_conditions::ConditionExpressionWrapper;
 
 async fn reactive_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
     let node = FallbackCompositeNode::new(
