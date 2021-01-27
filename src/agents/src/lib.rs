@@ -1,10 +1,9 @@
 use std::future::Future;
 
 use actix::{Actor, Context, Handler, ResponseActFuture};
+use buttercup_bts::tick::{TickError, TickStatus};
+use buttercup_bts::tree::BehaviorTree;
 use uuid::Uuid;
-
-use crate::app::behavior::tick::{TickError, TickStatus};
-use crate::app::behavior::tree::BehaviorTree;
 
 pub struct Agent {
 
@@ -54,11 +53,10 @@ impl AgentAddress {
 mod tests {
     use std::sync::Arc;
 
+    use buttercup_blackboards::BlackboardService;
+    use buttercup_bts::context::BTNodeExecutionContext;
+    use buttercup_bts::node::action::logging::PrintLogActionNode;
     use dashmap::DashMap;
-
-    use crate::app::behavior::context::BTNodeExecutionContext;
-    use crate::app::behavior::node::action::logging::PrintLogActionNode;
-    use crate::app::blackboards::service::BlackboardService;
 
     use super::*;
 

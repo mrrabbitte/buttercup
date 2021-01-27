@@ -882,6 +882,15 @@ dependencies = [
 [[package]]
 name = "buttercup_agents"
 version = "0.1.0"
+dependencies = [
+ "actix",
+ "actix-rt",
+ "actix-web 3.3.1",
+ "buttercup_blackboards",
+ "buttercup_bts",
+ "dashmap",
+ "uuid",
+]
 
 [[package]]
 name = "buttercup_blackboards"
