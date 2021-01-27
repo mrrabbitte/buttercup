@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate derivative;
-
 use std::convert::{TryFrom, TryInto};
 use std::sync::Arc;
 
@@ -23,7 +20,7 @@ impl VariableName {
         }
     }
 
-    pub fn get_value(&self) -> &str {
+    pub fn get_value(&self) -> &String {
         &self.value
     }
 
@@ -54,20 +51,17 @@ pub enum VariableSpecification<T: TryFrom<ValueHolder> + Copy> {
 pub struct VariableServiceErrorReport {
 
     message: String,
-    reason: String,
-    variable_name: VariableName
+    reason: String
 
 }
 
 impl VariableServiceErrorReport {
 
     pub fn new(message: String,
-               reason: String,
-               variable_name: VariableName) -> VariableServiceErrorReport {
+               reason: String) -> VariableServiceErrorReport {
         VariableServiceErrorReport {
             message,
-            reason,
-            variable_name
+            reason
         }
     }
 

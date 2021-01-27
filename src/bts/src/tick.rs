@@ -5,9 +5,9 @@ use std::task::{Context, Poll};
 use actix::Message;
 use serde::{Deserialize, Serialize};
 
-use crate::app::behavior::context::reactive::ReactiveServiceError;
-use crate::app::blackboards::service::BlackboardError;
-use crate::app::variables::VariableValueAccessError;
+use crate::context::reactive::ReactiveServiceError;
+use buttercup_blackboards::BlackboardError;
+use buttercup_variables::VariableValueAccessError;
 
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum TickStatus {

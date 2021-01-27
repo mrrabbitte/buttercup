@@ -3,10 +3,12 @@ use std::sync::Arc;
 
 use uuid::Uuid;
 
-use crate::app::behavior::context::reactive::ReactiveService;
-use crate::app::behavior::node::BTNode;
-use crate::app::blackboards::service::{BlackboardError, BlackboardService};
-use crate::app::values::{ValueHolder, ValuesPayload};
+use buttercup_blackboards::{BlackboardError, BlackboardService};
+use buttercup_values::{ValueHolder, ValuesPayload};
+use buttercup_variables::{VariableName, VariableService, VariableServiceErrorReport, VariableValueAccessError};
+
+use crate::context::reactive::ReactiveService;
+use crate::node::BTNode;
 
 pub mod reactive;
 
@@ -56,6 +58,22 @@ impl BTNodeExecutionContext {
         &self.reactive_service
     }
 
+    fn map_err(err: BlackboardError) -> VariableValueAccessError {
+        VariableValueAccessError::VariableServiceError(
+            VariableServiceErrorReport::new(
+                "Blackboard error".to_owned(),
+                format!("{:?}", err)))
+    }
+}
+
+impl VariableService for BTNodeExecutionContext {
+    fn get_variable_value_by_name(&self,
+                                  name: &VariableName)
+                                  -> Result<Option<ValueHolder>, VariableValueAccessError> {
+        self.blackboard_service
+            .get_value(&self.blackboard_id, name.get_value())
+            .map_err(BTNodeExecutionContext::map_err)
+    }
 }
 
 impl Default for BTNodeExecutionContext {

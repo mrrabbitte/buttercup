@@ -5,13 +5,13 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::app::behavior::context::BTNodeExecutionContext;
-use crate::app::behavior::node::action::ActionBTNode;
-use crate::app::behavior::node::composite::CompositeBTNode;
-use crate::app::behavior::node::decorator::DecoratorBTNode;
-use crate::app::behavior::tick::{TickError, TickStatus};
-use crate::app::blackboards::service::{BlackboardError, BlackboardService};
-use crate::app::values::ValuesPayload;
+use crate::context::BTNodeExecutionContext;
+use crate::node::action::ActionBTNode;
+use crate::node::composite::CompositeBTNode;
+use crate::node::decorator::DecoratorBTNode;
+use crate::tick::{TickError, TickStatus};
+use buttercup_blackboards::{BlackboardError, BlackboardService};
+use buttercup_values::ValuesPayload;
 
 pub mod action;
 pub mod composite;

@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
-use crate::app::behavior::context::BTNodeExecutionContext;
-use crate::app::behavior::node::{BehaviorTreeNode, BTNode};
-use crate::app::behavior::tick::{TickError, TickStatus};
+use crate::context::BTNodeExecutionContext;
+use crate::node::{BehaviorTreeNode, BTNode};
+use crate::tick::{TickError, TickStatus};
 
 pub struct BehaviorTree {
 
@@ -35,8 +35,8 @@ mod tests {
     use dashmap::DashMap;
     use uuid::Uuid;
 
-    use crate::app::behavior::node::action::logging::PrintLogActionNode;
-    use crate::app::blackboards::service::BlackboardService;
+    use crate::node::action::logging::PrintLogActionNode;
+    use buttercup_blackboards::BlackboardService;
 
     use super::*;
 

@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 
-use crate::app::behavior::context::BTNodeExecutionContext;
-use crate::app::behavior::node::{BehaviorTreeNode, BTNode};
-use crate::app::behavior::node::composite::CompositeBTNode;
-use crate::app::behavior::tick::{TickError, TickStatus};
+use crate::context::BTNodeExecutionContext;
+use crate::node::{BehaviorTreeNode, BTNode};
+use crate::node::composite::CompositeBTNode;
+use crate::tick::{TickError, TickStatus};
 
 #[derive(Derivative)]
 #[derivative(Debug)]

@@ -2,16 +2,16 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 
-use crate::app::behavior::context::BTNodeExecutionContext;
-use crate::app::behavior::node::{BehaviorTreeNode, BTNode};
-use crate::app::behavior::node::decorator::condition::ConditionDecoratorNode;
-use crate::app::behavior::node::decorator::invert::InvertDecoratorNode;
-use crate::app::behavior::node::decorator::reactive::ReactiveConditionDecoratorNode;
-use crate::app::behavior::tick::{TickError, TickStatus};
+use crate::context::BTNodeExecutionContext;
+use crate::node::{BehaviorTreeNode, BTNode};
+use crate::node::decorator::condition::ConditionDecoratorNode;
+use crate::node::decorator::invert::InvertDecoratorNode;
+use crate::node::decorator::reactive::ReactiveConditionDecoratorNode;
+use crate::tick::{TickError, TickStatus};
 
 pub(crate) mod condition;
 pub(crate) mod invert;
-pub (crate) mod reactive;
+pub(crate) mod reactive;
 
 #[derive(Derivative)]
 #[derivative(Debug)]

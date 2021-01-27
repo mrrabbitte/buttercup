@@ -6,19 +6,22 @@ use std::time::Duration;
 use async_std::task;
 use async_trait::async_trait;
 
-use crate::app::behavior::context::BTNodeExecutionContext;
-use crate::app::behavior::node::{BehaviorTreeNode, BTNode};
-use crate::app::behavior::node::action::ActionBTNode;
-use crate::app::behavior::tick::{TickError, TickStatus};
-use crate::app::blackboards::service::BlackboardError;
-use crate::app::values::ValueHolder;
-use crate::app::variables::{VariableSpecification, VariableValueAccessError};
+use buttercup_blackboards::BlackboardError;
+use buttercup_values::ValueHolder;
+use buttercup_variables::{VariableSpecification, VariableValueAccessError};
+
+use crate::context::BTNodeExecutionContext;
+use crate::node::{BehaviorTreeNode, BTNode};
+use crate::node::action::ActionBTNode;
+use crate::tick::{TickError, TickStatus};
 
 #[derive(Derivative)]
 #[derivative(Debug)]
 pub struct WaitDurationActionNode {
 
     id: i32,
+
+    #[derivative(Debug(format_with="WaitDurationActionNode::fmt"))]
     duration: VariableSpecification<Duration>
 
 }
@@ -31,6 +34,17 @@ impl WaitDurationActionNode {
             id,
             duration: duration.into()
         }
+    }
+
+    fn fmt(spec: &VariableSpecification<Duration>,
+           formatter: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+        match spec {
+            VariableSpecification::Literal(duration) => formatter.write_str(
+                format!("{} ms", duration.as_millis()).as_str()),
+            VariableSpecification::VariableName(name) =>
+                formatter.write_str(name.get_value())
+        };
+        Result::Ok(())
     }
 
 }

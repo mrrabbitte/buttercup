@@ -2,12 +2,12 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 
-use crate::app::behavior::context::BTNodeExecutionContext;
-use crate::app::behavior::node::{BehaviorTreeNode, BTNode};
-use crate::app::behavior::node::composite::fallback::FallbackCompositeNode;
-use crate::app::behavior::node::composite::parallel::ParallelCompositeNode;
-use crate::app::behavior::node::composite::sequence::SequenceCompositeNode;
-use crate::app::behavior::tick::{TickError, TickStatus};
+use crate::context::BTNodeExecutionContext;
+use crate::node::{BehaviorTreeNode, BTNode};
+use crate::node::composite::fallback::FallbackCompositeNode;
+use crate::node::composite::parallel::ParallelCompositeNode;
+use crate::node::composite::sequence::SequenceCompositeNode;
+use crate::tick::{TickError, TickStatus};
 
 pub(crate) mod parallel;
 pub(crate) mod fallback;
