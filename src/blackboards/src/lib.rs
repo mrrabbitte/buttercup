@@ -96,6 +96,10 @@ impl BlackboardService {
         }
     }
 
+    fn is_empty(&self) -> bool {
+        self.local_blackboards.is_empty()
+    }
+
     #[inline(always)]
     fn do_destroy(&self,
                   path: OsString) -> Result<(), BlackboardError> {
@@ -195,15 +199,19 @@ mod tests {
     use rocksdb::Options;
 
     use super::*;
+    use std::fs::remove_dir_all;
 
     const FIRST_DB_UUID: u128 = 1;
     const SECOND_DB_UUID: u128 = 2;
+    const THIRD_DB_UUID: u128 = 3;
 
     const SOME_KEY: &str = "some_key";
     const OTHER_KEY: &str = "other_key";
 
     const SOME_VALUE: &str = "some_value";
     const OTHER_VALUE: &str = "other_value";
+
+    const TEMP_TEST: &str = "temp_test/";
 
     lazy_static! {
        static ref SERVICE: BlackboardService = {
@@ -218,6 +226,12 @@ mod tests {
                         RwLock::new(
                             DB::open_default(
                                 format!("temp_test/{}.rocksdb", SECOND_DB_UUID))
+                        .unwrap())));
+         dbs.insert(Uuid::from_u128(THIRD_DB_UUID),
+                    Arc::new(
+                        RwLock::new(
+                            DB::open_default(
+                                format!("temp_test/{}.rocksdb", THIRD_DB_UUID))
                         .unwrap())));
          BlackboardService::new(dbs)
        };
@@ -238,6 +252,8 @@ mod tests {
                 .unwrap();
 
         assert_eq!(payload, retrieved);
+
+        cleanup(FIRST_DB_UUID);
     }
 
     #[test]
@@ -246,10 +262,10 @@ mod tests {
         values.insert(OTHER_KEY.to_owned(), ValueHolder::String(OTHER_VALUE.to_owned()));
         let payload = ValuesPayload::new(values);
         SERVICE.put_values(
-            &Uuid::from_u128(FIRST_DB_UUID), &payload)
+            &Uuid::from_u128(SECOND_DB_UUID), &payload)
             .unwrap();
         let retrieved =
-            SERVICE.get_values(&Uuid::from_u128(FIRST_DB_UUID),
+            SERVICE.get_values(&Uuid::from_u128(SECOND_DB_UUID),
                                &HashSet::from_iter(
                                    payload.get_keys().clone()))
                 .unwrap();
@@ -261,16 +277,29 @@ mod tests {
                                  ValueHolder::String(SOME_VALUE.to_owned()));
         let payload_for_second = ValuesPayload::new(values_for_second);
         SERVICE.put_values(
-            &Uuid::from_u128(SECOND_DB_UUID), &payload_for_second)
+            &Uuid::from_u128(THIRD_DB_UUID), &payload_for_second)
             .unwrap();
         let retrieved_for_second =
-            SERVICE.get_values(&Uuid::from_u128(SECOND_DB_UUID),
+            SERVICE.get_values(&Uuid::from_u128(THIRD_DB_UUID),
                                &HashSet::from_iter(
                                    payload_for_second.get_keys().clone()))
                 .unwrap();
 
         assert_eq!(payload_for_second, retrieved_for_second);
         assert_ne!(retrieved, retrieved_for_second);
+
+        cleanup(SECOND_DB_UUID);
+        cleanup(THIRD_DB_UUID);
+    }
+
+    fn cleanup(uuid: u128) {
+        SERVICE.destroy(&Uuid::from_u128(uuid)).unwrap();
+        if SERVICE.is_empty() {
+            match remove_dir_all(TEMP_TEST) {
+                Ok(_) => {}
+                Err(err) => println!("{}", err)
+            }
+        }
     }
 
 }
