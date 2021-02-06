@@ -19,6 +19,7 @@ use crate::geolocation::GeoCoordinates;
 use crate::lists::ValueHoldersList;
 use crate::wrappers::{LanguageWrapper, TzWrapper, WeekdayWrapper};
 use crate::zoned_date_time::ZonedDateTime;
+use std::sync::Arc;
 
 pub mod email;
 pub mod extractors;
@@ -41,12 +42,12 @@ pub enum ValueHolder {
     Integer(BigInt),
     IpAddress(IpAddr),
     Language(LanguageWrapper),
-    List(ValueHoldersList),
+    List(Arc<ValueHoldersList>),
     LocalDate(NaiveDate),
     LocalDateTime(NaiveDateTime),
     LocalTime(NaiveTime),
     TimeZone(TzWrapper),
-    String(String),
+    String(Arc<String>),
     ZonedDateTime(ZonedDateTime),
 
 }
@@ -57,10 +58,12 @@ impl ValueHolder {
                     other: &ValueHolder) -> bool {
         match (self, other) {
             (ValueHolder::String(this), ValueHolder::String(other)) =>
-                this.contains(other),
-            (ValueHolder::List(list), _) =>
-                list.get_value_type().matches(other)
-                    && list.get_elements().contains(other),
+                this.as_ref().contains(other.as_ref()),
+            (ValueHolder::List(list), _) => {
+                let list_ref = list.as_ref();
+                list_ref.get_value_type().matches(other)
+                    && list_ref.get_elements().contains(other)
+            },
             (_, _) => false
         }
     }
@@ -69,7 +72,7 @@ impl ValueHolder {
                      other: &ValueHolder) -> bool {
         match (self, other) {
             (ValueHolder::String(this), ValueHolder::String(other)) =>
-                this.ends_with(other),
+                this.as_ref().ends_with(other.as_ref()),
             (_, _) => false
         }
     }
@@ -83,7 +86,7 @@ impl ValueHolder {
                        other: &ValueHolder) -> bool {
         match (self, other) {
             (ValueHolder::String(this), ValueHolder::String(other)) =>
-                this.starts_with(other),
+                this.as_ref().starts_with(other.as_ref()),
             (_, _) => false
         }
     }
@@ -190,6 +193,7 @@ mod tests {
     use strum::VariantNames;
 
     use super::*;
+    use num_rational::Ratio;
 
     #[test]
     fn test_consistency() {

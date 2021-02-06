@@ -5,7 +5,7 @@ authors = ["Przemyslaw Gliniecki <pgliniecki@protonmail.ch>"]
 edition = "2018"
 
 [dependencies]
-serde = { version = "1.0.*", features = ["derive"] }
+serde = { version = "1.0.*", features = ["derive", "rc"] }
 serde_json = {version = "1.*", features = ["preserve_order"]}
 chrono = {version = "0.4", features = ["serde"]}
 chrono-tz = {version ="0.5", features = ["serde"]}
