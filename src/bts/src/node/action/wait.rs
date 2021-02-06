@@ -39,11 +39,11 @@ impl WaitDurationActionNode {
     fn fmt(spec: &VariableSpecification<Duration>,
            formatter: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match spec {
-            VariableSpecification::Literal(duration) => formatter.write_str(
-                format!("{} ms", duration.as_millis()).as_str()),
+            VariableSpecification::Literal(duration) =>
+                formatter.write_str(format!("{} ms", duration.as_millis()).as_str())?,
             VariableSpecification::VariableName(name) =>
-                formatter.write_str(name.get_value())
-        };
+                formatter.write_str(name.get_value())?
+        }
         Result::Ok(())
     }
 
