@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use serde_json::Value;
 
 use crate::extractors::{ListExtractionError, ListExtractorInput, ValueExtractorInput, ValueExtractorService};
@@ -33,7 +35,7 @@ impl ListExtractor {
         match ValueHoldersList::new(value_holders,
                                     input.elements_type.clone()) {
             Ok(value_holders_list) =>
-                Result::Ok(ValueHolder::List(value_holders_list)),
+                Result::Ok(ValueHolder::List(Arc::new(value_holders_list))),
             Err(err) =>
                 Result::Err(ListExtractionError::ValueHoldersListError(err))
         }
@@ -42,11 +44,10 @@ impl ListExtractor {
 
 #[cfg(test)]
 mod tests {
-
-    use super::*;
-
     use crate::extractors::{ValueExtractionError, ValueExtractionPolicy};
     use crate::ValueType;
+
+    use super::*;
 
     const ERROR_ELEMENT_TYPE_LIST: &str = "[0, 1.23, 2]";
     const EMPTY_LIST: &str = "[]";
