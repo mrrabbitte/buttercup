@@ -115,10 +115,7 @@ impl<T: TryFrom<ValueHolder> + Copy> VariableSpecification<T> {
                     VariableValueAccessError::VariableOfGivenNameNotFound(
                         variable_name.clone())),
             Some(value_holder) => {
-                let result: Result<T, _> =
-                    value_holder
-                        .clone()
-                        .try_into();
+                let result: Result<T, _> = value_holder.try_into();
                 match result {
                     Err(_) =>
                         Result::Err(
