@@ -12,7 +12,7 @@ use crate::tick::{TickError, TickStatus};
 pub struct FallbackCompositeNode {
 
     id: i32,
-    children: Vec<BTNode>
+    children: Vec<Arc<BTNode>>
 }
 
 impl FallbackCompositeNode {
@@ -21,7 +21,7 @@ impl FallbackCompositeNode {
                children: Vec<BTNode>) -> FallbackCompositeNode {
         FallbackCompositeNode {
             id,
-            children
+            children: children.into_iter().map(|e| Arc::new(e)).collect()
         }
     }
 
@@ -32,7 +32,7 @@ impl BehaviorTreeNode for FallbackCompositeNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         let mut errs = Vec::new();
         for child in &self.children {
-            match child.tick(context).await {
+            match child.as_ref().tick(context).await {
                 Ok(status) => match status {
                     TickStatus::Success => {
                         return Result::Ok(TickStatus::Success);

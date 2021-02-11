@@ -12,14 +12,14 @@ use crate::tick::{TickError, TickStatus};
 pub struct InvertDecoratorNode {
 
     id: i32,
-    child: Box<BTNode>
+    child: Arc<BTNode>
 
 }
 
 #[async_trait(?Send)]
 impl BehaviorTreeNode for InvertDecoratorNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
-        match self.child.tick(context).await {
+        match self.child.as_ref().tick(context).await {
             Ok(status) =>
                 Result::Ok(
                     match status {
