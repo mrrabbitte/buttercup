@@ -24,7 +24,7 @@ async fn reactive_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
         1, vec![
             ReactiveConditionDecoratorNode::new(
                 2,
-                Box::new(
+                Arc::new(
                     WaitDurationActionNode::new(
                         3,
                         Duration::from_millis(10000))

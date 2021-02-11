@@ -15,7 +15,7 @@ use crate::tick::{TickError, TickStatus};
 pub struct ParallelCompositeNode {
 
     id: i32,
-    children: Vec<BTNode>,
+    children: Vec<Arc<BTNode>>,
     num_successes_to_succeed: usize,
     num_failures_to_fail: usize
 
@@ -33,7 +33,7 @@ impl ParallelCompositeNode {
         Result::Ok(
             ParallelCompositeNode {
                 id,
-                children,
+                children: children.into_iter().map(|e| Arc::new(e)).collect(),
                 num_successes_to_succeed,
                 num_failures_to_fail
             }
@@ -48,7 +48,7 @@ impl BehaviorTreeNode for ParallelCompositeNode {
         let mut futures = Vec::new();
 
         for child in &self.children {
-            futures.push(child.tick(context));
+            futures.push(child.as_ref().tick(context));
         }
 
         let mut num_failures: usize = 0;

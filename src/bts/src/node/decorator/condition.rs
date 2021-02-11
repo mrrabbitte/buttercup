@@ -6,10 +6,11 @@ use std::sync::Arc;
 
 use actix_web::guard::Guard;
 use async_trait::async_trait;
+use futures::future::{Abortable, Aborted, AbortHandle};
+
 use buttercup_blackboards::BlackboardError;
 use buttercup_conditions::ConditionExpressionWrapper;
 use buttercup_values::ValuesPayload;
-use futures::future::{Abortable, Aborted, AbortHandle};
 
 use crate::context::BTNodeExecutionContext;
 use crate::context::reactive::ReactiveServiceError;
@@ -22,7 +23,7 @@ use crate::tick::{TickError, TickStatus};
 pub struct ConditionDecoratorNode {
 
     id: i32,
-    child: Box<BTNode>,
+    child: Arc<BTNode>,
     #[derivative(Debug="ignore")]
     predicate: Box<dyn Fn(&ValuesPayload)  -> bool + Send + Sync>,
     value_names: HashSet<String>
@@ -32,7 +33,7 @@ pub struct ConditionDecoratorNode {
 impl ConditionDecoratorNode {
 
     pub fn new(id: i32,
-               child: Box<BTNode>,
+               child: Arc<BTNode>,
                condition: ConditionExpressionWrapper) -> ConditionDecoratorNode {
         let value_names = condition.get_value_names_cloned();
         ConditionDecoratorNode {
