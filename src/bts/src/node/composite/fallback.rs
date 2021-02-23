@@ -18,10 +18,10 @@ pub struct FallbackCompositeNode {
 impl FallbackCompositeNode {
 
     pub fn new(id: i32,
-               children: Vec<BTNode>) -> FallbackCompositeNode {
+               children: Vec<Arc<BTNode>>) -> FallbackCompositeNode {
         FallbackCompositeNode {
             id,
-            children: children.into_iter().map(|e| Arc::new(e)).collect()
+            children
         }
     }
 

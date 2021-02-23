@@ -79,6 +79,14 @@ impl ReactiveConditionDecoratorNode {
         }
     }
 
+    pub fn get_id(&self) -> &i32 {
+        &self.id
+    }
+
+    pub fn get_value_names(&self) -> &HashSet<String> {
+        &self.value_names
+    }
+
 }
 
 #[async_trait(?Send)]

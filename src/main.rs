@@ -20,24 +20,27 @@ use buttercup_bts::tree::BehaviorTree;
 use buttercup_conditions::ConditionExpressionWrapper;
 
 async fn reactive_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
+    let reactive_node = Arc::new(ReactiveConditionDecoratorNode::new(
+        2,
+        Arc::new(
+            WaitDurationActionNode::new(
+                3,
+                Duration::from_millis(10000))
+                .into()),
+        ConditionExpressionWrapper::always_true())
+        .into()
+    );
     let node = FallbackCompositeNode::new(
         1, vec![
-            ReactiveConditionDecoratorNode::new(
-                2,
-                Arc::new(
-                    WaitDurationActionNode::new(
-                        3,
-                        Duration::from_millis(10000))
-                        .into()),
-                ConditionExpressionWrapper::always_true())
-                .into(),
-            PrintLogActionNode::new(
+            reactive_node.clone(),
+            Arc::new(PrintLogActionNode::new(
                 4,
                 "Looks like reactive node returned failure, so cool!.".to_string())
-                .into()]
+                .into()
+            )]
     );
 
-    data.get_reactive_service().initialize_node(&2);
+    data.get_reactive_service().initialize_node(reactive_node.clone());
 
     format!("Got: {:?}", node.tick(data.as_ref()).await)
 }
