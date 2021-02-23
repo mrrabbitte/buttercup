@@ -26,6 +26,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1be241f88f3b1e7e9a3fbe3b5a8a0f6915b5a1d7ee0d9a248d3376d01068cc60"
+dependencies = [
+ "actix-rt",
+ "actix_derive",
+ "bitflags",
+ "bytes",
+ "crossbeam-channel",
+ "derive_more",
+ "futures-channel",
+ "futures-util",
+ "log",
+ "once_cell",
+ "parking_lot 0.11.0",
+ "pin-project 0.4.23",
+ "smallvec",
+ "tokio",
+ "tokio-util 0.3.1",
+ "trust-dns-proto 0.19.6",
+ "trust-dns-resolver 0.19.6",
+]
+
+[[package]]
 name = "actix-codec"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -747,14 +772,14 @@ checksum = "2e8c087f005730276d1096a652e92a8bacee2e2472bcc9715a74d2bec38b5820"
 name = "buttercup"
 version = "0.1.0"
 dependencies = [
- "actix",
+ "actix 0.9.0",
  "actix-rt",
  "actix-web",
  "buttercup_agents",
  "buttercup_blackboards",
  "buttercup_bts",
  "buttercup_conditions",
- "dashmap",
+ "dashmap 3.11.10",
  "env_logger",
  "uuid",
 ]
@@ -763,12 +788,12 @@ dependencies = [
 name = "buttercup_agents"
 version = "0.1.0"
 dependencies = [
- "actix",
+ "actix 0.9.0",
  "actix-rt",
  "actix-web",
  "buttercup_blackboards",
  "buttercup_bts",
- "dashmap",
+ "dashmap 3.11.10",
  "uuid",
 ]
 
@@ -778,7 +803,7 @@ version = "0.1.0"
 dependencies = [
  "bincode",
  "buttercup_values",
- "dashmap",
+ "dashmap 3.11.10",
  "lazy_static",
  "rocksdb",
  "serde",
@@ -790,7 +815,7 @@ dependencies = [
 name = "buttercup_bts"
 version = "0.1.0"
 dependencies = [
- "actix",
+ "actix 0.9.0",
  "actix-rt",
  "actix-web",
  "async-std",
@@ -799,7 +824,7 @@ dependencies = [
  "buttercup_conditions",
  "buttercup_values",
  "buttercup_variables",
- "dashmap",
+ "dashmap 4.0.2",
  "derivative",
  "futures",
  "serde",
@@ -830,9 +855,13 @@ dependencies = [
 name = "buttercup_endpoints"
 version = "0.1.0"
 dependencies = [
+ "actix 0.10.0",
+ "buttercup_blackboards",
  "buttercup_values",
+ "dashmap 4.0.2",
  "serde",
  "serde_json",
+ "uuid",
 ]
 
 [[package]]
@@ -1124,6 +1153,16 @@ checksum = "0f260e2fc850179ef410018660006951c1b55b79e8087e87111a2c388994b9b5"
 dependencies = [
  "ahash",
  "cfg-if 0.1.10",
+ "num_cpus",
+]
+
+[[package]]
+name = "dashmap"
+version = "4.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e77a43b28d0668df09411cb0bc9a8c2adc40f9a048afe863e05fd43251e8e39c"
+dependencies = [
+ "cfg-if 1.0.0",
  "num_cpus",
 ]
 
@@ -3019,6 +3058,7 @@ checksum = "be8242891f2b6cbef26a2d7e8605133c2c554cd35b3e4948ea892d6d68436499"
 dependencies = [
  "bytes",
  "futures-core",
+ "futures-io",
  "futures-sink",
  "log",
  "pin-project-lite",

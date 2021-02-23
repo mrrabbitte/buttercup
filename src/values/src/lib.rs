@@ -183,6 +183,10 @@ impl ValuesPayload {
         &self.keys
     }
 
+    pub fn into_keys(self) -> HashSet<String> {
+        self.keys
+    }
+
 }
 
 

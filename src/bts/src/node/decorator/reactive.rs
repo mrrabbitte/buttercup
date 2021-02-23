@@ -59,9 +59,9 @@ impl ReactiveConditionDecoratorNode {
         }
     }
 
-    pub fn handle_data_change_event(&self,
-                                    context: &BTNodeExecutionContext)
-        -> Result<DataChangeHandlingStatus, DataChangeHandlingError> {
+    pub fn handle_value_change(&self,
+                               context: &BTNodeExecutionContext)
+                               -> Result<DataChangeHandlingStatus, DataChangeHandlingError> {
         match context.get_values(&self.value_names) {
             Ok(payload) => {
                 if !self.predicate.deref()(&payload) {

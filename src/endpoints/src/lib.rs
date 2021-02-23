@@ -7,6 +7,7 @@ use serde_json::Value;
 
 use crate::extraction::{ArgumentsExtractionInput, ArgumentValueExtractorError, ArgumentValuesExtractionService};
 
+pub mod endpoints;
 pub mod extraction;
 
 pub struct ArgumentSetDefinition {
