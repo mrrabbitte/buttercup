@@ -1,8 +1,9 @@
-
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use actix::{Actor, Addr};
+use actix::{Actor, Addr, Arbiter};
 use actix_web::{App, http, HttpRequest, HttpServer, middleware};
+use actix_web::{post, Responder, web};
 use actix_web::web::{Data, get, resource};
 use dashmap::DashMap;
 use env_logger;
@@ -11,14 +12,27 @@ use uuid::Uuid;
 use buttercup_agents::{Agent, AgentAddress};
 use buttercup_blackboards::BlackboardService;
 use buttercup_bts::context::BTNodeExecutionContext;
+use buttercup_bts::context::reactive::ReactiveService;
+use buttercup_bts::node::{BehaviorTreeNode, BTNode};
 use buttercup_bts::node::action::logging::PrintLogActionNode;
 use buttercup_bts::node::action::wait::WaitDurationActionNode;
-use buttercup_bts::node::{BehaviorTreeNode, BTNode};
 use buttercup_bts::node::composite::fallback::FallbackCompositeNode;
 use buttercup_bts::node::decorator::reactive::ReactiveConditionDecoratorNode;
 use buttercup_bts::tree::BehaviorTree;
-use buttercup_conditions::ConditionExpressionWrapper;
-use std::sync::{Arc, Mutex};
+use buttercup_conditions::{ConditionExpression, ConditionExpressionWrapper,
+                           LogicalExpression, RelationalExpression, RelationalExpressionSpecification};
+use buttercup_conditions::relational::{EndsWithRelationalExpression, StartsWithRelationalExpression};
+use buttercup_endpoints::endpoints::EndpointService;
+use buttercup_values::{ValueHolder, ValuesPayload};
+
+#[post("/values/{name}/{value}")]
+async fn endpoint(data: Data<Arc<EndpointService>>,
+                  web::Path((name, value)): web::Path<(String, String)>) -> impl Responder {
+    serde_json::to_string(
+        &data.accept_value_changes(&Uuid::from_u128(1),
+                                   ValuesPayload::singleton(name, value.into())))
+        .unwrap()
+}
 
 async fn reactive_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
     let reactive_node: Arc<BTNode> = Arc::new(ReactiveConditionDecoratorNode::new(
@@ -26,19 +40,19 @@ async fn reactive_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
         Arc::new(
             WaitDurationActionNode::new(
                 3,
-                Duration::from_millis(10000))
+                Duration::from_millis(30000))
                 .into()),
-        ConditionExpressionWrapper::always_true())
+        ConditionExpressionWrapper::new(get_mock_condition_expression()))
         .into()
     );
     let node = FallbackCompositeNode::new(
         1, vec![
-            reactive_node.clone(),
-            Arc::new(PrintLogActionNode::new(
-                4,
-                "Looks like reactive node returned failure, so cool!.".to_string())
-                .into()
-            )]
+            reactive_node.clone(),]
+            // Arc::new(PrintLogActionNode::new(
+            //     4,
+            //     "Looks like reactive node returned failure, so cool!.".to_string())
+            //     .into()
+            // )]
     );
 
     data.get_reactive_service().initialize_node(reactive_node.clone());
@@ -101,20 +115,39 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
 
     env_logger::init();
+    let blackboard_service: Arc<BlackboardService> = Arc::new(Default::default());
+    blackboard_service.initialize(Uuid::from_u128(1),
+                                  "my-blackboard.bl".into());
+    let reactive_service: Arc<ReactiveService> = Arc::new(Default::default());
+    let bt_node_context = Arc::new(BTNodeExecutionContext::new(
+        Uuid::from_u128(1),
+        blackboard_service.clone(),
+        reactive_service.clone()));
 
+    let context_data =
+        Data::new(bt_node_context.clone());
+    let endpoints_service_data =
+        Data::new(
+            Arc::new(EndpointService::new(
+                Arbiter::new(),
+                blackboard_service.clone(),
+                Arc::new(move |changed|
+                    reactive_service.handle_value_changes(
+                        bt_node_context.as_ref(), changed)))
+            ));
     let agents_data =  Data::new(Mutex::new(Agents{ agents: vec![]}));
-    let context =
-        Data::new(Arc::new(BTNodeExecutionContext::default()));
 
     HttpServer::new(move || {
         App::new()
             .app_data(agents_data.clone())
-            .app_data(context.clone())
+            .app_data(context_data.clone())
+            .app_data(endpoints_service_data.clone())
             .service(
                 resource("/test")
                     .route(
                         get().to(example))
             )
+            .service(endpoint)
             .service(
                 resource("/tick")
                     .route(
@@ -126,4 +159,37 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
     })
         .bind("127.0.0.1:7777")?.run().await
+}
+
+
+fn get_mock_condition_expression() -> ConditionExpression {
+    ConditionExpression::LogicalExpression(
+        Box::new(
+            LogicalExpression::And(
+                vec![
+                    ConditionExpression::RelationExpression(
+                        RelationalExpression::EndsWith(
+                            EndsWithRelationalExpression::new(
+                                RelationalExpressionSpecification::NameAndLiteral(
+                                    "var_name_1".to_owned(),
+                                    "elka".to_owned().into()
+                                )
+                            )
+                        )
+                    ),
+                    ConditionExpression::RelationExpression(
+                        RelationalExpression::StartsWith(
+                            StartsWithRelationalExpression::new(
+                                RelationalExpressionSpecification::NameAndLiteral(
+                                    "var_name_1".to_owned(),
+                                    "mira".to_owned().into()
+                                )
+                            )
+                        )
+                    )
+                ]
+            )
+        )
+    )
+
 }

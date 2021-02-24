@@ -779,8 +779,11 @@ dependencies = [
  "buttercup_blackboards",
  "buttercup_bts",
  "buttercup_conditions",
+ "buttercup_endpoints",
+ "buttercup_values",
  "dashmap 3.11.10",
  "env_logger",
+ "serde_json",
  "uuid",
 ]
 

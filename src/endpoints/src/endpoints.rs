@@ -10,8 +10,9 @@ use buttercup_values::ValuesPayload;
 
 pub struct EndpointService {
 
-    blackboard_service: BlackboardService,
-    value_change_handling_service: ValueChangeHandlingService
+    arbiter: Arbiter,
+    blackboard_service: Arc<BlackboardService>,
+    listener: Arc<dyn Fn(HashSet<String>) + Send + Sync>
 
 }
 
@@ -30,34 +31,31 @@ impl From<BlackboardError> for EndpointError {
 
 impl EndpointService {
 
+    pub fn new(arbiter: Arbiter,
+               blackboard_service: Arc<BlackboardService>,
+               listener: Arc<dyn Fn(HashSet<String>) + Send + Sync>) -> EndpointService {
+        EndpointService {
+            arbiter,
+            blackboard_service,
+            listener
+        }
+    }
+
     pub fn accept_value_changes(&self,
                                 blackboard_id: &Uuid,
                                 payload: ValuesPayload) -> Result<(), EndpointError> {
         self.blackboard_service.put_values(blackboard_id, &payload)?;
 
-        self.value_change_handling_service.handle_value_changes(payload.into_keys());
+        let keys = payload.into_keys();
+
+        let listener = self.listener.clone();
+
+        self.arbiter.exec_fn(move || {
+            listener(keys)
+        });
 
         Result::Ok(())
     }
 
 }
 
-pub struct ValueChangeHandlingService {
-
-    arbiter: Arbiter,
-    listener: Arc<dyn Fn(HashSet<String>) + Send + Sync>
-
-}
-
-impl ValueChangeHandlingService {
-
-    fn handle_value_changes(&self,
-                            keys: HashSet<String>) {
-        let listener = self.listener.clone();
-
-        self.arbiter.exec_fn(move || {
-            listener(keys)
-        });
-    }
-
-}
