@@ -41,7 +41,8 @@ pub enum DataChangeHandlingStatus {
 pub enum DataChangeHandlingError {
 
     BlackboardError(i32, BlackboardError),
-    ReactiveServiceError(i32, ReactiveServiceError)
+    ReactiveServiceError(i32, ReactiveServiceError),
+    NonReactiveNodeCalledError
 
 }
 

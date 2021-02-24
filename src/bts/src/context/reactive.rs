@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::context::BTNodeExecutionContext;
 use crate::node::decorator::reactive::ReactiveConditionDecoratorNode;
+use crate::node::BTNode;
 
 pub struct ReactiveService {
 
@@ -49,7 +50,7 @@ impl ReactiveService {
     }
 
     pub fn initialize_node(&self,
-                           bt_node: Arc<ReactiveConditionDecoratorNode>) {
+                           bt_node: Arc<BTNode>) {
         let bt_node_id = bt_node.get_id();
         let value_names = bt_node.get_value_names().clone();
 
@@ -94,18 +95,18 @@ impl ReactiveService {
                                 context: &BTNodeExecutionContext,
                                 changed_value_names: HashSet<String>) {
         let mut already_called = HashSet::new();
+
         for value_name in changed_value_names {
-            match self.nodes_by_value_names.get(&value_name) {
-                Some(nodes) => {
-                    for node in nodes.value() {
-                        let node_id = node.get_id();
-                        if !already_called.contains(node_id) {
-                            node.get_node().handle_value_change(context);
-                            already_called.insert(node_id.clone());
-                        }
+            if let Some(nodes) =
+            self.nodes_by_value_names.get(&value_name) {
+                for node in nodes.value() {
+                    let node_id = node.get_id();
+
+                    if !already_called.contains(node_id) {
+                        node.get_node().handle_value_change(context);
+                        already_called.insert(node_id.clone());
                     }
-                },
-                None => {}
+                }
             }
         }
     }
@@ -168,7 +169,7 @@ impl AbortEntry {
 struct ReactiveNodeEntry {
 
     id: i32,
-    node: Arc<ReactiveConditionDecoratorNode>
+    node: Arc<BTNode>
 
 }
 
@@ -178,7 +179,7 @@ impl ReactiveNodeEntry {
         &self.id
     }
 
-    fn get_node(&self) -> &Arc<ReactiveConditionDecoratorNode> {
+    fn get_node(&self) -> &Arc<BTNode> {
         &self.node
     }
 

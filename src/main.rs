@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+
 use std::time::Duration;
 
 use actix::{Actor, Addr};
@@ -13,14 +13,15 @@ use buttercup_blackboards::BlackboardService;
 use buttercup_bts::context::BTNodeExecutionContext;
 use buttercup_bts::node::action::logging::PrintLogActionNode;
 use buttercup_bts::node::action::wait::WaitDurationActionNode;
-use buttercup_bts::node::BehaviorTreeNode;
+use buttercup_bts::node::{BehaviorTreeNode, BTNode};
 use buttercup_bts::node::composite::fallback::FallbackCompositeNode;
 use buttercup_bts::node::decorator::reactive::ReactiveConditionDecoratorNode;
 use buttercup_bts::tree::BehaviorTree;
 use buttercup_conditions::ConditionExpressionWrapper;
+use std::sync::{Arc, Mutex};
 
 async fn reactive_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
-    let reactive_node = Arc::new(ReactiveConditionDecoratorNode::new(
+    let reactive_node: Arc<BTNode> = Arc::new(ReactiveConditionDecoratorNode::new(
         2,
         Arc::new(
             WaitDurationActionNode::new(
