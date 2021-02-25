@@ -41,7 +41,8 @@ pub enum DataChangeHandlingStatus {
 pub enum DataChangeHandlingError {
 
     BlackboardError(i32, BlackboardError),
-    ReactiveServiceError(i32, ReactiveServiceError)
+    ReactiveServiceError(i32, ReactiveServiceError),
+    NonReactiveNodeCalledError
 
 }
 
@@ -59,9 +60,9 @@ impl ReactiveConditionDecoratorNode {
         }
     }
 
-    pub fn handle_data_change_event(&self,
-                                    context: &BTNodeExecutionContext)
-        -> Result<DataChangeHandlingStatus, DataChangeHandlingError> {
+    pub fn handle_value_change(&self,
+                               context: &BTNodeExecutionContext)
+                               -> Result<DataChangeHandlingStatus, DataChangeHandlingError> {
         match context.get_values(&self.value_names) {
             Ok(payload) => {
                 if !self.predicate.deref()(&payload) {
@@ -77,6 +78,14 @@ impl ReactiveConditionDecoratorNode {
             Err(err) => Result::Err(
                 DataChangeHandlingError::BlackboardError(self.id, err))
         }
+    }
+
+    pub fn get_id(&self) -> &i32 {
+        &self.id
+    }
+
+    pub fn get_value_names(&self) -> &HashSet<String> {
+        &self.value_names
     }
 
 }

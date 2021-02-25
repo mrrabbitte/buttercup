@@ -15,7 +15,7 @@ buttercup_blackboards = { path = "../blackboards" }
 buttercup_conditions = { path = "../conditions" }
 buttercup_values = { path = "../values" }
 buttercup_variables = { path = "../variables" }
-dashmap = "3.11"
+dashmap = "4"
 derivative = "2"
 futures = "0.3"
 serde = { version = "1.0.*", features = ["derive"] }

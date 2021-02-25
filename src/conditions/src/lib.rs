@@ -326,7 +326,7 @@ mod tests {
                             RelationalExpression::Equals(
                                 EqualsRelationalExpression::new(
                                     RelationalExpressionSpecification::LiteralAndName(
-                                        ValueHolder::String(FIRST_VALUE.to_owned()),
+                                        FIRST_VALUE.into(),
                                         FIRST_VALUE_NAME.to_owned()
                                     )
                                 )
@@ -336,7 +336,7 @@ mod tests {
                             RelationalExpression::Equals(
                                 EqualsRelationalExpression::new(
                                     RelationalExpressionSpecification::LiteralAndName(
-                                        ValueHolder::String(FIRST_VALUE.to_owned()),
+                                        FIRST_VALUE.into(),
                                         SECOND_VALUE_NAME.to_owned()
                                     )
                                 )
@@ -367,10 +367,10 @@ mod tests {
         let mut values = HashMap::new();
         values.insert(
             FIRST_VALUE_NAME.to_owned(),
-            ValueHolder::String(FIRST_VALUE.to_owned()));
+            FIRST_VALUE.into());
         values.insert(
             SECOND_VALUE_NAME.to_owned(),
-            ValueHolder::String(FIRST_VALUE.to_owned()));
+            FIRST_VALUE.into());
         values.insert(
             THIRD_VALUE_NAME.to_owned(),
             ValueHolder::Integer(BigInt::from(THIRD_VALUE)));
@@ -381,10 +381,10 @@ mod tests {
         let mut values = HashMap::new();
         values.insert(
             FIRST_VALUE_NAME.to_owned(),
-            ValueHolder::String(FIRST_VALUE.to_owned()));
+            FIRST_VALUE.into());
         values.insert(
             SECOND_VALUE_NAME.to_owned(),
-            ValueHolder::String(SECOND_VALUE.to_owned()));
+            SECOND_VALUE.into());
         values.insert(
             THIRD_VALUE_NAME.to_owned(),
             ValueHolder::Integer(BigInt::from(THIRD_VALUE)));

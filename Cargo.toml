@@ -25,6 +25,9 @@ buttercup_agents = { path = "src/agents" }
 buttercup_blackboards = { path = "src/blackboards" }
 buttercup_bts = { path = "src/bts" }
 buttercup_conditions = { path = "src/conditions" }
+buttercup_endpoints = { path = "src/endpoints" }
+buttercup_values = { path = "src/values" }
 env_logger = "0.7.1"
 dashmap = "3.11"
+serde_json = "1"
 uuid = { version = "0.8", features = ["serde", "v4"] }

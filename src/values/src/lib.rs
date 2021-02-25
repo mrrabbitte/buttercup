@@ -104,6 +104,12 @@ impl TryFrom<ValueHolder> for Duration {
     }
 }
 
+impl From<String> for ValueHolder {
+    fn from(val: String) -> Self {
+        ValueHolder::String(Arc::new(val))
+    }
+}
+
 #[derive(AsRefStr, EnumVariantNames, EnumIter,
 Debug, Clone, Hash, Eq, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum ValueType {
@@ -163,6 +169,12 @@ impl ValuesPayload {
         }
     }
 
+    pub fn singleton(name: String, value: ValueHolder) -> ValuesPayload {
+        let mut values = HashMap::new();
+        values.insert(name, value);
+        ValuesPayload::new(values)
+    }
+
     pub fn empty() -> ValuesPayload {
         ValuesPayload {
             values: HashMap::new(),
@@ -181,6 +193,10 @@ impl ValuesPayload {
 
     pub fn get_keys(&self) -> &HashSet<String> {
         &self.keys
+    }
+
+    pub fn into_keys(self) -> HashSet<String> {
+        self.keys
     }
 
 }

@@ -24,8 +24,10 @@ pub struct ConditionDecoratorNode {
 
     id: i32,
     child: Arc<BTNode>,
+
     #[derivative(Debug="ignore")]
-    predicate: Box<dyn Fn(&ValuesPayload)  -> bool + Send + Sync>,
+    predicate: Box<dyn Fn(&ValuesPayload) -> bool + Send + Sync>,
+
     value_names: HashSet<String>
 
 }

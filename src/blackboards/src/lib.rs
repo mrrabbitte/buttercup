@@ -29,6 +29,7 @@ pub enum BlackboardError {
     BlackboardOfGivenIdNotFound(Uuid),
     DeserializeError(String),
     DestroyError(String),
+    InitializeError(String),
     LockPoisonedError,
     SerializeError(String)
 
@@ -79,6 +80,19 @@ impl BlackboardService {
                     Err(_) =>
                         Result::Err(BlackboardError::LockPoisonedError)
                 }
+        }
+    }
+
+    pub fn initialize(&self,
+                      blackboard_id: Uuid,
+                      path: OsString) -> Result<(), BlackboardError> {
+        match DB::open_default(path) {
+            Ok(db) => {
+                self.local_blackboards.insert(blackboard_id,
+                                                     Arc::new(RwLock::new(db)));
+                Result::Ok(())
+            }
+            Err(err) => Result::Err(BlackboardError::InitializeError(err.into_string()))
         }
     }
 
@@ -194,12 +208,12 @@ impl Default for BlackboardService {
 
 #[cfg(test)]
 mod tests {
+    use std::fs::remove_dir_all;
     use std::iter::FromIterator;
 
     use rocksdb::Options;
 
     use super::*;
-    use std::fs::remove_dir_all;
 
     const FIRST_DB_UUID: u128 = 1;
     const SECOND_DB_UUID: u128 = 2;
@@ -240,7 +254,8 @@ mod tests {
     #[test]
     fn test_puts_and_gets_values_from_db() {
         let mut values = HashMap::new();
-        values.insert(SOME_KEY.to_owned(), ValueHolder::String(SOME_VALUE.to_owned()));
+        values.insert(SOME_KEY.to_owned(), ValueHolder::String(
+            Arc::new(SOME_VALUE.to_owned())));
         let payload = ValuesPayload::new(values);
         SERVICE.put_values(
             &Uuid::from_u128(FIRST_DB_UUID), &payload)
@@ -259,7 +274,8 @@ mod tests {
     #[test]
     fn test_puts_and_gets_values_for_different_dbs() {
         let mut values = HashMap::new();
-        values.insert(OTHER_KEY.to_owned(), ValueHolder::String(OTHER_VALUE.to_owned()));
+        values.insert(OTHER_KEY.to_owned(), ValueHolder::String(
+            Arc::new(OTHER_VALUE.to_owned())));
         let payload = ValuesPayload::new(values);
         SERVICE.put_values(
             &Uuid::from_u128(SECOND_DB_UUID), &payload)
@@ -274,7 +290,7 @@ mod tests {
 
         let mut values_for_second = HashMap::new();
         values_for_second.insert(SOME_KEY.to_owned(),
-                                 ValueHolder::String(SOME_VALUE.to_owned()));
+                                 ValueHolder::String(Arc::new(SOME_VALUE.to_owned())));
         let payload_for_second = ValuesPayload::new(values_for_second);
         SERVICE.put_values(
             &Uuid::from_u128(THIRD_DB_UUID), &payload_for_second)
