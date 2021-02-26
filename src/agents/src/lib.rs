@@ -2,14 +2,13 @@ use std::future::Future;
 use std::sync::{Arc, Mutex, PoisonError};
 
 use actix::{Actor, Context, Handler, ResponseActFuture};
-use uuid::Uuid;
-
 use futures::future::{Abortable, Aborted, AbortHandle, AbortRegistration};
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use buttercup_bts::context::BTNodeExecutionContext;
 use buttercup_bts::tick::{TickError, TickStatus};
 use buttercup_bts::tree::BehaviorTree;
-use serde::{Deserialize, Serialize};
 
 pub struct Agent {
 
@@ -113,8 +112,8 @@ mod tests {
                                                         .into()
                                   )
                               )
-        )
-                       .start().await, Result::Ok(TickStatus::Success));
+        ).start().await,
+                   Result::Ok(TickStatus::Success));
     }
 
 }

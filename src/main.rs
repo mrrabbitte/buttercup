@@ -9,7 +9,7 @@ use dashmap::DashMap;
 use env_logger;
 use uuid::Uuid;
 
-use buttercup_agents::{Agent, AgentAddress};
+use buttercup_agents::Agent;
 use buttercup_blackboards::BlackboardService;
 use buttercup_bts::context::BTNodeExecutionContext;
 use buttercup_bts::context::reactive::ReactiveService;
@@ -18,6 +18,7 @@ use buttercup_bts::node::action::logging::PrintLogActionNode;
 use buttercup_bts::node::action::wait::WaitDurationActionNode;
 use buttercup_bts::node::composite::fallback::FallbackCompositeNode;
 use buttercup_bts::node::decorator::reactive::ReactiveConditionDecoratorNode;
+use buttercup_bts::node::root::one_off::OneOffRootBTNode;
 use buttercup_bts::tree::BehaviorTree;
 use buttercup_conditions::{ConditionExpression, ConditionExpressionWrapper,
                            LogicalExpression, RelationalExpression, RelationalExpressionSpecification};
@@ -68,27 +69,35 @@ async fn abort_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
 
 async fn example(data: Data<Mutex<Agents>>) -> String {
     let mut agents = data.lock().unwrap();
-    let n_agents = agents.len() as i32;
-    let agent = Agent::new(AgentAddress::new(n_agents, n_agents as u32),
-                           BehaviorTree::new(n_agents,
-                                             Arc::new(Default::default()),
-                                             PrintLogActionNode::new(
-                                                 n_agents, "hello".to_owned())
-                                                 .into()));
+    let agent = Agent::new(1,
+                           Arc::new(Default::default()),
+                           Arc::new(
+                               BehaviorTree::new(1,
+                                                 OneOffRootBTNode::new(
+                                                     1,
+                                                     PrintLogActionNode::new(
+                                                         1,
+                                                         "hello".to_owned())
+                                                         .into()
+                                                 )
+                                                     .into()
+                               )
+                           )
+    );
     agents.push(agent);
 
     let mut response = String::new();
 
-    for agent in &agents.agents {
-        let response_one = agent.tick().await;
-        let response_two = agent.tick().await;
-        let response_three = agent.tick().await;
+    for agent in &mut agents.agents {
+        let response_one = agent.start().await;
+        let response_two = agent.start().await;
+        let response_three = agent.start().await;
         response.push_str(format!("Welcome: {:?}, {:?}, {:?}",
                                   response_one,
                                   response_two,
                                   response_three)
             .as_str());
-        agent.tick().await;
+        agent.start().await;
     }
     response.to_owned()
 }
