@@ -797,6 +797,8 @@ dependencies = [
  "buttercup_blackboards",
  "buttercup_bts",
  "dashmap 3.11.10",
+ "futures",
+ "serde",
  "uuid",
 ]
 

@@ -1,74 +1,120 @@
 use std::future::Future;
+use std::sync::{Arc, Mutex, PoisonError};
 
 use actix::{Actor, Context, Handler, ResponseActFuture};
+use uuid::Uuid;
+
+use futures::future::{Abortable, Aborted, AbortHandle, AbortRegistration};
+
+use buttercup_bts::context::BTNodeExecutionContext;
 use buttercup_bts::tick::{TickError, TickStatus};
 use buttercup_bts::tree::BehaviorTree;
-use uuid::Uuid;
+use serde::{Deserialize, Serialize};
 
 pub struct Agent {
 
-    address: AgentAddress,
-    tree: BehaviorTree,
-    uuid: Uuid
+    id: i32,
+    abort_handle: Mutex<Option<AbortHandle>>,
+    context: Arc<BTNodeExecutionContext>,
+    tree: Arc<BehaviorTree>
 
 }
 
 impl Agent {
 
-    pub fn new(address: AgentAddress,
-               tree: BehaviorTree) -> Agent {
-        Agent {
-            address,
-            tree,
-            uuid: Uuid::new_v4()
-        }
-    }
-
-    pub async fn tick(&self) -> Result<TickStatus, TickError> {
-        println!("Performing tick: {}", self.uuid);
-        self.tree.tick().await
-    }
-}
-
-pub struct AgentAddress {
-
-    id: i32,
-    index: u32
-
-}
-
-impl AgentAddress {
-
     pub fn new(id: i32,
-               index: u32) -> AgentAddress {
-        AgentAddress {
+               context: Arc<BTNodeExecutionContext>,
+               tree: Arc<BehaviorTree>) -> Agent {
+        Agent {
             id,
-            index
+            abort_handle: Mutex::default(),
+            context,
+            tree
         }
     }
 
+    pub async fn start(&mut self) -> Result<TickStatus, AgentError> {
+        let abort_registration = self.create_abort_registration()?;
+        Result::Ok(Abortable::new(self.tree.tick(self.context.as_ref()),
+                                  abort_registration).await??)
+    }
+
+    pub async fn stop(&mut self) {
+
+    }
+
+    fn create_abort_registration(&mut self) -> Result<AbortRegistration, AgentError> {
+        let abort_handle_maybe = self.abort_handle.get_mut()?;
+        if abort_handle_maybe.is_some() {
+            return Result::Err(AgentError::AlreadyRunning);
+        }
+        let (abort_handle, abort_registration) =
+            AbortHandle::new_pair();
+        abort_handle_maybe.replace(abort_handle);
+        Result::Ok(abort_registration)
+    }
+
+}
+
+#[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
+pub enum AgentError {
+
+    AbortedError(String),
+    AlreadyRunning,
+    ExecutionError(TickError),
+    LockPoisoned(String)
+
+}
+
+impl From<TickError> for AgentError {
+    fn from(val: TickError) -> Self {
+        AgentError::ExecutionError(val)
+    }
+}
+
+impl From<Aborted> for AgentError {
+    fn from(val: Aborted) -> Self {
+        AgentError::AbortedError(val.to_string())
+    }
+}
+
+impl From<PoisonError<&mut Option<AbortHandle>>> for AgentError {
+    fn from(val: PoisonError<&mut Option<AbortHandle>>) -> Self {
+        AgentError::LockPoisoned(val.to_string())
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use std::sync::Arc;
 
+    use dashmap::DashMap;
+
     use buttercup_blackboards::BlackboardService;
     use buttercup_bts::context::BTNodeExecutionContext;
     use buttercup_bts::node::action::logging::PrintLogActionNode;
-    use dashmap::DashMap;
+    use buttercup_bts::node::root::one_off::OneOffRootBTNode;
 
     use super::*;
 
     #[actix_rt::test]
     async fn test_returns_status() {
-        assert_eq!(Agent::new(AgentAddress {id: 1, index: 1},
-                              BehaviorTree::new(1,
-                                                Arc::new(Default::default()),
-                                                PrintLogActionNode::new(
-                                                    1, "hello".to_owned())
-                                                    .into()))
-                       .tick().await, Result::Ok(TickStatus::Success));
+        assert_eq!(Agent::new(1,
+                              Arc::new(Default::default()),
+                              Arc::new(
+                                  BehaviorTree::new(1,
+                                                    OneOffRootBTNode::new(
+                                                        1,
+                                                        PrintLogActionNode::new(
+                                                            1,
+                                                            "hello".to_owned())
+                                                            .into()
+                                                    )
+                                                        .into()
+                                  )
+                              )
+        )
+                       .start().await, Result::Ok(TickStatus::Success));
     }
 
 }

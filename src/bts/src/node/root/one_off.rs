@@ -13,6 +13,18 @@ pub struct OneOffRootBTNode {
 
 }
 
+impl OneOffRootBTNode {
+
+    pub fn new(id: i32,
+               child: BTNode) -> OneOffRootBTNode {
+        OneOffRootBTNode {
+            id,
+            child: Arc::new(child)
+        }
+    }
+
+}
+
 #[async_trait(?Send)]
 impl BehaviorTreeNode for OneOffRootBTNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {

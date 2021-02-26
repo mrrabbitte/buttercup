@@ -13,7 +13,7 @@ pub mod one_off;
 pub mod reactive;
 pub mod until_stopped;
 
-pub enum RootNode {
+pub enum RootBTNode {
 
     OneOff(OneOffRootBTNode),
     Reactive(ReactiveRootBTNode),
@@ -23,15 +23,39 @@ pub enum RootNode {
 }
 
 #[async_trait(?Send)]
-impl BehaviorTreeNode for RootNode {
+impl BehaviorTreeNode for RootBTNode {
     async fn tick(&self,
                   context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match self {
-            RootNode::OneOff(node) => node.tick(context).await,
-            RootNode::Reactive(node) => node.tick(context).await,
-            RootNode::ToFirstFail(node) => node.tick(context).await,
-            RootNode::UntilStopped(node) => node.tick(context).await
+            RootBTNode::OneOff(node) => node.tick(context).await,
+            RootBTNode::Reactive(node) => node.tick(context).await,
+            RootBTNode::ToFirstFail(node) => node.tick(context).await,
+            RootBTNode::UntilStopped(node) => node.tick(context).await
         }
     }
 }
 
+
+impl From<OneOffRootBTNode> for RootBTNode {
+    fn from(node: OneOffRootBTNode) -> Self {
+        RootBTNode::OneOff(node)
+    }
+}
+
+impl From<ReactiveRootBTNode> for RootBTNode {
+    fn from(node: ReactiveRootBTNode) -> Self {
+        RootBTNode::Reactive(node)
+    }
+}
+
+impl From<ToFirstFailRootBTNode> for RootBTNode {
+    fn from(node: ToFirstFailRootBTNode) -> Self {
+        RootBTNode::ToFirstFail(node)
+    }
+}
+
+impl From<UntilStoppedRootBTNode> for RootBTNode {
+    fn from(node: UntilStoppedRootBTNode) -> Self {
+        RootBTNode::UntilStopped(node)
+    }
+}
