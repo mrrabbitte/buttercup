@@ -19,6 +19,7 @@ use crate::tick::{TickError, TickStatus};
 pub mod action;
 pub mod composite;
 pub mod decorator;
+pub mod root;
 
 #[derive(Derivative)]
 #[derivative(Debug)]

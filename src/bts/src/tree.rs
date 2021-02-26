@@ -23,7 +23,7 @@ impl BehaviorTree {
         }
     }
 
-    pub async fn tick(&self) -> Result<TickStatus, TickError> {
+    pub async fn tick(&mut self) -> Result<TickStatus, TickError> {
         self.root.tick(self.context.as_ref()).await
     }
 }
