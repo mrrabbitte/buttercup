@@ -5,13 +5,13 @@ use actix::Arbiter;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use buttercup_blackboards::{LocalBlackboardError, LocalBlackboard};
+use buttercup_blackboards::{LocalBlackboard, LocalBlackboardError, LocalBlackboardService};
 use buttercup_values::ValuesPayload;
 
 pub struct EndpointService {
 
     arbiter: Arbiter,
-    blackboard_service: Arc<LocalBlackboard>,
+    blackboard_service: Arc<LocalBlackboardService>,
     listener: Arc<dyn Fn(HashSet<String>) + Send + Sync>
 
 }
@@ -32,7 +32,7 @@ impl From<LocalBlackboardError> for EndpointError {
 impl EndpointService {
 
     pub fn new(arbiter: Arbiter,
-               blackboard_service: Arc<LocalBlackboard>,
+               blackboard_service: Arc<LocalBlackboardService>,
                listener: Arc<dyn Fn(HashSet<String>) + Send + Sync>) -> EndpointService {
         EndpointService {
             arbiter,
@@ -44,7 +44,9 @@ impl EndpointService {
     pub fn accept_value_changes(&self,
                                 blackboard_id: &Uuid,
                                 payload: ValuesPayload) -> Result<(), EndpointError> {
-        self.blackboard_service.put_values(blackboard_id, &payload)?;
+        self.blackboard_service
+            .get(blackboard_id)?
+            .put_values(&payload)?;
 
         let keys = payload.into_keys();
 

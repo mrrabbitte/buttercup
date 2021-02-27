@@ -75,9 +75,12 @@ impl VariableService for BTNodeExecutionContext {
 
 impl Default for BTNodeExecutionContext {
     fn default() -> Self {
+        let uuid = Uuid::new_v4();
+        let path = format!("{}.bb", &uuid).into();
+
         BTNodeExecutionContext::new(
-            Uuid::new_v4(),
-            Arc::new(Default::default()),
+            uuid,
+            Arc::new(LocalBlackboard::new(path).unwrap()),
             Arc::new(Default::default()))
     }
 }

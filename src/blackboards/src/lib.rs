@@ -60,10 +60,14 @@ impl LocalBlackboardService {
         Result::Ok(())
     }
 
-    pub fn get(&self, blackboard_id: &Uuid) -> Option<Arc<LocalBlackboard>> {
+    pub fn get(&self, blackboard_id: &Uuid) -> Result<Arc<LocalBlackboard>, LocalBlackboardError> {
         self.local_blackboards
             .get(blackboard_id)
-            .map(|kv| kv.value().clone())
+            .map_or_else(
+                || Result::Err(
+                    LocalBlackboardError::BlackboardOfGivenIdNotFound(blackboard_id.clone())),
+                |kv| Result::Ok(kv.value().clone()))
+
     }
 
     pub fn is_empty(&self) -> bool {
@@ -291,7 +295,7 @@ mod tests {
             assert_eq!(payload_for_second, retrieved_for_second);
             assert_ne!(retrieved, retrieved_for_second);
         }
-        
+
         cleanup(SECOND_DB_UUID);
         cleanup(THIRD_DB_UUID);
     }
