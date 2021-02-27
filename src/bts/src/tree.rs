@@ -1,11 +1,12 @@
+use std::sync::Arc;
+
+use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::root::RootBTNode;
 use crate::tick::{TickError, TickStatus};
-use dashmap::DashMap;
-use std::sync::Arc;
 
 pub struct BehaviorTree {
 
@@ -61,6 +62,7 @@ mod tests {
 
     use buttercup_blackboards::LocalBlackboard;
 
+    use crate::context::test_utils;
     use crate::node::action::logging::PrintLogActionNode;
     use crate::node::root::one_off::OneOffRootBTNode;
 
@@ -68,12 +70,21 @@ mod tests {
 
     #[actix_rt::test]
     async fn test_returns_status() {
-        assert_eq!(Result::Ok(TickStatus::Success),
-                   BehaviorTree::new(1,
-                                     OneOffRootBTNode::new(1,PrintLogActionNode::new(
-                                         1, "hello".to_owned())
-                                         .into()).into())
-                       .tick(&Default::default()).await)
+        let path = {
+            let context = Default::default();
+            assert_eq!(Result::Ok(TickStatus::Success),
+                       BehaviorTree::new(1,
+                                         OneOffRootBTNode::new(
+                                             1,
+                                                               PrintLogActionNode::new(
+                                             1, "hello".to_owned())
+                                             .into()).into())
+                           .tick(&context).await);
+
+            test_utils::get_path(&context)
+        };
+
+        test_utils::destroy(path);
     }
 
 }

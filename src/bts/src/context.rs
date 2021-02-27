@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::ffi::OsString;
 use std::sync::Arc;
 
 use uuid::Uuid;
@@ -32,6 +33,10 @@ impl BTNodeExecutionContext {
         }
     }
 
+    pub fn get_reactive_service(&self) -> &Arc<ReactiveContext> {
+        &self.reactive_service
+    }
+
     pub fn get_values(&self,
                       value_names: &HashSet<String>) -> Result<ValuesPayload, LocalBlackboardError> {
         if value_names.is_empty() {
@@ -49,10 +54,6 @@ impl BTNodeExecutionContext {
     pub fn put_values(&self,
                       payload: &ValuesPayload) -> Result<(), LocalBlackboardError> {
         self.local_blackboard.put_values(payload)
-    }
-
-    pub fn get_reactive_service(&self) -> &Arc<ReactiveContext> {
-        &self.reactive_service
     }
 
     fn map_err(err: LocalBlackboardError) -> VariableValueAccessError {
@@ -85,3 +86,23 @@ impl Default for BTNodeExecutionContext {
     }
 }
 
+pub mod test_utils {
+    use std::ffi::OsString;
+
+    use buttercup_blackboards::LocalBlackboard;
+
+    use crate::context::BTNodeExecutionContext;
+
+    pub fn cleanup(context: &BTNodeExecutionContext) {
+        destroy(get_path(context));
+    }
+
+    pub fn destroy(path: OsString) {
+        LocalBlackboard::destroy(path).unwrap();
+    }
+
+    pub fn get_path(context: &BTNodeExecutionContext) -> OsString {
+        context.local_blackboard.get_path().unwrap()
+    }
+
+}

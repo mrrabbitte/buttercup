@@ -53,11 +53,7 @@ impl LocalBlackboardService {
             }
         }?;
 
-        DB::destroy(
-            &Options::default(),
-            path)?;
-
-        Result::Ok(())
+        LocalBlackboard::destroy(path)
     }
 
     pub fn get(&self, blackboard_id: &Uuid) -> Result<Arc<LocalBlackboard>, LocalBlackboardError> {
@@ -120,6 +116,14 @@ impl LocalBlackboard {
                 db: Arc::new(RwLock::new(DB::open_default(path)?))
             }
         )
+    }
+
+    pub fn destroy(path: OsString) -> Result<(), LocalBlackboardError> {
+        DB::destroy(
+            &Options::default(),
+            path)?;
+
+        Result::Ok(())
     }
 
     pub fn get_path(&self) -> Result<OsString, LocalBlackboardError> {

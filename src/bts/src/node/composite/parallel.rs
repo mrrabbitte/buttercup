@@ -104,6 +104,7 @@ mod tests {
 
     use actix_web::test;
 
+    use crate::context::test_utils;
     use crate::node::action::logging::PrintLogActionNode;
     use crate::node::action::wait::WaitDurationActionNode;
 
@@ -111,21 +112,27 @@ mod tests {
 
     #[actix_rt::test]
     async fn test_finishes_based_on_minimal_number_of_successes() {
-        let context = Default::default();
-        let children: Vec<BTNode> = vec![
-            PrintLogActionNode::new(1, "I am one.".to_string()).into(),
-            WaitDurationActionNode::new(2, Duration::from_millis(10)).into(),
-            PrintLogActionNode::new(3, "I am two.".to_string()).into(),
-            PrintLogActionNode::new(4, "I am four.".to_string()).into()];
-        match ParallelCompositeNode::new(5, children, 3)
-            .unwrap()
-            .tick(&context)
-            .await {
-            Ok(status) => {
-                assert_eq!(TickStatus::Success, status)
+        let path = {
+            let context = Default::default();
+            let children: Vec<BTNode> = vec![
+                PrintLogActionNode::new(1, "I am one.".to_string()).into(),
+                WaitDurationActionNode::new(2, Duration::from_millis(10)).into(),
+                PrintLogActionNode::new(3, "I am two.".to_string()).into(),
+                PrintLogActionNode::new(4, "I am four.".to_string()).into()];
+            match ParallelCompositeNode::new(5, children, 3)
+                .unwrap()
+                .tick(&context)
+                .await {
+                Ok(status) => {
+                    assert_eq!(TickStatus::Success, status)
+                }
+                Err(err) => panic!("Expected success.")
             }
-            Err(err) => panic!("Expected success.")
-        }
+
+            test_utils::get_path(&context)
+        };
+        
+        test_utils::destroy(path);
     }
 
 }

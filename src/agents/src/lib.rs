@@ -92,7 +92,7 @@ mod tests {
     use dashmap::DashMap;
 
     use buttercup_blackboards::LocalBlackboard;
-    use buttercup_bts::context::BTNodeExecutionContext;
+    use buttercup_bts::context::{BTNodeExecutionContext, test_utils};
     use buttercup_bts::node::action::logging::PrintLogActionNode;
     use buttercup_bts::node::root::one_off::OneOffRootBTNode;
 
@@ -100,22 +100,28 @@ mod tests {
 
     #[actix_rt::test]
     async fn test_returns_status() {
-        assert_eq!(Agent::new(1,
-                              Arc::new(Default::default()),
-                              Arc::new(
-                                  BehaviorTree::new(1,
-                                                    OneOffRootBTNode::new(
-                                                        1,
-                                                        PrintLogActionNode::new(
+        let path = {
+            let context: Arc<BTNodeExecutionContext> = Arc::new(Default::default());
+            assert_eq!(Agent::new(1,
+                                  context.clone(),
+                                  Arc::new(
+                                      BehaviorTree::new(1,
+                                                        OneOffRootBTNode::new(
                                                             1,
-                                                            "hello".to_owned())
+                                                            PrintLogActionNode::new(
+                                                                1,
+                                                                "hello".to_owned())
+                                                                .into()
+                                                        )
                                                             .into()
-                                                    )
-                                                        .into()
+                                      )
                                   )
-                              )
-        ).start().await,
-                   Result::Ok(TickStatus::Success));
+            ).start().await,
+                       Result::Ok(TickStatus::Success));
+            test_utils::get_path(context.as_ref())
+        };
+
+        test_utils::destroy(path);
     }
 
 }
