@@ -3,11 +3,11 @@ use std::sync::Arc;
 
 use uuid::Uuid;
 
-use buttercup_blackboards::{BlackboardError, BlackboardService};
+use buttercup_blackboards::{LocalBlackboard, LocalBlackboardError};
 use buttercup_values::{ValueHolder, ValuesPayload};
 use buttercup_variables::{VariableName, VariableService, VariableServiceErrorReport, VariableValueAccessError};
 
-use crate::context::reactive::ReactiveService;
+use crate::context::reactive::ReactiveContext;
 use crate::node::BTNode;
 
 pub mod reactive;
@@ -15,50 +15,47 @@ pub mod reactive;
 pub struct BTNodeExecutionContext {
 
     blackboard_id: Uuid,
-    blackboard_service: Arc<BlackboardService>,
-    reactive_service: Arc<ReactiveService>
+    local_blackboard: Arc<LocalBlackboard>,
+    reactive_service: Arc<ReactiveContext>
 
 }
 
 impl BTNodeExecutionContext {
 
     pub fn new(blackboard_id: Uuid,
-               blackboard_service: Arc<BlackboardService>,
-               reactive_service: Arc<ReactiveService>) -> BTNodeExecutionContext {
+               local_blackboard: Arc<LocalBlackboard>,
+               reactive_service: Arc<ReactiveContext>) -> BTNodeExecutionContext {
         BTNodeExecutionContext {
             blackboard_id,
-            blackboard_service,
+            local_blackboard,
             reactive_service
         }
     }
 
-    pub fn destroy(&self) -> Result<(), BlackboardError> {
-        self.blackboard_service.destroy(&self.blackboard_id)
-    }
-
     pub fn get_values(&self,
-                      value_names: &HashSet<String>) -> Result<ValuesPayload, BlackboardError> {
+                      value_names: &HashSet<String>) -> Result<ValuesPayload, LocalBlackboardError> {
         if value_names.is_empty() {
             return Result::Ok(ValuesPayload::empty());
         }
-        self.blackboard_service.get_values(&self.blackboard_id, value_names)
+
+        self.local_blackboard.get_values(value_names)
     }
 
     pub fn get_value(&self,
-                     value_name: &String) -> Result<Option<ValueHolder>, BlackboardError> {
-        self.blackboard_service.get_value(&self.blackboard_id, value_name)
+                     value_name: &String) -> Result<Option<ValueHolder>, LocalBlackboardError> {
+        self.local_blackboard.get_value(value_name)
     }
 
     pub fn put_values(&self,
-                      payload: &ValuesPayload) -> Result<(), BlackboardError> {
-        self.blackboard_service.put_values(&self.blackboard_id, payload)
+                      payload: &ValuesPayload) -> Result<(), LocalBlackboardError> {
+        self.local_blackboard.put_values(payload)
     }
 
-    pub fn get_reactive_service(&self) -> &Arc<ReactiveService> {
+    pub fn get_reactive_service(&self) -> &Arc<ReactiveContext> {
         &self.reactive_service
     }
 
-    fn map_err(err: BlackboardError) -> VariableValueAccessError {
+    fn map_err(err: LocalBlackboardError) -> VariableValueAccessError {
         VariableValueAccessError::VariableServiceError(
             VariableServiceErrorReport::new(
                 "Blackboard error".to_owned(),
@@ -70,8 +67,8 @@ impl VariableService for BTNodeExecutionContext {
     fn get_variable_value_by_name(&self,
                                   name: &VariableName)
                                   -> Result<Option<ValueHolder>, VariableValueAccessError> {
-        self.blackboard_service
-            .get_value(&self.blackboard_id, name.get_value())
+        self.local_blackboard
+            .get_value(name.get_value())
             .map_err(BTNodeExecutionContext::map_err)
     }
 }

@@ -5,13 +5,13 @@ use actix::Arbiter;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use buttercup_blackboards::{BlackboardError, BlackboardService};
+use buttercup_blackboards::{LocalBlackboardError, LocalBlackboard};
 use buttercup_values::ValuesPayload;
 
 pub struct EndpointService {
 
     arbiter: Arbiter,
-    blackboard_service: Arc<BlackboardService>,
+    blackboard_service: Arc<LocalBlackboard>,
     listener: Arc<dyn Fn(HashSet<String>) + Send + Sync>
 
 }
@@ -19,12 +19,12 @@ pub struct EndpointService {
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum EndpointError {
 
-    BlackboardError(BlackboardError)
+    BlackboardError(LocalBlackboardError)
 
 }
 
-impl From<BlackboardError> for EndpointError {
-    fn from(err: BlackboardError) -> Self {
+impl From<LocalBlackboardError> for EndpointError {
+    fn from(err: LocalBlackboardError) -> Self {
         EndpointError::BlackboardError(err)
     }
 }
@@ -32,7 +32,7 @@ impl From<BlackboardError> for EndpointError {
 impl EndpointService {
 
     pub fn new(arbiter: Arbiter,
-               blackboard_service: Arc<BlackboardService>,
+               blackboard_service: Arc<LocalBlackboard>,
                listener: Arc<dyn Fn(HashSet<String>) + Send + Sync>) -> EndpointService {
         EndpointService {
             arbiter,

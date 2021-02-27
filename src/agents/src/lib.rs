@@ -10,6 +10,8 @@ use buttercup_bts::context::BTNodeExecutionContext;
 use buttercup_bts::tick::{TickError, TickStatus};
 use buttercup_bts::tree::BehaviorTree;
 
+pub mod service;
+
 pub struct Agent {
 
     id: i32,
@@ -89,7 +91,7 @@ mod tests {
 
     use dashmap::DashMap;
 
-    use buttercup_blackboards::BlackboardService;
+    use buttercup_blackboards::LocalBlackboard;
     use buttercup_bts::context::BTNodeExecutionContext;
     use buttercup_bts::node::action::logging::PrintLogActionNode;
     use buttercup_bts::node::root::one_off::OneOffRootBTNode;

@@ -10,9 +10,9 @@ use env_logger;
 use uuid::Uuid;
 
 use buttercup_agents::Agent;
-use buttercup_blackboards::BlackboardService;
+use buttercup_blackboards::LocalBlackboard;
 use buttercup_bts::context::BTNodeExecutionContext;
-use buttercup_bts::context::reactive::ReactiveService;
+use buttercup_bts::context::reactive::ReactiveContext;
 use buttercup_bts::node::{BehaviorTreeNode, BTNode};
 use buttercup_bts::node::action::logging::PrintLogActionNode;
 use buttercup_bts::node::action::wait::WaitDurationActionNode;
@@ -124,10 +124,10 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
 
     env_logger::init();
-    let blackboard_service: Arc<BlackboardService> = Arc::new(Default::default());
+    let blackboard_service: Arc<LocalBlackboard> = Arc::new(Default::default());
     blackboard_service.initialize(Uuid::from_u128(1),
                                   "my-blackboard.bl".into());
-    let reactive_service: Arc<ReactiveService> = Arc::new(Default::default());
+    let reactive_service: Arc<ReactiveContext> = Arc::new(Default::default());
     let bt_node_context = Arc::new(BTNodeExecutionContext::new(
         Uuid::from_u128(1),
         blackboard_service.clone(),

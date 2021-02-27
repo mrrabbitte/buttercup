@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use buttercup_blackboards::{BlackboardError, BlackboardService};
+use buttercup_blackboards::{LocalBlackboardError, LocalBlackboard};
 use buttercup_values::ValuesPayload;
 
 use crate::context::BTNodeExecutionContext;

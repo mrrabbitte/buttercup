@@ -4,6 +4,8 @@ use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::root::RootBTNode;
 use crate::tick::{TickError, TickStatus};
+use dashmap::DashMap;
+use std::sync::Arc;
 
 pub struct BehaviorTree {
 
@@ -29,6 +31,27 @@ impl BehaviorTree {
 
 }
 
+#[derive(Default)]
+pub struct BehaviorTreeService {
+
+    trees: DashMap<i32, Arc<BehaviorTree>>
+
+}
+
+impl BehaviorTreeService {
+
+    pub fn insert(&self,
+                  tree: BehaviorTree) {
+        self.trees.insert(tree.id, Arc::new(tree));
+    }
+
+    pub fn get_by_id(&self,
+                     id: &i32) -> Option<Arc<BehaviorTree>> {
+        self.trees.get(id).map(|tree_arc| tree_arc.clone())
+    }
+
+}
+
 #[cfg(test)]
 mod tests {
     use std::sync::Arc;
@@ -36,7 +59,7 @@ mod tests {
     use dashmap::DashMap;
     use uuid::Uuid;
 
-    use buttercup_blackboards::BlackboardService;
+    use buttercup_blackboards::LocalBlackboard;
 
     use crate::node::action::logging::PrintLogActionNode;
     use crate::node::root::one_off::OneOffRootBTNode;

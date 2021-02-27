@@ -6,7 +6,7 @@ use std::time::Duration;
 use async_std::task;
 use async_trait::async_trait;
 
-use buttercup_blackboards::BlackboardError;
+use buttercup_blackboards::LocalBlackboardError;
 use buttercup_values::ValueHolder;
 use buttercup_variables::{VariableSpecification, VariableValueAccessError};
 

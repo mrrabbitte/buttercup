@@ -8,12 +8,12 @@ use actix_web::guard::Guard;
 use async_trait::async_trait;
 use futures::future::{Abortable, Aborted, AbortHandle};
 
-use buttercup_blackboards::BlackboardError;
+use buttercup_blackboards::LocalBlackboardError;
 use buttercup_conditions::ConditionExpressionWrapper;
 use buttercup_values::ValuesPayload;
 
 use crate::context::BTNodeExecutionContext;
-use crate::context::reactive::ReactiveServiceError;
+use crate::context::reactive::ReactiveContextError;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::decorator::DecoratorBTNode;
 use crate::tick::{TickError, TickStatus};
@@ -40,8 +40,8 @@ pub enum DataChangeHandlingStatus {
 
 pub enum DataChangeHandlingError {
 
-    BlackboardError(i32, BlackboardError),
-    ReactiveServiceError(i32, ReactiveServiceError),
+    BlackboardError(i32, LocalBlackboardError),
+    ReactiveServiceError(i32, ReactiveContextError),
     NonReactiveNodeCalledError
 
 }
