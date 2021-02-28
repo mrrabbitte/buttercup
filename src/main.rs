@@ -11,7 +11,7 @@ use uuid::Uuid;
 
 use buttercup_agents::Agent;
 use buttercup_blackboards::{LocalBlackboard, LocalBlackboardService};
-use buttercup_bts::context::BTNodeExecutionContext;
+use buttercup_bts::context::{BTNodeContextService, BTNodeExecutionContext, BTNodeExecutionContextHolder};
 use buttercup_bts::context::reactive::ReactiveContext;
 use buttercup_bts::node::{BehaviorTreeNode, BTNode};
 use buttercup_bts::node::action::logging::PrintLogActionNode;
@@ -35,7 +35,7 @@ async fn endpoint(data: Data<Arc<EndpointService>>,
         .unwrap()
 }
 
-async fn reactive_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
+async fn reactive_tick(data: Data<Arc<BTNodeExecutionContextHolder>>) -> String {
     let reactive_node: Arc<BTNode> = Arc::new(ReactiveConditionDecoratorNode::new(
         2,
         Arc::new(
@@ -56,9 +56,10 @@ async fn reactive_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
             // )]
     );
 
-    data.get_reactive_service().initialize_node(reactive_node.clone());
+    let context = data.get_context();
+    context.get_reactive_service().initialize_node(reactive_node.clone());
 
-    format!("Got: {:?}", node.tick(data.as_ref()).await)
+    format!("Got: {:?}", node.tick(context).await)
 }
 
 async fn abort_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
@@ -67,10 +68,15 @@ async fn abort_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
     "Aborted".to_owned()
 }
 
-async fn example(data: Data<Mutex<Agents>>) -> String {
-    let mut agents = data.lock().unwrap();
+async fn example(agents_data: Data<Mutex<Agents>>,
+                 context_service: Data<Arc<BTNodeContextService>>) -> String {
+    let mut agents = agents_data.lock().unwrap();
     let agent = Agent::new(1,
-                           Arc::new(Default::default()),
+                           Arc::new(
+                               context_service
+                                   .get_ref()
+                                   .build_new()
+                                   .unwrap()),
                            Arc::new(
                                BehaviorTree::new(1,
                                                  OneOffRootBTNode::new(
@@ -124,15 +130,14 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
 
     env_logger::init();
+
     let blackboard_service: Arc<LocalBlackboardService> =
         Arc::new(LocalBlackboardService::default());
-    blackboard_service.create(Uuid::from_u128(1),
-                                  "my-blackboard.bl".into());
-    let reactive_service: Arc<ReactiveContext> = Arc::new(Default::default());
-    let bt_node_context = Arc::new(BTNodeExecutionContext::new(
-        Uuid::from_u128(1),
-        blackboard_service.get(&Uuid::from_u128(1)).unwrap(),
-        reactive_service.clone()));
+    let context_service =
+        Arc::new(BTNodeContextService::new(blackboard_service.clone()));
+
+    let bt_node_context: Arc<BTNodeExecutionContextHolder> =
+        Arc::new(context_service.build_new().unwrap());
 
     let context_data =
         Data::new(bt_node_context.clone());
@@ -141,16 +146,16 @@ async fn main() -> std::io::Result<()> {
             Arc::new(EndpointService::new(
                 Arbiter::new(),
                 blackboard_service.clone(),
-                Arc::new(move |changed|
-                    reactive_service.handle_value_changes(
-                        bt_node_context.as_ref(), changed)))
-            ));
+                vec![bt_node_context.get_value_changes_listener()]
+            )));
     let agents_data =  Data::new(Mutex::new(Agents{ agents: vec![]}));
+    let context_service_data = Data::new(context_service.clone());
 
     HttpServer::new(move || {
         App::new()
             .app_data(agents_data.clone())
             .app_data(context_data.clone())
+            .app_data(context_service_data.clone())
             .app_data(endpoints_service_data.clone())
             .service(
                 resource("/test")

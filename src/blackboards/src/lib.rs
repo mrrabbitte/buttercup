@@ -28,12 +28,14 @@ impl LocalBlackboardService {
     }
 
     pub fn create(&self,
-                  blackboard_id: Uuid,
-                  path: OsString) -> Result<(), LocalBlackboardError> {
-        self.local_blackboards.insert(blackboard_id,
-                                      Arc::new(LocalBlackboard::new(path)?));
+                  blackboard_id: &Uuid,
+                  path: OsString) -> Result<Arc<LocalBlackboard>, LocalBlackboardError> {
+        let blackboard = Arc::new(LocalBlackboard::new(path)?);
 
-        Result::Ok(())
+        self.local_blackboards.insert(blackboard_id.clone(),
+                                      blackboard.clone());
+
+        Result::Ok(blackboard)
     }
 
     ///

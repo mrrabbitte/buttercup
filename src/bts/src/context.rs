@@ -2,9 +2,11 @@ use std::collections::HashSet;
 use std::ffi::OsString;
 use std::sync::Arc;
 
+use dashmap::DashMap;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use buttercup_blackboards::{LocalBlackboard, LocalBlackboardError};
+use buttercup_blackboards::{LocalBlackboard, LocalBlackboardError, LocalBlackboardService};
 use buttercup_values::{ValueHolder, ValuesPayload};
 use buttercup_variables::{VariableName, VariableService, VariableServiceErrorReport, VariableValueAccessError};
 
@@ -13,21 +15,61 @@ use crate::node::BTNode;
 
 pub mod reactive;
 
+pub struct BTNodeExecutionContextHolder {
+
+    id: Uuid,
+    context: Arc<BTNodeExecutionContext>,
+    value_changes_listener: Arc<dyn Fn(&HashSet<String>) + Send + Sync>
+
+}
+
+impl BTNodeExecutionContextHolder {
+
+    pub fn new(id: Uuid,
+               local_blackboard: Arc<LocalBlackboard>,
+               reactive_service: Arc<ReactiveContext>) -> BTNodeExecutionContextHolder {
+        let context =
+            Arc::new(
+                BTNodeExecutionContext::new(
+                    local_blackboard,
+                    reactive_service.clone()));
+
+        BTNodeExecutionContextHolder {
+            id,
+            context: context.clone(),
+            value_changes_listener: Arc::new(move |changed|
+                reactive_service.handle_value_changes(
+                    context.as_ref(), changed))
+        }
+    }
+
+    pub fn get_id(&self) -> &Uuid {
+        &self.id
+    }
+
+    pub fn get_context(&self) -> &BTNodeExecutionContext {
+        self.context.as_ref()
+    }
+
+    pub fn get_value_changes_listener(&self) -> Arc<dyn Fn(&HashSet<String>) + Send + Sync> {
+        self.value_changes_listener.clone()
+    }
+
+}
+
 pub struct BTNodeExecutionContext {
 
-    blackboard_id: Uuid,
     local_blackboard: Arc<LocalBlackboard>,
-    reactive_service: Arc<ReactiveContext>
+    reactive_service: Arc<ReactiveContext>,
+
 
 }
 
 impl BTNodeExecutionContext {
 
-    pub fn new(blackboard_id: Uuid,
-               local_blackboard: Arc<LocalBlackboard>,
+    pub fn new(local_blackboard: Arc<LocalBlackboard>,
                reactive_service: Arc<ReactiveContext>) -> BTNodeExecutionContext {
         BTNodeExecutionContext {
-            blackboard_id,
             local_blackboard,
             reactive_service
         }
@@ -76,14 +118,67 @@ impl VariableService for BTNodeExecutionContext {
 
 impl Default for BTNodeExecutionContext {
     fn default() -> Self {
-        let uuid = Uuid::new_v4();
-        let path = format!("{}.bb", &uuid).into();
-
         BTNodeExecutionContext::new(
-            uuid,
-            Arc::new(LocalBlackboard::new(path).unwrap()),
+            Arc::new(
+                LocalBlackboard::new(format!("{}.bb", Uuid::new_v4()).into()).unwrap()),
             Arc::new(Default::default()))
     }
+}
+#[derive(Default)]
+pub struct BTNodeContextService {
+
+    contexts: DashMap<Uuid, Arc<BTNodeExecutionContextHolder>>,
+    local_blackboard_service: Arc<LocalBlackboardService>
+
+}
+
+#[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
+pub enum BTNodeContextServiceError {
+
+    LocalBlackboardError(LocalBlackboardError)
+
+}
+
+impl From<LocalBlackboardError> for BTNodeContextServiceError {
+    fn from(err: LocalBlackboardError) -> Self {
+        BTNodeContextServiceError::LocalBlackboardError(err)
+    }
+}
+
+impl BTNodeContextService {
+
+    pub fn new(local_blackboard_service: Arc<LocalBlackboardService>) -> BTNodeContextService {
+        BTNodeContextService {
+            contexts: DashMap::new(),
+            local_blackboard_service
+        }
+    }
+
+    pub fn build_new(&self) -> Result<BTNodeExecutionContextHolder, BTNodeContextServiceError> {
+        let uuid = Uuid::new_v4();
+        let blackboard_service =
+            self.local_blackboard_service.create(
+                &uuid, format!("{}.bb", &uuid).into())?;
+
+        Result::Ok(
+            BTNodeExecutionContextHolder::new(
+                uuid,
+                blackboard_service,
+                Arc::new(ReactiveContext::new())))
+    }
+
+    pub fn insert(&self,
+                  context: BTNodeExecutionContextHolder) {
+        self.contexts.insert(context.id, Arc::new(context));
+    }
+
+    pub fn get_by_id(&self,
+                     id: &Uuid) -> Option<Arc<BTNodeExecutionContextHolder>> {
+        self.contexts
+            .get(id)
+            .map(|context_arc| context_arc.clone())
+    }
+
 }
 
 pub mod test_utils {

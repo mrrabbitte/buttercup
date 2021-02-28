@@ -1,5 +1,5 @@
 use std::collections::HashSet;
-use std::sync::Arc;
+use std::sync::{Arc, PoisonError, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 use actix::Arbiter;
 use serde::{Deserialize, Serialize};
@@ -8,19 +8,34 @@ use uuid::Uuid;
 use buttercup_blackboards::{LocalBlackboard, LocalBlackboardError, LocalBlackboardService};
 use buttercup_values::ValuesPayload;
 
+type Listeners = Vec<Arc<dyn Fn(&HashSet<String>) + Send + Sync>>;
+
 pub struct EndpointService {
 
     arbiter: Arbiter,
     blackboard_service: Arc<LocalBlackboardService>,
-    listener: Arc<dyn Fn(HashSet<String>) + Send + Sync>
+    listeners: RwLock<Listeners>
 
 }
 
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum EndpointError {
 
-    BlackboardError(LocalBlackboardError)
+    BlackboardError(LocalBlackboardError),
+    LockPoisonedError
 
+}
+
+impl From<PoisonError<RwLockReadGuard<'_, Listeners>>> for EndpointError {
+    fn from(_: PoisonError<RwLockReadGuard<'_, Listeners>>) -> Self {
+        EndpointError::LockPoisonedError
+    }
+}
+
+impl From<PoisonError<RwLockWriteGuard<'_, Listeners>>> for EndpointError {
+    fn from(_: PoisonError<RwLockWriteGuard<'_, Listeners>>) -> Self {
+        EndpointError::LockPoisonedError
+    }
 }
 
 impl From<LocalBlackboardError> for EndpointError {
@@ -33,11 +48,11 @@ impl EndpointService {
 
     pub fn new(arbiter: Arbiter,
                blackboard_service: Arc<LocalBlackboardService>,
-               listener: Arc<dyn Fn(HashSet<String>) + Send + Sync>) -> EndpointService {
+               listeners: Listeners) -> EndpointService {
         EndpointService {
             arbiter,
             blackboard_service,
-            listener
+            listeners: RwLock::new(listeners)
         }
     }
 
@@ -50,11 +65,24 @@ impl EndpointService {
 
         let keys = payload.into_keys();
 
-        let listener = self.listener.clone();
+
+        let listeners = {
+            self.listeners.read()?.clone()
+        };
 
         self.arbiter.exec_fn(move || {
-            listener(keys)
+            for listener in listeners {
+                listener(&keys);
+            }
         });
+
+        Result::Ok(())
+    }
+
+    pub fn add_listener(&mut self,
+                        listener: Arc<dyn Fn(&HashSet<String>) + Send + Sync>)
+        -> Result<(), EndpointError> {
+        self.listeners.write()?.push(listener);
 
         Result::Ok(())
     }

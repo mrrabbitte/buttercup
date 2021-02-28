@@ -93,12 +93,12 @@ impl ReactiveContext {
 
     pub fn handle_value_changes(&self,
                                 context: &BTNodeExecutionContext,
-                                changed_value_names: HashSet<String>) {
+                                changed_value_names: &HashSet<String>) {
         let mut already_called = HashSet::new();
 
         for value_name in changed_value_names {
             if let Some(nodes) =
-            self.nodes_by_value_names.get(&value_name) {
+            self.nodes_by_value_names.get(value_name) {
                 for node in nodes.value() {
                     let node_id = node.get_id();
 
