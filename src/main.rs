@@ -25,6 +25,7 @@ use buttercup_conditions::{ConditionExpression, ConditionExpressionWrapper,
 use buttercup_conditions::relational::{EndsWithRelationalExpression, StartsWithRelationalExpression};
 use buttercup_endpoints::endpoints::EndpointService;
 use buttercup_values::{ValueHolder, ValuesPayload};
+use buttercup_bts::node::root::until_stopped::UntilStoppedRootBTNode;
 
 #[post("/values/{name}/{value}")]
 async fn endpoint(data: Data<Arc<EndpointService>>,
@@ -71,7 +72,7 @@ async fn abort_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
 async fn example(agents_data: Data<Mutex<Agents>>,
                  context_service: Data<Arc<BTNodeContextService>>) -> String {
     let mut agents = agents_data.lock().unwrap();
-    let agent = Agent::new(1,
+    let agent = Agent::new(Uuid::new_v4(),
                            Arc::new(
                                context_service
                                    .get_ref()
@@ -79,7 +80,7 @@ async fn example(agents_data: Data<Mutex<Agents>>,
                                    .unwrap()),
                            Arc::new(
                                BehaviorTree::new(1,
-                                                 OneOffRootBTNode::new(
+                                                 UntilStoppedRootBTNode::new(
                                                      1,
                                                      PrintLogActionNode::new(
                                                          1,

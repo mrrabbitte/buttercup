@@ -13,6 +13,17 @@ pub struct UntilStoppedRootBTNode {
 
 }
 
+impl UntilStoppedRootBTNode {
+
+    pub fn new(id: i32, child: BTNode) -> UntilStoppedRootBTNode {
+        UntilStoppedRootBTNode {
+            id,
+            child: Arc::new(child)
+        }
+    }
+
+}
+
 #[async_trait(?Send)]
 impl BehaviorTreeNode for UntilStoppedRootBTNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {

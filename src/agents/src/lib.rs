@@ -14,7 +14,7 @@ pub mod service;
 
 pub struct Agent {
 
-    id: i32,
+    id: Uuid,
     abort_handle: Mutex<Option<AbortHandle>>,
     context: Arc<BTNodeExecutionContextHolder>,
     tree: Arc<BehaviorTree>
@@ -23,7 +23,7 @@ pub struct Agent {
 
 impl Agent {
 
-    pub fn new(id: i32,
+    pub fn new(id: Uuid,
                context: Arc<BTNodeExecutionContextHolder>,
                tree: Arc<BehaviorTree>) -> Agent {
         Agent {
@@ -36,8 +36,13 @@ impl Agent {
 
     pub async fn start(&mut self) -> Result<TickStatus, AgentError> {
         let abort_registration = self.create_abort_registration()?;
-        Result::Ok(Abortable::new(self.tree.tick(self.context.get_context()),
-                                  abort_registration).await??)
+
+        let result = Abortable::new(
+            self.tree.tick(
+                self.context.get_context()), abort_registration).await??;
+        self.abort_handle.get_mut()?.take();
+
+        Result::Ok(result)
     }
 
     pub async fn stop(&mut self) -> Result<(), AgentError> {
@@ -107,7 +112,7 @@ mod tests {
         let path = {
             let context: Arc<BTNodeExecutionContextHolder> =
                 Arc::new(BTNodeContextService::default().build_new().unwrap());
-            assert_eq!(Agent::new(1,
+            assert_eq!(Agent::new(Uuid::new_v4(),
                                   context.clone(),
                                   Arc::new(
                                       BehaviorTree::new(1,
