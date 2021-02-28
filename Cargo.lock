@@ -796,6 +796,7 @@ dependencies = [
  "actix-web",
  "buttercup_blackboards",
  "buttercup_bts",
+ "buttercup_endpoints",
  "dashmap 3.11.10",
  "futures",
  "serde",

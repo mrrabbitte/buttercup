@@ -228,13 +228,13 @@ mod tests {
          let service = LocalBlackboardService::default();
 
          service.create(
-                    Uuid::from_u128(FIRST_DB_UUID),
+                    &Uuid::from_u128(FIRST_DB_UUID),
                     format!("temp_test/{}.rocksdb", FIRST_DB_UUID).into()).unwrap();
          service.create(
-                    Uuid::from_u128(SECOND_DB_UUID),
+                    &Uuid::from_u128(SECOND_DB_UUID),
                     format!("temp_test/{}.rocksdb", SECOND_DB_UUID).into()).unwrap();
          service.create(
-                    Uuid::from_u128(THIRD_DB_UUID),
+                    &Uuid::from_u128(THIRD_DB_UUID),
                     format!("temp_test/{}.rocksdb", THIRD_DB_UUID).into()).unwrap();
 
          service
