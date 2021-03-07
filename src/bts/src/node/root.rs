@@ -22,7 +22,7 @@ pub enum RootBTNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for RootBTNode {
     async fn tick(&self,
                   context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {

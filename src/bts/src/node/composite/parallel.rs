@@ -42,7 +42,7 @@ impl ParallelCompositeNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for ParallelCompositeNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         let mut futures = Vec::new();

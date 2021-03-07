@@ -91,7 +91,7 @@ impl ReactiveConditionDecoratorNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for ReactiveConditionDecoratorNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match context.get_values(&self.value_names) {

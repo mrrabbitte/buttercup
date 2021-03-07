@@ -15,7 +15,7 @@ pub struct ReactiveRootBTNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for ReactiveRootBTNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         loop {

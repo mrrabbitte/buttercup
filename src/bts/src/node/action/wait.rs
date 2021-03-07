@@ -49,7 +49,7 @@ impl WaitDurationActionNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for WaitDurationActionNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match self.duration.get_value(context) {

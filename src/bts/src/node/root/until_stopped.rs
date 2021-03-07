@@ -24,7 +24,7 @@ impl UntilStoppedRootBTNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for UntilStoppedRootBTNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         loop {

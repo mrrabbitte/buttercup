@@ -16,7 +16,7 @@ pub struct SequenceCompositeNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for SequenceCompositeNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         for child in &self.children {

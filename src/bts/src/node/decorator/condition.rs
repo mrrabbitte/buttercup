@@ -47,7 +47,7 @@ impl ConditionDecoratorNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for ConditionDecoratorNode {
 
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {

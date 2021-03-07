@@ -27,7 +27,7 @@ impl FallbackCompositeNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for FallbackCompositeNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         let mut errs = Vec::new();

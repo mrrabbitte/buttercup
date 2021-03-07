@@ -25,7 +25,7 @@ impl OneOffRootBTNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for OneOffRootBTNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         self.child.tick(context).await

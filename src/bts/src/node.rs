@@ -31,14 +31,14 @@ pub enum BTNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 pub trait BehaviorTreeNode {
 
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError>;
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for BTNode {
 
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {

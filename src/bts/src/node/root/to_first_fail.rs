@@ -14,7 +14,7 @@ pub struct ToFirstFailRootBTNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for ToFirstFailRootBTNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         loop {
