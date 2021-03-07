@@ -27,6 +27,7 @@ pub struct ReactiveConditionDecoratorNode {
 
     #[derivative(Debug="ignore")]
     predicate: Box<dyn Fn(&ValuesPayload)  -> bool + Send + Sync>,
+
     value_names: HashSet<String>
 
 }

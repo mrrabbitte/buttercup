@@ -17,7 +17,8 @@ pub struct Agent {
     id: Uuid,
     abort_handle: Mutex<Option<AbortHandle>>,
     context: Arc<BTNodeExecutionContextHolder>,
-    tree: Arc<BehaviorTree>
+    tree: Arc<BehaviorTree>,
+    results: Vec<Result<TickStatus, AgentError>>
 
 }
 
@@ -30,19 +31,18 @@ impl Agent {
             id,
             abort_handle: Mutex::default(),
             context,
-            tree
+            tree,
+            results: Vec::new()
         }
     }
 
-    pub async fn start(&mut self) -> Result<TickStatus, AgentError> {
-        let abort_registration = self.create_abort_registration()?;
+    pub fn get_results(&self) -> &Vec<Result<TickStatus, AgentError>> {
+        &self.results
+    }
 
-        let result = Abortable::new(
-            self.tree.tick(
-                self.context.get_context()), abort_registration).await??;
-        self.abort_handle.get_mut()?.take();
-
-        Result::Ok(result)
+    pub async fn start(&mut self) {
+        let result = self.do_start().await;
+        self.results.push(result);
     }
 
     pub async fn stop(&mut self) -> Result<(), AgentError> {
@@ -62,6 +62,19 @@ impl Agent {
             AbortHandle::new_pair();
         abort_handle_maybe.replace(abort_handle);
         Result::Ok(abort_registration)
+    }
+
+    async fn do_start(&mut self) -> Result<TickStatus, AgentError> {
+        let abort_registration = self.create_abort_registration()?;
+
+        let result =
+            Abortable::new(
+                self.tree.tick(
+                    self.context.get_context()), abort_registration).await??;
+
+        self.abort_handle.get_mut()?.take();
+
+        Result::Ok(result)
     }
 
 }
@@ -112,22 +125,30 @@ mod tests {
         let path = {
             let context: Arc<BTNodeExecutionContextHolder> =
                 Arc::new(BTNodeContextService::default().build_new().unwrap());
-            assert_eq!(Agent::new(Uuid::new_v4(),
-                                  context.clone(),
-                                  Arc::new(
-                                      BehaviorTree::new(1,
-                                                        OneOffRootBTNode::new(
-                                                            1,
-                                                            PrintLogActionNode::new(
-                                                                1,
-                                                                "hello".to_owned())
-                                                                .into()
-                                                        )
-                                                            .into()
-                                      )
-                                  )
-            ).start().await,
-                       Result::Ok(TickStatus::Success));
+            let mut agent = Agent::new(Uuid::new_v4(),
+                                   context.clone(),
+                                   Arc::new(
+                                       BehaviorTree::new(1,
+                                                         OneOffRootBTNode::new(
+                                                             1,
+                                                             PrintLogActionNode::new(
+                                                                 1,
+                                                                 "hello".to_owned())
+                                                                 .into()
+                                                         )
+                                                             .into()
+                                       )
+                                   )
+            );
+
+            agent.start().await;
+
+            let results = agent.get_results();
+
+            assert_eq!(results.is_empty(), false);
+            assert_eq!(results.contains(
+                &Result::Ok(TickStatus::Success)), true);
+
             test_utils::get_path(context.get_context())
         };
 

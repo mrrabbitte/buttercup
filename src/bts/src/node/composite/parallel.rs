@@ -84,7 +84,7 @@ impl BehaviorTreeNode for ParallelCompositeNode {
                 if errors.is_empty() {
                     return Result::Ok(TickStatus::Failure);
                 }
-                return Result::Err(TickError::CompositeError(self.id, errors));
+                return Result::Err(TickError::CompositeError(self.id, Arc::new(errors)));
             }
         }
         Result::Ok(TickStatus::Success)

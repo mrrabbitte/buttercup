@@ -45,7 +45,7 @@ impl BehaviorTreeNode for FallbackCompositeNode {
         if errs.is_empty() {
             return Result::Ok(TickStatus::Failure);
         }
-        return Result::Err(TickError::CompositeError(self.id, errs));
+        return Result::Err(TickError::CompositeError(self.id, Arc::new(errs)));
     }
 }
 

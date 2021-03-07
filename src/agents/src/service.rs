@@ -1,7 +1,9 @@
 use std::sync::{Arc, Mutex};
 
 use actix::Arbiter;
+use actix_web::dev::Service;
 use dashmap::DashMap;
+use futures::io::Error;
 use tokio::runtime::Runtime;
 use uuid::Uuid;
 
@@ -55,14 +57,16 @@ impl AgentService {
 
     pub fn start_agent_by_id(&self,
                              agent_id: &Uuid) -> Result<(), AgentServiceError> {
-        self.agents
-            .alter(agent_id,
-                   |id, agent| {
-                       self.runtime.spawn(
-                           agent.lock().unwrap().start());
-                       agent
-                   }
-            );
+        // self.agents
+        //     .alter(agent_id,
+        //            |id, agent| {
+        //                let future = agent.lock().unwrap().start();
+        //
+        //                //self.runtime.spawn(future);
+        //
+        //                agent
+        //            }
+        //     );
 
         Result::Ok(())
     }
@@ -73,6 +77,7 @@ impl AgentService {
 pub enum AgentServiceError {
 
     BTNodeContextServiceError(BTNodeContextServiceError),
+    IOError(std::io::Error),
     TreeOfGivenIdNotFound(i32)
 
 }
@@ -80,5 +85,11 @@ pub enum AgentServiceError {
 impl From<BTNodeContextServiceError> for AgentServiceError {
     fn from(err: BTNodeContextServiceError) -> Self {
         AgentServiceError::BTNodeContextServiceError(err)
+    }
+}
+
+impl From<std::io::Error> for AgentServiceError {
+    fn from(err: Error) -> Self {
+        AgentServiceError::IOError(err)
     }
 }
