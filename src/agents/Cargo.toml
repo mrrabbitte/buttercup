@@ -13,6 +13,7 @@ actix-web = "3.0.0"
 buttercup_blackboards = { path = "../blackboards" }
 buttercup_bts = { path = "../bts" }
 buttercup_endpoints = { path = "../endpoints" }
+chrono = {version = "0.4", features = ["serde"]}
 dashmap = "3.11"
 futures = "0.3"
 uuid = { version = "0.8", features = ["serde", "v4"] }

@@ -12,12 +12,16 @@ use buttercup_bts::tree::BehaviorTreeService;
 use buttercup_endpoints::endpoints::EndpointService;
 
 use crate::Agent;
+use std::ops::DerefMut;
+use futures::future::AbortHandle;
+use crate::service::AgentServiceError::AgentAlreadyStarted;
 
 pub struct AgentService {
 
-    agents: DashMap<Uuid, Mutex<Agent>>,
     context_service: Arc<BTNodeContextService>,
     endpoint_service: Arc<EndpointService>,
+    started_agents: DashMap<Uuid, (Arc<Agent>, AbortHandle)>,
+    stopped_agents: DashMap<Uuid, Arc<Agent>>,
     tree_service: Arc<BehaviorTreeService>,
     runtime: Runtime
 
@@ -30,7 +34,8 @@ impl AgentService {
                tree_service: Arc<BehaviorTreeService>) -> Result<AgentService, AgentServiceError> {
         Result::Ok(
             AgentService {
-                agents: DashMap::new(),
+                stopped_agents: DashMap::new(),
+                started_agents: DashMap::new(),
                 context_service,
                 endpoint_service,
                 tree_service,
@@ -46,8 +51,9 @@ impl AgentService {
                 Arc::new(self.context_service.build_new()?);
 
             let agent_id = Uuid::new_v4();
-            self.agents.insert(agent_id,
-                               Mutex::new(Agent::new(agent_id.clone(), context, tree)));
+            self.stopped_agents.insert(agent_id,
+                                       Arc::new(
+                                           Agent::new(agent_id.clone(), context, tree)));
 
             return Result::Ok(agent_id);
         }
@@ -57,16 +63,27 @@ impl AgentService {
 
     pub fn start_agent_by_id(&self,
                              agent_id: &Uuid) -> Result<(), AgentServiceError> {
-        // self.agents
-        //     .alter(agent_id,
-        //            |id, agent| {
-        //                let future = agent.lock().unwrap().start();
-        //
-        //                //self.runtime.spawn(future);
-        //
-        //                agent
-        //            }
-        //     );
+        match self.stopped_agents.remove(agent_id) {
+            None => {
+                if self.started_agents.contains_key(agent_id) {
+                    return Result::Err(AgentServiceError::AgentAlreadyStarted);
+                }
+                return Result::Err(AgentServiceError::AgentOfGivenIdNotFound);
+            }
+            Some(agent_entry) => {
+                let agent = agent_entry.1;
+                let (abort_handle, abort_registration) =
+                    AbortHandle::new_pair();
+
+                let agent_ref = agent.clone();
+
+                self.runtime.spawn(async move {
+                    agent.start(abort_registration).await
+                });
+
+                self.started_agents.insert(agent_id.clone(), (agent_ref, abort_handle));
+            }
+        }
 
         Result::Ok(())
     }
@@ -76,6 +93,8 @@ impl AgentService {
 
 pub enum AgentServiceError {
 
+    AgentAlreadyStarted,
+    AgentOfGivenIdNotFound,
     BTNodeContextServiceError(BTNodeContextServiceError),
     IOError(std::io::Error),
     TreeOfGivenIdNotFound(i32)

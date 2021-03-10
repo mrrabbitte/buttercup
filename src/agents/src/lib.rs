@@ -2,6 +2,7 @@ use std::future::Future;
 use std::sync::{Arc, Mutex, PoisonError};
 
 use actix::{Actor, Context, Handler, ResponseActFuture};
+use chrono::{DateTime, NaiveDateTime, Utc};
 use futures::future::{Abortable, Aborted, AbortHandle, AbortRegistration};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -15,10 +16,8 @@ pub mod service;
 pub struct Agent {
 
     id: Uuid,
-    abort_handle: Mutex<Option<AbortHandle>>,
     context: Arc<BTNodeExecutionContextHolder>,
-    tree: Arc<BehaviorTree>,
-    results: Vec<Result<TickStatus, AgentError>>
+    tree: Arc<BehaviorTree>
 
 }
 
@@ -29,52 +28,33 @@ impl Agent {
                tree: Arc<BehaviorTree>) -> Agent {
         Agent {
             id,
-            abort_handle: Mutex::default(),
             context,
-            tree,
-            results: Vec::new()
+            tree
         }
     }
 
-    pub fn get_results(&self) -> &Vec<Result<TickStatus, AgentError>> {
-        &self.results
+    pub async fn start(&self,
+                       abort_registration: AbortRegistration) -> AgentExecutionResult {
+        let exec_id = Uuid::new_v4();
+        let started_at = Utc::now();
+
+        let result = self.do_start(abort_registration).await;
+
+        AgentExecutionResult::new(
+            exec_id,
+            self.id.clone(),
+            Utc::now().naive_utc(),
+            result,
+            started_at.naive_utc())
     }
 
-    pub async fn start(&mut self) {
-        let result = self.do_start().await;
-        self.results.push(result);
-    }
-
-    pub async fn stop(&mut self) -> Result<(), AgentError> {
-        match self.abort_handle.get_mut()?.take() {
-            None => {}
-            Some(handle) => handle.abort()
-        }
-        Result::Ok(())
-    }
-
-    fn create_abort_registration(&mut self) -> Result<AbortRegistration, AgentError> {
-        let abort_handle_maybe = self.abort_handle.get_mut()?;
-        if abort_handle_maybe.is_some() {
-            return Result::Err(AgentError::AlreadyRunning);
-        }
-        let (abort_handle, abort_registration) =
-            AbortHandle::new_pair();
-        abort_handle_maybe.replace(abort_handle);
-        Result::Ok(abort_registration)
-    }
-
-    async fn do_start(&mut self) -> Result<TickStatus, AgentError> {
-        let abort_registration = self.create_abort_registration()?;
-
-        let result =
+    async fn do_start(&self,
+                      abort_registration: AbortRegistration) -> Result<TickStatus, AgentError> {
+        Result::Ok(
             Abortable::new(
                 self.tree.tick(
-                    self.context.get_context()), abort_registration).await??;
-
-        self.abort_handle.get_mut()?.take();
-
-        Result::Ok(result)
+                    self.context.get_context()), abort_registration)
+                .await??)
     }
 
 }
@@ -84,8 +64,7 @@ pub enum AgentError {
 
     AbortedError(String),
     AlreadyRunning,
-    ExecutionError(TickError),
-    LockPoisoned(String)
+    ExecutionError(TickError)
 
 }
 
@@ -101,11 +80,35 @@ impl From<Aborted> for AgentError {
     }
 }
 
-impl From<PoisonError<&mut Option<AbortHandle>>> for AgentError {
-    fn from(val: PoisonError<&mut Option<AbortHandle>>) -> Self {
-        AgentError::LockPoisoned(val.to_string())
-    }
+pub struct AgentExecutionResult {
+
+    id: Uuid,
+    agent_id: Uuid,
+    ended_at_utc: NaiveDateTime,
+    result: Result<TickStatus, AgentError>,
+    started_at_utc: NaiveDateTime
+
 }
+
+impl AgentExecutionResult {
+
+    pub fn new(id: Uuid,
+               agent_id: Uuid,
+               ended_at_utc: NaiveDateTime,
+               result: Result<TickStatus, AgentError>,
+               started_at_utc: NaiveDateTime) -> AgentExecutionResult {
+        AgentExecutionResult {
+            id,
+            agent_id,
+            ended_at_utc,
+            result,
+            started_at_utc
+        }
+    }
+
+}
+
+
 
 #[cfg(test)]
 mod tests {
@@ -126,28 +129,25 @@ mod tests {
             let context: Arc<BTNodeExecutionContextHolder> =
                 Arc::new(BTNodeContextService::default().build_new().unwrap());
             let mut agent = Agent::new(Uuid::new_v4(),
-                                   context.clone(),
-                                   Arc::new(
-                                       BehaviorTree::new(1,
-                                                         OneOffRootBTNode::new(
-                                                             1,
-                                                             PrintLogActionNode::new(
+                                       context.clone(),
+                                       Arc::new(
+                                           BehaviorTree::new(1,
+                                                             OneOffRootBTNode::new(
                                                                  1,
-                                                                 "hello".to_owned())
+                                                                 PrintLogActionNode::new(
+                                                                     1,
+                                                                     "hello".to_owned())
+                                                                     .into()
+                                                             )
                                                                  .into()
-                                                         )
-                                                             .into()
+                                           )
                                        )
-                                   )
             );
+            let (abort_handle, abort_registration) =
+                AbortHandle::new_pair();
+            let result = agent.start(abort_registration).await;
 
-            agent.start().await;
-
-            let results = agent.get_results();
-
-            assert_eq!(results.is_empty(), false);
-            assert_eq!(results.contains(
-                &Result::Ok(TickStatus::Success)), true);
+            assert_eq!(result.result.unwrap(), TickStatus::Success);
 
             test_utils::get_path(context.get_context())
         };

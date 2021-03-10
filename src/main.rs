@@ -69,63 +69,6 @@ async fn abort_tick(data: Data<Arc<BTNodeExecutionContext>>) -> String {
     "Aborted".to_owned()
 }
 
-async fn example(agents_data: Data<Mutex<Agents>>,
-                 context_service: Data<Arc<BTNodeContextService>>) -> String {
-    let mut agents = agents_data.lock().unwrap();
-    let agent = Agent::new(Uuid::new_v4(),
-                           Arc::new(
-                               context_service
-                                   .get_ref()
-                                   .build_new()
-                                   .unwrap()),
-                           Arc::new(
-                               BehaviorTree::new(1,
-                                                 UntilStoppedRootBTNode::new(
-                                                     1,
-                                                     PrintLogActionNode::new(
-                                                         1,
-                                                         "hello".to_owned())
-                                                         .into()
-                                                 )
-                                                     .into()
-                               )
-                           )
-    );
-    agents.push(agent);
-
-    let mut response = String::new();
-
-    for agent in &mut agents.agents {
-        let response_one = agent.start().await;
-        let response_two = agent.start().await;
-        let response_three = agent.start().await;
-        response.push_str(format!("Welcome: {:?}, {:?}, {:?}",
-                                  response_one,
-                                  response_two,
-                                  response_three)
-            .as_str());
-        agent.start().await;
-    }
-    response.to_owned()
-}
-
-pub struct Agents {
-
-    agents: Vec<Agent>
-
-}
-
-impl Agents {
-
-    pub fn push(&mut self, agent: Agent) {
-        self.agents.push(agent)
-    }
-
-    pub fn len(&self) -> usize {
-        self.agents.len()
-    }
-}
-
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
@@ -149,20 +92,14 @@ async fn main() -> std::io::Result<()> {
                 blackboard_service.clone(),
                 vec![bt_node_context.get_value_changes_listener()]
             )));
-    let agents_data =  Data::new(Mutex::new(Agents{ agents: vec![]}));
+
     let context_service_data = Data::new(context_service.clone());
 
     HttpServer::new(move || {
         App::new()
-            .app_data(agents_data.clone())
             .app_data(context_data.clone())
             .app_data(context_service_data.clone())
             .app_data(endpoints_service_data.clone())
-            .service(
-                resource("/test")
-                    .route(
-                        get().to(example))
-            )
             .service(endpoint)
             .service(
                 resource("/tick")
