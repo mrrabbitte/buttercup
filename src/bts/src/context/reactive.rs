@@ -10,7 +10,7 @@ use crate::context::BTNodeExecutionContext;
 use crate::node::decorator::reactive::ReactiveConditionDecoratorNode;
 use crate::node::BTNode;
 
-pub struct ReactiveService {
+pub struct ReactiveContext {
 
     abort_handles: DashMap<i32, AbortEntry>,
     nodes_by_value_names: DashMap<String, Vec<ReactiveNodeEntry>>
@@ -18,17 +18,17 @@ pub struct ReactiveService {
 }
 
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
-pub enum ReactiveServiceError {
+pub enum ReactiveContextError {
 
     AbortEntryNotFound(i32),
     AbortEntryLockError(i32, String)
 
 }
 
-impl ReactiveService {
+impl ReactiveContext {
 
-    pub fn new() -> ReactiveService {
-        ReactiveService { abort_handles: DashMap::new(), nodes_by_value_names: DashMap::new() }
+    pub fn new() -> ReactiveContext {
+        ReactiveContext { abort_handles: DashMap::new(), nodes_by_value_names: DashMap::new() }
     }
 
     pub fn cleanup_node(&self,
@@ -70,9 +70,9 @@ impl ReactiveService {
 
     pub fn register(&self,
                     bt_node_id: &i32,
-                    handle: AbortHandle) -> Result<(), ReactiveServiceError> {
+                    handle: AbortHandle) -> Result<(), ReactiveContextError> {
         match self.abort_handles.get(bt_node_id) {
-            None => Result::Err(ReactiveServiceError::AbortEntryNotFound(*bt_node_id)),
+            None => Result::Err(ReactiveContextError::AbortEntryNotFound(*bt_node_id)),
             Some(entry) => match entry.push(handle) {
                 Ok(_) => Result::Ok(()),
                 Err(err) => Result::Err(err)
@@ -81,9 +81,9 @@ impl ReactiveService {
     }
 
     pub fn abort(&self,
-                 bt_node_id: &i32) -> Result<(), ReactiveServiceError> {
+                 bt_node_id: &i32) -> Result<(), ReactiveContextError> {
         match self.abort_handles.get(bt_node_id) {
-            None => Result::Err(ReactiveServiceError::AbortEntryNotFound(*bt_node_id)),
+            None => Result::Err(ReactiveContextError::AbortEntryNotFound(*bt_node_id)),
             Some(entry) => match entry.abort() {
                 Ok(_) => Result::Ok(()),
                 Err(err) => Result::Err(err)
@@ -93,12 +93,12 @@ impl ReactiveService {
 
     pub fn handle_value_changes(&self,
                                 context: &BTNodeExecutionContext,
-                                changed_value_names: HashSet<String>) {
+                                changed_value_names: &HashSet<String>) {
         let mut already_called = HashSet::new();
 
         for value_name in changed_value_names {
             if let Some(nodes) =
-            self.nodes_by_value_names.get(&value_name) {
+            self.nodes_by_value_names.get(value_name) {
                 for node in nodes.value() {
                     let node_id = node.get_id();
 
@@ -113,9 +113,9 @@ impl ReactiveService {
 
 }
 
-impl Default for ReactiveService {
+impl Default for ReactiveContext {
     fn default() -> Self {
-        ReactiveService::new()
+        ReactiveContext::new()
     }
 }
 
@@ -135,7 +135,7 @@ impl AbortEntry {
         }
     }
 
-    fn push(&self, handle: AbortHandle) -> Result<(), ReactiveServiceError> {
+    fn push(&self, handle: AbortHandle) -> Result<(), ReactiveContextError> {
         match self.handles.lock() {
             Ok(mut handlers) => {
                 handlers.push(handle);
@@ -143,11 +143,11 @@ impl AbortEntry {
             },
             Err(err) =>
                 Result::Err(
-                    ReactiveServiceError::AbortEntryLockError(self.bt_node_id, err.to_string()))
+                    ReactiveContextError::AbortEntryLockError(self.bt_node_id, err.to_string()))
         }
     }
 
-    fn abort(&self) -> Result<(), ReactiveServiceError> {
+    fn abort(&self) -> Result<(), ReactiveContextError> {
         match self.handles.lock() {
             Ok(mut handlers) => {
 
@@ -160,7 +160,7 @@ impl AbortEntry {
             },
             Err(err) =>
                 Result::Err(
-                    ReactiveServiceError::AbortEntryLockError(self.bt_node_id, err.to_string()))
+                    ReactiveContextError::AbortEntryLockError(self.bt_node_id, err.to_string()))
         }
     }
 

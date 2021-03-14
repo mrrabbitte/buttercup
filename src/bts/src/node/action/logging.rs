@@ -25,7 +25,7 @@ impl PrintLogActionNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for PrintLogActionNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         println!("[{}] {}", self.id, self.message);

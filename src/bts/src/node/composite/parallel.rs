@@ -1,5 +1,4 @@
 use std::future::Future;
-use std::sync::Arc;
 
 use actix_rt::Arbiter;
 use async_trait::async_trait;
@@ -9,13 +8,14 @@ use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::composite::CompositeBTNode;
 use crate::tick::{TickError, TickStatus};
+use std::sync::Arc;
 
 #[derive(Derivative)]
 #[derivative(Debug)]
 pub struct ParallelCompositeNode {
 
     id: i32,
-    children: Vec<Arc<BTNode>>,
+    children: Vec<BTNode>,
     num_successes_to_succeed: usize,
     num_failures_to_fail: usize
 
@@ -33,7 +33,7 @@ impl ParallelCompositeNode {
         Result::Ok(
             ParallelCompositeNode {
                 id,
-                children: children.into_iter().map(|e| Arc::new(e)).collect(),
+                children,
                 num_successes_to_succeed,
                 num_failures_to_fail
             }
@@ -42,13 +42,13 @@ impl ParallelCompositeNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for ParallelCompositeNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         let mut futures = Vec::new();
 
         for child in &self.children {
-            futures.push(child.as_ref().tick(context));
+            futures.push(child.tick(context));
         }
 
         let mut num_failures: usize = 0;
@@ -84,7 +84,7 @@ impl BehaviorTreeNode for ParallelCompositeNode {
                 if errors.is_empty() {
                     return Result::Ok(TickStatus::Failure);
                 }
-                return Result::Err(TickError::CompositeError(self.id, errors));
+                return Result::Err(TickError::CompositeError(self.id, Arc::new(errors)));
             }
         }
         Result::Ok(TickStatus::Success)
@@ -104,6 +104,7 @@ mod tests {
 
     use actix_web::test;
 
+    use crate::context::test_utils;
     use crate::node::action::logging::PrintLogActionNode;
     use crate::node::action::wait::WaitDurationActionNode;
 
@@ -111,21 +112,27 @@ mod tests {
 
     #[actix_rt::test]
     async fn test_finishes_based_on_minimal_number_of_successes() {
-        let context = Default::default();
-        let children: Vec<BTNode> = vec![
-            PrintLogActionNode::new(1, "I am one.".to_string()).into(),
-            WaitDurationActionNode::new(2, Duration::from_millis(10)).into(),
-            PrintLogActionNode::new(3, "I am two.".to_string()).into(),
-            PrintLogActionNode::new(4, "I am four.".to_string()).into()];
-        match ParallelCompositeNode::new(5, children, 3)
-            .unwrap()
-            .tick(&context)
-            .await {
-            Ok(status) => {
-                assert_eq!(TickStatus::Success, status)
+        let path = {
+            let context = Default::default();
+            let children: Vec<BTNode> = vec![
+                PrintLogActionNode::new(1, "I am one.".to_string()).into(),
+                WaitDurationActionNode::new(2, Duration::from_millis(10)).into(),
+                PrintLogActionNode::new(3, "I am two.".to_string()).into(),
+                PrintLogActionNode::new(4, "I am four.".to_string()).into()];
+            match ParallelCompositeNode::new(5, children, 3)
+                .unwrap()
+                .tick(&context)
+                .await {
+                Ok(status) => {
+                    assert_eq!(TickStatus::Success, status)
+                }
+                Err(err) => panic!("Expected success.")
             }
-            Err(err) => panic!("Expected success.")
-        }
+
+            test_utils::get_path(&context)
+        };
+        
+        test_utils::destroy(path);
     }
 
 }

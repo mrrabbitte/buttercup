@@ -5,9 +5,11 @@ use std::task::{Context, Poll};
 use actix::Message;
 use serde::{Deserialize, Serialize};
 
-use crate::context::reactive::ReactiveServiceError;
-use buttercup_blackboards::BlackboardError;
+use crate::context::reactive::ReactiveContextError;
+use buttercup_blackboards::LocalBlackboardError;
 use buttercup_variables::VariableValueAccessError;
+use std::sync::Arc;
+
 
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum TickStatus {
@@ -21,9 +23,9 @@ pub enum TickStatus {
 pub enum TickError {
 
     AbortedExecution(i32),
-    BlackboardError(i32, BlackboardError),
-    CompositeError(i32, Vec<(i32, TickError)>),
-    ReactiveServiceError(i32, ReactiveServiceError),
+    BlackboardError(i32, LocalBlackboardError),
+    CompositeError(i32, Arc<Vec<(i32, TickError)>>),
+    ReactiveServiceError(i32, ReactiveContextError),
     VariableValueAccessError(i32, VariableValueAccessError)
 
 }

@@ -110,6 +110,12 @@ impl From<String> for ValueHolder {
     }
 }
 
+impl From<&str> for ValueHolder {
+    fn from(val: &str) -> Self {
+        ValueHolder::String(Arc::new(val.to_owned()))
+    }
+}
+
 #[derive(AsRefStr, EnumVariantNames, EnumIter,
 Debug, Clone, Hash, Eq, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum ValueType {

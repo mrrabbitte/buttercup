@@ -6,7 +6,7 @@ use std::time::Duration;
 use async_std::task;
 use async_trait::async_trait;
 
-use buttercup_blackboards::BlackboardError;
+use buttercup_blackboards::LocalBlackboardError;
 use buttercup_values::ValueHolder;
 use buttercup_variables::{VariableSpecification, VariableValueAccessError};
 
@@ -49,7 +49,7 @@ impl WaitDurationActionNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for WaitDurationActionNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match self.duration.get_value(context) {

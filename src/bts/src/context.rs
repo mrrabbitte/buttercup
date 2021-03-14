@@ -1,64 +1,105 @@
 use std::collections::HashSet;
+use std::ffi::OsString;
 use std::sync::Arc;
 
+use dashmap::DashMap;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use buttercup_blackboards::{BlackboardError, BlackboardService};
+use buttercup_blackboards::{LocalBlackboard, LocalBlackboardError, LocalBlackboardService};
 use buttercup_values::{ValueHolder, ValuesPayload};
 use buttercup_variables::{VariableName, VariableService, VariableServiceErrorReport, VariableValueAccessError};
 
-use crate::context::reactive::ReactiveService;
+use crate::context::reactive::ReactiveContext;
 use crate::node::BTNode;
+use buttercup_endpoints::endpoints::EndpointService;
 
 pub mod reactive;
 
+pub struct BTNodeExecutionContextHolder {
+
+    id: Uuid,
+    context: Arc<BTNodeExecutionContext>,
+    value_changes_listener: Arc<dyn Fn(&HashSet<String>) + Send + Sync>
+
+}
+
+impl BTNodeExecutionContextHolder {
+
+    pub fn new(id: Uuid,
+               local_blackboard: Arc<LocalBlackboard>,
+               reactive_service: Arc<ReactiveContext>) -> BTNodeExecutionContextHolder {
+        let context =
+            Arc::new(
+                BTNodeExecutionContext::new(
+                    local_blackboard,
+                    reactive_service.clone()));
+
+        BTNodeExecutionContextHolder {
+            id,
+            context: context.clone(),
+            value_changes_listener: Arc::new(move |changed|
+                reactive_service.handle_value_changes(
+                    context.as_ref(), changed))
+        }
+    }
+
+    pub fn get_id(&self) -> &Uuid {
+        &self.id
+    }
+
+    pub fn get_context(&self) -> &BTNodeExecutionContext {
+        self.context.as_ref()
+    }
+
+    pub fn get_value_changes_listener(&self) -> Arc<dyn Fn(&HashSet<String>) + Send + Sync> {
+        self.value_changes_listener.clone()
+    }
+
+}
+
 pub struct BTNodeExecutionContext {
 
-    blackboard_id: Uuid,
-    blackboard_service: Arc<BlackboardService>,
-    reactive_service: Arc<ReactiveService>
+    local_blackboard: Arc<LocalBlackboard>,
+    reactive_service: Arc<ReactiveContext>,
+
 
 }
 
 impl BTNodeExecutionContext {
 
-    pub fn new(blackboard_id: Uuid,
-               blackboard_service: Arc<BlackboardService>,
-               reactive_service: Arc<ReactiveService>) -> BTNodeExecutionContext {
+    pub fn new(local_blackboard: Arc<LocalBlackboard>,
+               reactive_service: Arc<ReactiveContext>) -> BTNodeExecutionContext {
         BTNodeExecutionContext {
-            blackboard_id,
-            blackboard_service,
+            local_blackboard,
             reactive_service
         }
     }
 
-    pub fn destroy(&self) -> Result<(), BlackboardError> {
-        self.blackboard_service.destroy(&self.blackboard_id)
-    }
-
-    pub fn get_values(&self,
-                      value_names: &HashSet<String>) -> Result<ValuesPayload, BlackboardError> {
-        if value_names.is_empty() {
-            return Result::Ok(ValuesPayload::empty());
-        }
-        self.blackboard_service.get_values(&self.blackboard_id, value_names)
-    }
-
-    pub fn get_value(&self,
-                     value_name: &String) -> Result<Option<ValueHolder>, BlackboardError> {
-        self.blackboard_service.get_value(&self.blackboard_id, value_name)
-    }
-
-    pub fn put_values(&self,
-                      payload: &ValuesPayload) -> Result<(), BlackboardError> {
-        self.blackboard_service.put_values(&self.blackboard_id, payload)
-    }
-
-    pub fn get_reactive_service(&self) -> &Arc<ReactiveService> {
+    pub fn get_reactive_service(&self) -> &Arc<ReactiveContext> {
         &self.reactive_service
     }
 
-    fn map_err(err: BlackboardError) -> VariableValueAccessError {
+    pub fn get_values(&self,
+                      value_names: &HashSet<String>) -> Result<ValuesPayload, LocalBlackboardError> {
+        if value_names.is_empty() {
+            return Result::Ok(ValuesPayload::empty());
+        }
+
+        self.local_blackboard.get_values(value_names)
+    }
+
+    pub fn get_value(&self,
+                     value_name: &String) -> Result<Option<ValueHolder>, LocalBlackboardError> {
+        self.local_blackboard.get_value(value_name)
+    }
+
+    pub fn put_values(&self,
+                      payload: &ValuesPayload) -> Result<(), LocalBlackboardError> {
+        self.local_blackboard.put_values(payload)
+    }
+
+    fn map_err(err: LocalBlackboardError) -> VariableValueAccessError {
         VariableValueAccessError::VariableServiceError(
             VariableServiceErrorReport::new(
                 "Blackboard error".to_owned(),
@@ -70,8 +111,8 @@ impl VariableService for BTNodeExecutionContext {
     fn get_variable_value_by_name(&self,
                                   name: &VariableName)
                                   -> Result<Option<ValueHolder>, VariableValueAccessError> {
-        self.blackboard_service
-            .get_value(&self.blackboard_id, name.get_value())
+        self.local_blackboard
+            .get_value(name.get_value())
             .map_err(BTNodeExecutionContext::map_err)
     }
 }
@@ -79,9 +120,91 @@ impl VariableService for BTNodeExecutionContext {
 impl Default for BTNodeExecutionContext {
     fn default() -> Self {
         BTNodeExecutionContext::new(
-            Uuid::new_v4(),
-            Arc::new(Default::default()),
+            Arc::new(
+                LocalBlackboard::new(format!("{}.bb", Uuid::new_v4()).into()).unwrap()),
             Arc::new(Default::default()))
     }
 }
+#[derive(Default)]
+pub struct BTNodeContextService {
 
+    contexts: DashMap<Uuid, Arc<BTNodeExecutionContextHolder>>,
+    endpoint_service: Arc<EndpointService>,
+    local_blackboard_service: Arc<LocalBlackboardService>
+
+}
+
+#[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
+pub enum BTNodeContextServiceError {
+
+    LocalBlackboardError(LocalBlackboardError)
+
+}
+
+impl From<LocalBlackboardError> for BTNodeContextServiceError {
+    fn from(err: LocalBlackboardError) -> Self {
+        BTNodeContextServiceError::LocalBlackboardError(err)
+    }
+}
+
+impl BTNodeContextService {
+
+    pub fn new(endpoint_service: Arc<EndpointService>,
+               local_blackboard_service: Arc<LocalBlackboardService>) -> BTNodeContextService {
+        BTNodeContextService {
+            contexts: DashMap::new(),
+            endpoint_service,
+            local_blackboard_service
+        }
+    }
+
+    pub fn build_new(&self) -> Result<BTNodeExecutionContextHolder, BTNodeContextServiceError> {
+        let uuid = Uuid::new_v4();
+        let blackboard_service =
+            self.local_blackboard_service.create(
+                &uuid, format!("{}.bb", &uuid).into())?;
+
+        let holder = BTNodeExecutionContextHolder::new(
+            uuid,
+            blackboard_service,
+            Arc::new(ReactiveContext::new()));
+
+        self.endpoint_service.add_listener(holder.get_value_changes_listener());
+
+        Result::Ok(holder)
+    }
+
+    pub fn insert(&self,
+                  context: BTNodeExecutionContextHolder) {
+        self.contexts.insert(context.id, Arc::new(context));
+    }
+
+    pub fn get_by_id(&self,
+                     id: &Uuid) -> Option<Arc<BTNodeExecutionContextHolder>> {
+        self.contexts
+            .get(id)
+            .map(|context_arc| context_arc.clone())
+    }
+
+}
+
+pub mod test_utils {
+    use std::ffi::OsString;
+
+    use buttercup_blackboards::LocalBlackboard;
+
+    use crate::context::BTNodeExecutionContext;
+
+    pub fn cleanup(context: &BTNodeExecutionContext) {
+        destroy(get_path(context));
+    }
+
+    pub fn destroy(path: OsString) {
+        LocalBlackboard::destroy(path).unwrap();
+    }
+
+    pub fn get_path(context: &BTNodeExecutionContext) -> OsString {
+        context.local_blackboard.get_path().unwrap()
+    }
+
+}

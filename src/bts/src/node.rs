@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use buttercup_blackboards::{BlackboardError, BlackboardService};
+use buttercup_blackboards::{LocalBlackboardError, LocalBlackboard};
 use buttercup_values::ValuesPayload;
 
 use crate::context::BTNodeExecutionContext;
@@ -19,6 +19,7 @@ use crate::tick::{TickError, TickStatus};
 pub mod action;
 pub mod composite;
 pub mod decorator;
+pub mod root;
 
 #[derive(Derivative)]
 #[derivative(Debug)]
@@ -30,14 +31,14 @@ pub enum BTNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 pub trait BehaviorTreeNode {
 
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError>;
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for BTNode {
 
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {

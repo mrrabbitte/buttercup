@@ -7,7 +7,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4af87564ff659dee8f9981540cac9418c45e910c8072fdedd643a262a38fcaf"
 dependencies = [
  "actix-http 1.0.1",
- "actix-rt",
+ "actix-rt 1.1.1",
  "actix_derive",
  "bitflags",
  "bytes",
@@ -19,7 +19,7 @@ dependencies = [
  "parking_lot 0.10.2",
  "pin-project 0.4.23",
  "smallvec",
- "tokio",
+ "tokio 0.2.22",
  "tokio-util 0.2.0",
  "trust-dns-proto 0.18.0-alpha.2",
  "trust-dns-resolver 0.18.0-alpha.2",
@@ -31,7 +31,7 @@ version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1be241f88f3b1e7e9a3fbe3b5a8a0f6915b5a1d7ee0d9a248d3376d01068cc60"
 dependencies = [
- "actix-rt",
+ "actix-rt 1.1.1",
  "actix_derive",
  "bitflags",
  "bytes",
@@ -44,7 +44,7 @@ dependencies = [
  "parking_lot 0.11.0",
  "pin-project 0.4.23",
  "smallvec",
- "tokio",
+ "tokio 0.2.22",
  "tokio-util 0.3.1",
  "trust-dns-proto 0.19.6",
  "trust-dns-resolver 0.19.6",
@@ -61,7 +61,7 @@ dependencies = [
  "futures-core",
  "futures-sink",
  "log",
- "tokio",
+ "tokio 0.2.22",
  "tokio-util 0.2.0",
 ]
 
@@ -77,7 +77,7 @@ dependencies = [
  "futures-sink",
  "log",
  "pin-project 0.4.23",
- "tokio",
+ "tokio 0.2.22",
  "tokio-util 0.3.1",
 ]
 
@@ -88,7 +88,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c95cc9569221e9802bf4c377f6c18b90ef10227d787611decf79fd47d2a8e76c"
 dependencies = [
  "actix-codec 0.2.0",
- "actix-rt",
+ "actix-rt 1.1.1",
  "actix-service",
  "actix-utils 1.0.6",
  "derive_more",
@@ -107,7 +107,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "177837a10863f15ba8d3ae3ec12fac1099099529ed20083a27fdfe247381d0dc"
 dependencies = [
  "actix-codec 0.3.0",
- "actix-rt",
+ "actix-rt 1.1.1",
  "actix-service",
  "actix-utils 2.0.0",
  "derive_more",
@@ -127,7 +127,7 @@ checksum = "c16664cc4fdea8030837ad5a845eb231fb93fc3c5c171edfefb52fad92ce9019"
 dependencies = [
  "actix-codec 0.2.0",
  "actix-connect 1.0.2",
- "actix-rt",
+ "actix-rt 1.1.1",
  "actix-service",
  "actix-threadpool",
  "actix-utils 1.0.6",
@@ -171,7 +171,7 @@ checksum = "452299e87817ae5673910e53c243484ca38be3828db819b6011736fc6982e874"
 dependencies = [
  "actix-codec 0.3.0",
  "actix-connect 2.0.0",
- "actix-rt",
+ "actix-rt 1.1.1",
  "actix-service",
  "actix-threadpool",
  "actix-utils 2.0.0",
@@ -221,6 +221,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-macros"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dbcb2b608f0accc2f5bcf3dd872194ce13d94ee45b571487035864cf966b04ef"
+dependencies = [
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "actix-router"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -239,13 +249,24 @@ version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "143fcc2912e0d1de2bcf4e2f720d2a60c28652ab4179685a1ee159e0fb3db227"
 dependencies = [
- "actix-macros",
+ "actix-macros 0.1.2",
  "actix-threadpool",
  "copyless",
  "futures-channel",
  "futures-util",
  "smallvec",
- "tokio",
+ "tokio 0.2.22",
+]
+
+[[package]]
+name = "actix-rt"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b4e57bc1a3915e71526d128baf4323700bd1580bc676239e2298a4c5b001f18"
+dependencies = [
+ "actix-macros 0.2.0",
+ "futures-core",
+ "tokio 1.2.0",
 ]
 
 [[package]]
@@ -255,13 +276,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e6d74b464215a473c973a2d7d03a69cc10f4ce1f4b38a7659c5193dc5c675630"
 dependencies = [
  "actix-codec 0.2.0",
- "actix-rt",
+ "actix-rt 1.1.1",
  "actix-service",
  "actix-utils 1.0.6",
  "futures-channel",
  "futures-util",
  "log",
- "mio",
+ "mio 0.6.22",
  "mio-uds",
  "num_cpus",
  "slab",
@@ -284,8 +305,8 @@ version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "47239ca38799ab74ee6a8a94d1ce857014b2ac36f242f70f3f75a66f691e791c"
 dependencies = [
- "actix-macros",
- "actix-rt",
+ "actix-macros 0.1.2",
+ "actix-rt 1.1.1",
  "actix-server",
  "actix-service",
  "log",
@@ -326,7 +347,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fcf8f5631bf01adec2267808f00e228b761c60c0584cc9fa0b5364f41d147f4e"
 dependencies = [
  "actix-codec 0.2.0",
- "actix-rt",
+ "actix-rt 1.1.1",
  "actix-service",
  "bitflags",
  "bytes",
@@ -344,7 +365,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2e9022dec56632d1d7979e59af14f0597a28a830a9c1c7fec8b2327eb9f16b5a"
 dependencies = [
  "actix-codec 0.3.0",
- "actix-rt",
+ "actix-rt 1.1.1",
  "actix-service",
  "bitflags",
  "bytes",
@@ -365,9 +386,9 @@ checksum = "7d6d0a6ae7ff7290372b3f636b9fc38b76dfbfc395187ce21e5b95471f7ccab9"
 dependencies = [
  "actix-codec 0.3.0",
  "actix-http 2.2.0",
- "actix-macros",
+ "actix-macros 0.1.2",
  "actix-router",
- "actix-rt",
+ "actix-rt 1.1.1",
  "actix-server",
  "actix-service",
  "actix-testing",
@@ -571,7 +592,7 @@ dependencies = [
  "memchr",
  "num_cpus",
  "once_cell",
- "pin-project-lite",
+ "pin-project-lite 0.1.7",
  "pin-utils",
  "slab",
  "wasm-bindgen-futures",
@@ -631,7 +652,7 @@ checksum = "b381e490e7b0cfc37ebc54079b0413d8093ef43d14a4e4747083f7fa47a9e691"
 dependencies = [
  "actix-codec 0.3.0",
  "actix-http 2.2.0",
- "actix-rt",
+ "actix-rt 1.1.1",
  "actix-service",
  "base64 0.13.0",
  "bytes",
@@ -773,7 +794,7 @@ name = "buttercup"
 version = "0.1.0"
 dependencies = [
  "actix 0.9.0",
- "actix-rt",
+ "actix-rt 1.1.1",
  "actix-web",
  "buttercup_agents",
  "buttercup_blackboards",
@@ -783,6 +804,7 @@ dependencies = [
  "buttercup_values",
  "dashmap 3.11.10",
  "env_logger",
+ "serde",
  "serde_json",
  "uuid",
 ]
@@ -791,12 +813,17 @@ dependencies = [
 name = "buttercup_agents"
 version = "0.1.0"
 dependencies = [
- "actix 0.9.0",
- "actix-rt",
+ "actix 0.10.0",
+ "actix-rt 2.1.0",
  "actix-web",
  "buttercup_blackboards",
  "buttercup_bts",
+ "buttercup_endpoints",
+ "chrono",
  "dashmap 3.11.10",
+ "futures",
+ "serde",
+ "tokio 1.2.0",
  "uuid",
 ]
 
@@ -819,12 +846,13 @@ name = "buttercup_bts"
 version = "0.1.0"
 dependencies = [
  "actix 0.9.0",
- "actix-rt",
+ "actix-rt 1.1.1",
  "actix-web",
  "async-std",
  "async-trait",
  "buttercup_blackboards",
  "buttercup_conditions",
+ "buttercup_endpoints",
  "buttercup_values",
  "buttercup_variables",
  "dashmap 4.0.2",
@@ -1441,7 +1469,7 @@ dependencies = [
  "futures-io",
  "memchr",
  "parking",
- "pin-project-lite",
+ "pin-project-lite 0.1.7",
  "waker-fn",
 ]
 
@@ -1561,7 +1589,7 @@ dependencies = [
  "http",
  "indexmap",
  "slab",
- "tokio",
+ "tokio 0.2.22",
  "tokio-util 0.3.1",
  "tracing",
 ]
@@ -1762,9 +1790,9 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "libc"
-version = "0.2.76"
+version = "0.2.86"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "755456fae044e6fa1ebbbd1b3e902ae19e73097ed4ed87bb79934a867c007bc3"
+checksum = "b7282d924be3275cec7f6756ff4121987bc6481325397dde6ba3e7802b1a8b1c"
 
 [[package]]
 name = "libloading"
@@ -1886,10 +1914,23 @@ dependencies = [
  "kernel32-sys",
  "libc",
  "log",
- "miow",
+ "miow 0.2.1",
  "net2",
  "slab",
  "winapi 0.2.8",
+]
+
+[[package]]
+name = "mio"
+version = "0.7.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a5dede4e2065b3842b8b0af444119f3aa331cc7cc2dd20388bfb0f5d5a38823a"
+dependencies = [
+ "libc",
+ "log",
+ "miow 0.3.6",
+ "ntapi",
+ "winapi 0.3.9",
 ]
 
 [[package]]
@@ -1900,7 +1941,7 @@ checksum = "afcb699eb26d4332647cc848492bbc15eafb26f08d0304550d5aa1f612e066f0"
 dependencies = [
  "iovec",
  "libc",
- "mio",
+ "mio 0.6.22",
 ]
 
 [[package]]
@@ -1913,6 +1954,16 @@ dependencies = [
  "net2",
  "winapi 0.2.8",
  "ws2_32-sys",
+]
+
+[[package]]
+name = "miow"
+version = "0.3.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a33c1b55807fbed163481b5ba66db4b2fa6cde694a5027be10fb724206c5897"
+dependencies = [
+ "socket2",
+ "winapi 0.3.9",
 ]
 
 [[package]]
@@ -1952,6 +2003,15 @@ checksum = "ffb4262d26ed83a1c0a33a38fe2bb15797329c85770da05e6b828ddb782627af"
 dependencies = [
  "memchr",
  "version_check",
+]
+
+[[package]]
+name = "ntapi"
+version = "0.3.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3f6bb902e437b6d86e03cce10a7e2af662292c5dfef23b65899ea3ac9354ad44"
+dependencies = [
+ "winapi 0.3.9",
 ]
 
 [[package]]
@@ -2052,9 +2112,9 @@ checksum = "1ab52be62400ca80aa00285d25253d7f7c437b7375c4de678f5405d3afe82ca5"
 
 [[package]]
 name = "once_cell"
-version = "1.4.1"
+version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "260e51e7efe62b592207e9e13a68e43692a7a279171d6ba57abd208bf23645ad"
+checksum = "10acf907b94fc1b1a152d08ef97e7759650268cf986bf127f387e602b02c7e5a"
 
 [[package]]
 name = "opaque-debug"
@@ -2255,6 +2315,12 @@ name = "pin-project-lite"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "282adbf10f2698a7a77f8e983a74b2d18176c19a7fd32a45446139ae7b02b715"
+
+[[package]]
+name = "pin-project-lite"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "439697af366c49a6d0a010c56a0d97685bc140ce0d377b13a2ea2aa42d64a827"
 
 [[package]]
 name = "pin-utils"
@@ -2754,13 +2820,12 @@ checksum = "fbee7696b84bbf3d89a1c2eccff0850e3047ed46bfcd2e92c29a2d074d57e252"
 
 [[package]]
 name = "socket2"
-version = "0.3.12"
+version = "0.3.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "03088793f677dce356f3ccc2edb1b314ad191ab702a5de3faf49304f7e104918"
+checksum = "122e570113d28d773067fab24266b66753f6ea915758651696b6e35e49f88d6e"
 dependencies = [
- "cfg-if 0.1.10",
+ "cfg-if 1.0.0",
  "libc",
- "redox_syscall",
  "winapi 0.3.9",
 ]
 
@@ -3031,11 +3096,28 @@ dependencies = [
  "lazy_static",
  "libc",
  "memchr",
- "mio",
+ "mio 0.6.22",
  "mio-uds",
- "pin-project-lite",
+ "pin-project-lite 0.1.7",
  "signal-hook-registry",
  "slab",
+ "winapi 0.3.9",
+]
+
+[[package]]
+name = "tokio"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e8190d04c665ea9e6b6a0dc45523ade572c088d2e6566244c1122671dbf4ae3a"
+dependencies = [
+ "autocfg 1.0.0",
+ "libc",
+ "mio 0.7.9",
+ "num_cpus",
+ "once_cell",
+ "parking_lot 0.11.0",
+ "pin-project-lite 0.2.4",
+ "signal-hook-registry",
  "winapi 0.3.9",
 ]
 
@@ -3049,8 +3131,8 @@ dependencies = [
  "futures-core",
  "futures-sink",
  "log",
- "pin-project-lite",
- "tokio",
+ "pin-project-lite 0.1.7",
+ "tokio 0.2.22",
 ]
 
 [[package]]
@@ -3064,8 +3146,8 @@ dependencies = [
  "futures-io",
  "futures-sink",
  "log",
- "pin-project-lite",
- "tokio",
+ "pin-project-lite 0.1.7",
+ "tokio 0.2.22",
 ]
 
 [[package]]
@@ -3104,7 +3186,7 @@ dependencies = [
  "rand 0.7.3",
  "smallvec",
  "socket2",
- "tokio",
+ "tokio 0.2.22",
  "url",
 ]
 
@@ -3124,7 +3206,7 @@ dependencies = [
  "rand 0.7.3",
  "smallvec",
  "thiserror",
- "tokio",
+ "tokio 0.2.22",
  "url",
 ]
 
@@ -3143,7 +3225,7 @@ dependencies = [
  "lru-cache",
  "resolv-conf 0.6.3",
  "smallvec",
- "tokio",
+ "tokio 0.2.22",
  "trust-dns-proto 0.18.0-alpha.2",
 ]
 
@@ -3163,7 +3245,7 @@ dependencies = [
  "resolv-conf 0.7.0",
  "smallvec",
  "thiserror",
- "tokio",
+ "tokio 0.2.22",
  "trust-dns-proto 0.19.6",
 ]
 

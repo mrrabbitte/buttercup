@@ -2,18 +2,16 @@ use std::collections::HashSet;
 use std::future::Future;
 use std::iter::FromIterator;
 use std::ops::Deref;
-use std::sync::Arc;
 
 use actix_web::guard::Guard;
 use async_trait::async_trait;
 use futures::future::{Abortable, Aborted, AbortHandle};
 
-use buttercup_blackboards::BlackboardError;
+use buttercup_blackboards::LocalBlackboardError;
 use buttercup_conditions::ConditionExpressionWrapper;
 use buttercup_values::ValuesPayload;
 
 use crate::context::BTNodeExecutionContext;
-use crate::context::reactive::ReactiveServiceError;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::decorator::DecoratorBTNode;
 use crate::tick::{TickError, TickStatus};
@@ -23,7 +21,7 @@ use crate::tick::{TickError, TickStatus};
 pub struct ConditionDecoratorNode {
 
     id: i32,
-    child: Arc<BTNode>,
+    child: Box<BTNode>,
 
     #[derivative(Debug="ignore")]
     predicate: Box<dyn Fn(&ValuesPayload) -> bool + Send + Sync>,
@@ -35,12 +33,12 @@ pub struct ConditionDecoratorNode {
 impl ConditionDecoratorNode {
 
     pub fn new(id: i32,
-               child: Arc<BTNode>,
+               child: BTNode,
                condition: ConditionExpressionWrapper) -> ConditionDecoratorNode {
         let value_names = condition.get_value_names_cloned();
         ConditionDecoratorNode {
             id,
-            child,
+            child: Box::new(child),
             predicate: condition.unpack(),
             value_names
         }
@@ -48,7 +46,7 @@ impl ConditionDecoratorNode {
 
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl BehaviorTreeNode for ConditionDecoratorNode {
 
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
