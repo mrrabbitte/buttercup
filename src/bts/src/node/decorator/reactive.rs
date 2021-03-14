@@ -23,7 +23,7 @@ use crate::tick::{TickError, TickStatus};
 pub struct ReactiveConditionDecoratorNode {
 
     id: i32,
-    child: Arc<BTNode>,
+    child: Box<BTNode>,
 
     #[derivative(Debug="ignore")]
     predicate: Box<dyn Fn(&ValuesPayload)  -> bool + Send + Sync>,
@@ -50,12 +50,12 @@ pub enum DataChangeHandlingError {
 impl ReactiveConditionDecoratorNode {
 
     pub fn new(id: i32,
-               child: Arc<BTNode>,
+               child: BTNode,
                condition: ConditionExpressionWrapper) -> ReactiveConditionDecoratorNode {
         let value_names = condition.get_value_names_cloned();
         ReactiveConditionDecoratorNode {
             id,
-            child,
+            child: Box::new(child),
             predicate: condition.unpack(),
             value_names
         }

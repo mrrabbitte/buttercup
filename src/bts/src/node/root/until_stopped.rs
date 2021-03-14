@@ -9,7 +9,7 @@ use crate::tick::{TickError, TickStatus};
 pub struct UntilStoppedRootBTNode {
 
     id: i32,
-    child: Arc<BTNode>
+    child: Box<BTNode>
 
 }
 
@@ -18,7 +18,7 @@ impl UntilStoppedRootBTNode {
     pub fn new(id: i32, child: BTNode) -> UntilStoppedRootBTNode {
         UntilStoppedRootBTNode {
             id,
-            child: Arc::new(child)
+            child: Box::new(child)
         }
     }
 

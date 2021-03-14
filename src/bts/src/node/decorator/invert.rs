@@ -12,7 +12,7 @@ use crate::tick::{TickError, TickStatus};
 pub struct InvertDecoratorNode {
 
     id: i32,
-    child: Arc<BTNode>
+    child: Box<BTNode>
 
 }
 

@@ -1,5 +1,4 @@
 use std::future::Future;
-use std::sync::Arc;
 
 use actix_rt::Arbiter;
 use async_trait::async_trait;
@@ -15,7 +14,7 @@ use crate::tick::{TickError, TickStatus};
 pub struct ParallelCompositeNode {
 
     id: i32,
-    children: Vec<Arc<BTNode>>,
+    children: Vec<BTNode>,
     num_successes_to_succeed: usize,
     num_failures_to_fail: usize
 
@@ -33,7 +32,7 @@ impl ParallelCompositeNode {
         Result::Ok(
             ParallelCompositeNode {
                 id,
-                children: children.into_iter().map(|e| Arc::new(e)).collect(),
+                children,
                 num_successes_to_succeed,
                 num_failures_to_fail
             }
@@ -48,7 +47,7 @@ impl BehaviorTreeNode for ParallelCompositeNode {
         let mut futures = Vec::new();
 
         for child in &self.children {
-            futures.push(child.as_ref().tick(context));
+            futures.push(child.tick(context));
         }
 
         let mut num_failures: usize = 0;

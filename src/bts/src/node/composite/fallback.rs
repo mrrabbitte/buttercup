@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use async_trait::async_trait;
 
 use crate::context::BTNodeExecutionContext;
@@ -12,13 +10,13 @@ use crate::tick::{TickError, TickStatus};
 pub struct FallbackCompositeNode {
 
     id: i32,
-    children: Vec<Arc<BTNode>>
+    children: Vec<BTNode>
 }
 
 impl FallbackCompositeNode {
 
     pub fn new(id: i32,
-               children: Vec<Arc<BTNode>>) -> FallbackCompositeNode {
+               children: Vec<BTNode>) -> FallbackCompositeNode {
         FallbackCompositeNode {
             id,
             children
@@ -32,7 +30,7 @@ impl BehaviorTreeNode for FallbackCompositeNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         let mut errs = Vec::new();
         for child in &self.children {
-            match child.as_ref().tick(context).await {
+            match child.tick(context).await {
                 Ok(status) => match status {
                     TickStatus::Success => {
                         return Result::Ok(TickStatus::Success);

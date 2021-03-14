@@ -10,7 +10,7 @@ use crate::tick::{TickError, TickStatus};
 pub struct ReactiveRootBTNode {
 
     id: i32,
-    child: Arc<ReactiveConditionDecoratorNode>,
+    child: Box<ReactiveConditionDecoratorNode>,
     stop_on_error: bool
 
 }

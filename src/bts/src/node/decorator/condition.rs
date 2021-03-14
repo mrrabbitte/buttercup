@@ -2,7 +2,6 @@ use std::collections::HashSet;
 use std::future::Future;
 use std::iter::FromIterator;
 use std::ops::Deref;
-use std::sync::Arc;
 
 use actix_web::guard::Guard;
 use async_trait::async_trait;
@@ -22,7 +21,7 @@ use crate::tick::{TickError, TickStatus};
 pub struct ConditionDecoratorNode {
 
     id: i32,
-    child: Arc<BTNode>,
+    child: Box<BTNode>,
 
     #[derivative(Debug="ignore")]
     predicate: Box<dyn Fn(&ValuesPayload) -> bool + Send + Sync>,
@@ -34,12 +33,12 @@ pub struct ConditionDecoratorNode {
 impl ConditionDecoratorNode {
 
     pub fn new(id: i32,
-               child: Arc<BTNode>,
+               child: BTNode,
                condition: ConditionExpressionWrapper) -> ConditionDecoratorNode {
         let value_names = condition.get_value_names_cloned();
         ConditionDecoratorNode {
             id,
-            child,
+            child: Box::new(child),
             predicate: condition.unpack(),
             value_names
         }

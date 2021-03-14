@@ -9,7 +9,7 @@ use crate::tick::{TickError, TickStatus};
 pub struct ToFirstFailRootBTNode {
 
     id: i32,
-    child: Arc<BTNode>,
+    child: Box<BTNode>,
     stop_on_failed_status: bool
 
 }

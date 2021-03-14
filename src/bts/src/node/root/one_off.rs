@@ -9,7 +9,7 @@ use crate::tick::{TickError, TickStatus};
 pub struct OneOffRootBTNode {
 
     id: i32,
-    child: Arc<BTNode>
+    child: Box<BTNode>
 
 }
 
@@ -19,7 +19,7 @@ impl OneOffRootBTNode {
                child: BTNode) -> OneOffRootBTNode {
         OneOffRootBTNode {
             id,
-            child: Arc::new(child)
+            child: Box::new(child)
         }
     }
 
