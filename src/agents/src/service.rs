@@ -85,6 +85,23 @@ impl AgentService {
 
         Result::Ok(())
     }
+
+    pub fn stop_agent_by_id(&self,
+                            agent_id: &Uuid) -> Result<(), AgentServiceError> {
+        match self.started_agents.remove(agent_id) {
+            None => {
+                return Result::Err(AgentServiceError::AgentOfGivenIdNotFound);
+            }
+            Some(agent_entry) => {
+                let (agent, abort_handle) = agent_entry.1;
+                abort_handle.abort();
+
+                self.stopped_agents.insert(agent_entry.0, agent);
+            }
+        }
+
+        Result::Ok(())
+    }
 }
 
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]

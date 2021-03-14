@@ -53,6 +53,14 @@ async fn start_agent(agent_service: Data<Arc<AgentService>>,
     )
 }
 
+#[post("/agents/{agent_id}/stop")]
+async fn stop_agent(agent_service: Data<Arc<AgentService>>,
+                    agent_id: web::Path<Uuid>) -> impl Responder {
+    format!("{:?}", agent_service
+        .stop_agent_by_id(&agent_id.0)
+    )
+}
+
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -84,6 +92,7 @@ async fn main() -> std::io::Result<()> {
             .service(add_variable_value)
             .service(build_new_agent)
             .service(start_agent)
+            .service(stop_agent)
             .wrap(middleware::Logger::default())
     })
         .bind("127.0.0.1:7777")?.run().await
