@@ -14,6 +14,18 @@ pub struct SequenceCompositeNode {
 
 }
 
+impl SequenceCompositeNode {
+
+    pub fn new(id: i32,
+               children: Vec<BTNode>) -> SequenceCompositeNode {
+        SequenceCompositeNode {
+            id,
+            children
+        }
+    }
+
+}
+
 #[async_trait]
 impl BehaviorTreeNode for SequenceCompositeNode {
     async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
