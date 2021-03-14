@@ -804,6 +804,7 @@ dependencies = [
  "buttercup_values",
  "dashmap 3.11.10",
  "env_logger",
+ "serde",
  "serde_json",
  "uuid",
 ]
@@ -851,6 +852,7 @@ dependencies = [
  "async-trait",
  "buttercup_blackboards",
  "buttercup_conditions",
+ "buttercup_endpoints",
  "buttercup_values",
  "buttercup_variables",
  "dashmap 4.0.2",

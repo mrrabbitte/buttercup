@@ -13,6 +13,7 @@ async-std = "1"
 async-trait = "0.1"
 buttercup_blackboards = { path = "../blackboards" }
 buttercup_conditions = { path = "../conditions" }
+buttercup_endpoints = { path = "../endpoints" }
 buttercup_values = { path = "../values" }
 buttercup_variables = { path = "../variables" }
 dashmap = "4"

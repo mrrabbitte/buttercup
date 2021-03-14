@@ -1,20 +1,22 @@
 use std::collections::HashSet;
-use std::sync::{Arc, PoisonError, RwLock, RwLockReadGuard, RwLockWriteGuard};
+use std::sync::Arc;
 
 use actix::Arbiter;
+use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use buttercup_blackboards::{LocalBlackboard, LocalBlackboardError, LocalBlackboardService};
 use buttercup_values::ValuesPayload;
 
-type Listeners = Vec<Arc<dyn Fn(&HashSet<String>) + Send + Sync>>;
+type Listener = Arc<dyn Fn(&HashSet<String>) + Send + Sync>;
 
+#[derive(Default)]
 pub struct EndpointService {
 
     arbiter: Arbiter,
     blackboard_service: Arc<LocalBlackboardService>,
-    listeners: RwLock<Listeners>
+    listeners: DashMap<Uuid, Listener>
 
 }
 
@@ -26,18 +28,6 @@ pub enum EndpointError {
 
 }
 
-impl From<PoisonError<RwLockReadGuard<'_, Listeners>>> for EndpointError {
-    fn from(_: PoisonError<RwLockReadGuard<'_, Listeners>>) -> Self {
-        EndpointError::LockPoisonedError
-    }
-}
-
-impl From<PoisonError<RwLockWriteGuard<'_, Listeners>>> for EndpointError {
-    fn from(_: PoisonError<RwLockWriteGuard<'_, Listeners>>) -> Self {
-        EndpointError::LockPoisonedError
-    }
-}
-
 impl From<LocalBlackboardError> for EndpointError {
     fn from(err: LocalBlackboardError) -> Self {
         EndpointError::BlackboardError(err)
@@ -47,12 +37,11 @@ impl From<LocalBlackboardError> for EndpointError {
 impl EndpointService {
 
     pub fn new(arbiter: Arbiter,
-               blackboard_service: Arc<LocalBlackboardService>,
-               listeners: Listeners) -> EndpointService {
+               blackboard_service: Arc<LocalBlackboardService>) -> EndpointService {
         EndpointService {
             arbiter,
             blackboard_service,
-            listeners: RwLock::new(listeners)
+            listeners: DashMap::new()
         }
     }
 
@@ -66,8 +55,11 @@ impl EndpointService {
         let keys = payload.into_keys();
 
 
-        let listeners = {
-            self.listeners.read()?.clone()
+        let listeners: Vec<Listener> = {
+            self.listeners
+                .iter()
+                .map(|entry| entry.value().clone())
+                .collect()
         };
 
         self.arbiter.exec_fn(move || {
@@ -79,12 +71,9 @@ impl EndpointService {
         Result::Ok(())
     }
 
-    pub fn add_listener(&mut self,
-                        listener: Arc<dyn Fn(&HashSet<String>) + Send + Sync>)
-        -> Result<(), EndpointError> {
-        self.listeners.write()?.push(listener);
-
-        Result::Ok(())
+    pub fn add_listener(&self,
+                        listener: Arc<dyn Fn(&HashSet<String>) + Send + Sync>) {
+        self.listeners.insert(Uuid::new_v4(), listener);
     }
 
 }

@@ -12,6 +12,7 @@ use buttercup_variables::{VariableName, VariableService, VariableServiceErrorRep
 
 use crate::context::reactive::ReactiveContext;
 use crate::node::BTNode;
+use buttercup_endpoints::endpoints::EndpointService;
 
 pub mod reactive;
 
@@ -128,6 +129,7 @@ impl Default for BTNodeExecutionContext {
 pub struct BTNodeContextService {
 
     contexts: DashMap<Uuid, Arc<BTNodeExecutionContextHolder>>,
+    endpoint_service: Arc<EndpointService>,
     local_blackboard_service: Arc<LocalBlackboardService>
 
 }
@@ -147,9 +149,11 @@ impl From<LocalBlackboardError> for BTNodeContextServiceError {
 
 impl BTNodeContextService {
 
-    pub fn new(local_blackboard_service: Arc<LocalBlackboardService>) -> BTNodeContextService {
+    pub fn new(endpoint_service: Arc<EndpointService>,
+               local_blackboard_service: Arc<LocalBlackboardService>) -> BTNodeContextService {
         BTNodeContextService {
             contexts: DashMap::new(),
+            endpoint_service,
             local_blackboard_service
         }
     }
@@ -160,11 +164,14 @@ impl BTNodeContextService {
             self.local_blackboard_service.create(
                 &uuid, format!("{}.bb", &uuid).into())?;
 
-        Result::Ok(
-            BTNodeExecutionContextHolder::new(
-                uuid,
-                blackboard_service,
-                Arc::new(ReactiveContext::new())))
+        let holder = BTNodeExecutionContextHolder::new(
+            uuid,
+            blackboard_service,
+            Arc::new(ReactiveContext::new()));
+
+        self.endpoint_service.add_listener(holder.get_value_changes_listener());
+
+        Result::Ok(holder)
     }
 
     pub fn insert(&self,
