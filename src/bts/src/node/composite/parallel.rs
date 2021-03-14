@@ -8,6 +8,7 @@ use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::composite::CompositeBTNode;
 use crate::tick::{TickError, TickStatus};
+use std::sync::Arc;
 
 #[derive(Derivative)]
 #[derivative(Debug)]
