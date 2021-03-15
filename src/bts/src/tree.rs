@@ -30,6 +30,10 @@ impl BehaviorTree {
         self.root.tick(context).await
     }
 
+    pub fn get_id(&self) -> &i32 {
+        &self.id
+    }
+
 }
 
 #[derive(Default)]
