@@ -1,12 +1,13 @@
 use std::collections::HashSet;
 use std::future::Future;
+use std::hash::{Hash, Hasher};
 use std::iter::FromIterator;
 use std::ops::Deref;
 use std::sync::Arc;
 
 use actix_web::guard::Guard;
 use async_trait::async_trait;
-use futures::future::{Abortable, Aborted, AbortHandle};
+use futures::future::{Abortable, Aborted, AbortHandle, AbortRegistration};
 
 use buttercup_blackboards::LocalBlackboardError;
 use buttercup_conditions::ConditionExpressionWrapper;
@@ -18,17 +19,11 @@ use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::decorator::DecoratorBTNode;
 use crate::tick::{TickError, TickStatus};
 
-#[derive(Derivative)]
-#[derivative(Debug)]
+#[derive(Debug)]
 pub struct ReactiveConditionDecoratorNode {
 
-    id: i32,
     child: Box<BTNode>,
-
-    #[derivative(Debug="ignore")]
-    predicate: Box<dyn Fn(&ValuesPayload)  -> bool + Send + Sync>,
-
-    value_names: HashSet<String>
+    inner: Arc<ReactiveConditionInnerNode>
 
 }
 
@@ -54,12 +49,68 @@ impl ReactiveConditionDecoratorNode {
                condition: ConditionExpressionWrapper) -> ReactiveConditionDecoratorNode {
         let value_names = condition.get_value_names_cloned();
         ReactiveConditionDecoratorNode {
-            id,
             child: Box::new(child),
-            predicate: condition.unpack(),
-            value_names
+            inner: Arc::new(ReactiveConditionInnerNode {
+                id,
+                predicate: condition.unpack(),
+                value_names
+            })
         }
     }
+
+}
+
+#[async_trait]
+impl BehaviorTreeNode for ReactiveConditionDecoratorNode {
+    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+        match self.inner.register_abortable(&self.inner, context)? {
+            None => Result::Ok(TickStatus::Failure),
+            Some(abort_registration) =>
+                match Abortable::new(self.child.tick(context),
+                                     abort_registration).await {
+                    Ok(result) => result,
+                    Err(_) => Result::Ok(TickStatus::Failure)
+                },
+        }
+    }
+}
+
+impl From<ReactiveConditionDecoratorNode> for BTNode {
+    fn from(node: ReactiveConditionDecoratorNode) -> Self {
+        BTNode::Decorator(DecoratorBTNode::ReactiveCondition(node))
+    }
+}
+
+#[derive(Derivative)]
+#[derivative(Debug)]
+pub struct ReactiveConditionInnerNode {
+
+    id: i32,
+
+    #[derivative(Debug="ignore")]
+    predicate: Box<dyn Fn(&ValuesPayload)  -> bool + Send + Sync>,
+
+    #[derivative(Debug="ignore")]
+    value_names: HashSet<String>
+
+}
+
+impl Hash for ReactiveConditionInnerNode {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+
+impl PartialEq for ReactiveConditionInnerNode {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for ReactiveConditionInnerNode {}
+
+
+impl ReactiveConditionInnerNode {
 
     pub fn handle_value_change(&self,
                                context: &BTNodeExecutionContext)
@@ -89,38 +140,26 @@ impl ReactiveConditionDecoratorNode {
         &self.value_names
     }
 
-}
-
-#[async_trait]
-impl BehaviorTreeNode for ReactiveConditionDecoratorNode {
-    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+    fn register_abortable(&self,
+                          inner: &Arc<ReactiveConditionInnerNode>,
+                          context: &BTNodeExecutionContext)
+                          -> Result<Option<AbortRegistration>, TickError> {
         match context.get_values(&self.value_names) {
             Ok(payload) => {
                 if self.predicate.deref()(&payload) {
                     let (abort_handle, abort_registration) =
                         AbortHandle::new_pair();
                     return
-                        match context.get_reactive_service().register(
-                            &self.id, abort_handle) {
+                        match context.get_reactive_service().register(abort_handle, inner) {
                             Ok(_) =>
-                                match Abortable::new(self.child.tick(context),
-                                                     abort_registration).await {
-                                    Ok(result) => result,
-                                    Err(_) => Result::Ok(TickStatus::Failure)
-                                },
+                                Result::Ok(Option::Some(abort_registration)),
                             Err(err) =>
                                 Result::Err(TickError::ReactiveServiceError(self.id, err))
                         };
                 }
-                return Result::Ok(TickStatus::Failure);
+                return Result::Ok(Option::None);
             }
             Err(err) => Result::Err(TickError::BlackboardError(self.id, err))
         }
-    }
-}
-
-impl From<ReactiveConditionDecoratorNode> for BTNode {
-    fn from(node: ReactiveConditionDecoratorNode) -> Self {
-        BTNode::Decorator(DecoratorBTNode::ReactiveCondition(node))
     }
 }

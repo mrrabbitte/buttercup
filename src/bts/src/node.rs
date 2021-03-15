@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use buttercup_blackboards::{LocalBlackboardError, LocalBlackboard};
+use buttercup_blackboards::{LocalBlackboard, LocalBlackboardError};
 use buttercup_values::ValuesPayload;
 
 use crate::context::BTNodeExecutionContext;
@@ -67,35 +67,4 @@ impl From<DecoratorBTNode> for BTNode {
     fn from(node: DecoratorBTNode) -> Self {
         BTNode::Decorator(node)
     }
-}
-
-/// This is an ugly abstraction leak and it should be sorted.
-impl BTNode {
-
-    pub fn handle_value_change(&self,
-                               context: &BTNodeExecutionContext)
-                               -> Result<DataChangeHandlingStatus, DataChangeHandlingError> {
-        if let BTNode::Decorator(
-            DecoratorBTNode::ReactiveCondition(node)) = &self {
-            return node.handle_value_change(context);
-        }
-        Result::Err(DataChangeHandlingError::NonReactiveNodeCalledError)
-    }
-
-    pub fn get_value_names(&self) -> &HashSet<String> {
-        if let BTNode::Decorator(
-            DecoratorBTNode::ReactiveCondition(node)) = &self {
-            return node.get_value_names();
-        }
-        panic!("Should not be called for non-reactive node.");
-    }
-
-    pub fn get_id(&self) -> &i32 {
-        if let BTNode::Decorator(
-            DecoratorBTNode::ReactiveCondition(node)) = &self {
-            return node.get_id();
-        }
-        panic!("Should not be called for non-reactive node.");
-    }
-
 }
