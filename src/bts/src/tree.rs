@@ -30,6 +30,14 @@ impl BehaviorTree {
         self.root.tick(context).await
     }
 
+    pub fn get_id(&self) -> &i32 {
+        &self.id
+    }
+
+    pub fn can_be_subtree(&self) -> bool {
+        self.root.can_be_subtree_root()
+    }
+
 }
 
 #[derive(Default)]
