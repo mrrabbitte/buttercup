@@ -34,6 +34,10 @@ impl BehaviorTree {
         &self.id
     }
 
+    pub fn can_be_subtree(&self) -> bool {
+        self.root.can_be_subtree_root()
+    }
+
 }
 
 #[derive(Default)]

@@ -22,11 +22,17 @@ pub struct ExecuteSubTreeActionNode {
 impl ExecuteSubTreeActionNode {
 
     pub fn new(id: i32,
-               tree: Arc<BehaviorTree>) -> ExecuteSubTreeActionNode {
-        ExecuteSubTreeActionNode {
-            id,
-            tree
+               tree: Arc<BehaviorTree>) -> Result<ExecuteSubTreeActionNode, ()> {
+        if !tree.can_be_subtree() {
+            return Result::Err(());
         }
+
+        Result::Ok(
+            ExecuteSubTreeActionNode {
+                id,
+                tree
+            }
+        )
     }
 
     fn fmt(tree: &Arc<BehaviorTree>,
