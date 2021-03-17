@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
@@ -22,9 +23,14 @@ pub struct ExecuteSubTreeActionNode {
 impl ExecuteSubTreeActionNode {
 
     pub fn new(id: i32,
-               tree: Arc<BehaviorTree>) -> Result<ExecuteSubTreeActionNode, ()> {
+               parent_tree_id: &i32,
+               tree: Arc<BehaviorTree>) -> Result<ExecuteSubTreeActionNode, ExecuteSubTreeActionNodeError> {
         if !tree.can_be_subtree() {
-            return Result::Err(());
+            return Result::Err(ExecuteSubTreeActionNodeError::ProvidedTreeCannotBeASubtree);
+        }
+
+        if tree.get_id() == parent_tree_id {
+            return Result::Err(ExecuteSubTreeActionNodeError::SubtreeIsParentTree);
         }
 
         Result::Ok(
@@ -37,10 +43,18 @@ impl ExecuteSubTreeActionNode {
 
     fn fmt(tree: &Arc<BehaviorTree>,
            formatter: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
-        formatter.write_str(format!("{}", tree.get_id()).as_str());
+        formatter.write_str(format!("id: {}", tree.get_id()).as_str());
 
         Result::Ok(())
     }
+
+}
+
+#[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
+pub enum ExecuteSubTreeActionNodeError {
+
+    ProvidedTreeCannotBeASubtree,
+    SubtreeIsParentTree,
 
 }
 
