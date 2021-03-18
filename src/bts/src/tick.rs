@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::context::reactive::ReactiveContextError;
 use buttercup_blackboards::LocalBlackboardError;
-use buttercup_variables::VariableValueAccessError;
+use buttercup_variables::specification::VariableValueAccessError;
 use std::sync::Arc;
 
 

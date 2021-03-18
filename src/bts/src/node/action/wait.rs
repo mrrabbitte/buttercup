@@ -8,7 +8,7 @@ use async_trait::async_trait;
 
 use buttercup_blackboards::LocalBlackboardError;
 use buttercup_values::ValueHolder;
-use buttercup_variables::{VariableSpecification, VariableValueAccessError};
+use buttercup_variables::specification::{VariableSpecification, VariableValueAccessError};
 
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};

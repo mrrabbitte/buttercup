@@ -3,10 +3,10 @@ use std::str::FromStr;
 use chrono::NaiveDateTime;
 use chrono_tz::Tz;
 use serde::{Deserialize, Serialize};
-use serde::export::TryFrom;
 use serde_json::Value;
 
 use crate::wrappers::{TzWrapper, Wrapper};
+use std::convert::TryFrom;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, Hash, PartialEq, PartialOrd)]
 pub struct ZonedDateTime {

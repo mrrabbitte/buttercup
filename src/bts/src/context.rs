@@ -7,12 +7,13 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use buttercup_blackboards::{LocalBlackboard, LocalBlackboardError, LocalBlackboardService};
+use buttercup_endpoints::endpoints::EndpointService;
 use buttercup_values::{ValueHolder, ValuesPayload};
-use buttercup_variables::{VariableName, VariableService, VariableServiceErrorReport, VariableValueAccessError};
+use buttercup_variables::{VariableName, VariableService, VariableServiceErrorReport};
+use buttercup_variables::specification::VariableValueAccessError;
 
 use crate::context::reactive::ReactiveContext;
 use crate::node::BTNode;
-use buttercup_endpoints::endpoints::EndpointService;
 
 pub mod reactive;
 
