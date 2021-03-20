@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::composite::CompositeBTNode;
-use crate::tick::{TickError, TickStatus};
+use crate::tick::{TickError, TickStatus, TickHeader};
 
 #[derive(Derivative)]
 #[derivative(Debug)]
@@ -28,9 +28,13 @@ impl SequenceCompositeNode {
 
 #[async_trait]
 impl BehaviorTreeNode for SequenceCompositeNode {
-    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+
+    async fn do_tick(&self,
+                     header: &TickHeader,
+                     context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+
         for child in &self.children {
-            match child.tick(context).await {
+            match child.tick(header, context).await {
                 Ok(status) => match status {
                     TickStatus::Success => {},
                     TickStatus::Failure => {
@@ -42,7 +46,12 @@ impl BehaviorTreeNode for SequenceCompositeNode {
                 },
             }
         }
+
         Result::Ok(TickStatus::Success)
+    }
+
+    fn get_id(&self) -> &i32 {
+        &self.id
     }
 }
 

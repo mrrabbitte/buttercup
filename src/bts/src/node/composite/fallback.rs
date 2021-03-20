@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::composite::CompositeBTNode;
-use crate::tick::{TickError, TickStatus};
+use crate::tick::{TickError, TickStatus, TickHeader};
 use std::sync::Arc;
 
 #[derive(Derivative)]
@@ -28,10 +28,14 @@ impl FallbackCompositeNode {
 
 #[async_trait]
 impl BehaviorTreeNode for FallbackCompositeNode {
-    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+
+    async fn do_tick(&self,
+                     header: &TickHeader,
+                     context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         let mut errs = Vec::new();
+
         for child in &self.children {
-            match child.tick(context).await {
+            match child.tick(header, context).await {
                 Ok(status) => match status {
                     TickStatus::Success => {
                         return Result::Ok(TickStatus::Success);
@@ -41,10 +45,16 @@ impl BehaviorTreeNode for FallbackCompositeNode {
                 Err(err) => errs.push((*err.get_node_id(), err)),
             }
         }
+
         if errs.is_empty() {
             return Result::Ok(TickStatus::Failure);
         }
+
         return Result::Err(TickError::CompositeError(self.id, Arc::new(errs)));
+    }
+
+    fn get_id(&self) -> &i32 {
+        &self.id
     }
 }
 

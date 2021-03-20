@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::ffi::OsString;
 use std::sync::Arc;
-
+use log::info;
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -13,6 +13,7 @@ use buttercup_variables::{VariableName, VariableService, VariableServiceErrorRep
 use crate::context::reactive::ReactiveContext;
 use crate::node::BTNode;
 use buttercup_endpoints::endpoints::EndpointService;
+use crate::events::{BTNodeExecutionEndedEvent, BTNodeExecutionStartedEvent};
 
 pub mod reactive;
 
@@ -63,7 +64,6 @@ pub struct BTNodeExecutionContext {
     local_blackboard: Arc<LocalBlackboard>,
     reactive_service: Arc<ReactiveContext>,
 
-
 }
 
 impl BTNodeExecutionContext {
@@ -74,6 +74,16 @@ impl BTNodeExecutionContext {
             local_blackboard,
             reactive_service
         }
+    }
+
+    pub async fn consume_execution_started_event(&self,
+                                                 event: BTNodeExecutionStartedEvent<'_>) {
+        info!("{:?}", event)
+    }
+
+    pub async fn consume_execution_ended_event(&self,
+                                               event: BTNodeExecutionEndedEvent<'_>) {
+        info!("{:?}", event)
     }
 
     pub fn get_reactive_service(&self) -> &Arc<ReactiveContext> {

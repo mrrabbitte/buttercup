@@ -14,7 +14,7 @@ use buttercup_values::ValuesPayload;
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::decorator::DecoratorBTNode;
-use crate::tick::{TickError, TickStatus};
+use crate::tick::{TickError, TickStatus, TickHeader};
 
 #[derive(Derivative)]
 #[derivative(Debug)]
@@ -49,16 +49,22 @@ impl ConditionDecoratorNode {
 #[async_trait]
 impl BehaviorTreeNode for ConditionDecoratorNode {
 
-    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+    async fn do_tick(&self,
+                     header: &TickHeader,
+                     context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match context.get_values(&self.value_names) {
             Ok(payload) => {
                 if self.predicate.deref()(&payload) {
-                    return self.child.tick(context).await;
+                    return self.child.tick(header, context).await;
                 }
                 return Result::Ok(TickStatus::Failure);
             }
             Err(err) => Result::Err(TickError::BlackboardError(self.id, err))
         }
+    }
+
+    fn get_id(&self) -> &i32 {
+        &self.id
     }
 }
 

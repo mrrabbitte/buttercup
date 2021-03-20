@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::decorator::DecoratorBTNode;
-use crate::tick::{TickError, TickStatus};
+use crate::tick::{TickError, TickStatus, TickHeader};
 
 #[derive(Derivative)]
 #[derivative(Debug)]
@@ -18,8 +18,10 @@ pub struct InvertDecoratorNode {
 
 #[async_trait]
 impl BehaviorTreeNode for InvertDecoratorNode {
-    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
-        match self.child.as_ref().tick(context).await {
+    async fn do_tick(&self,
+                     header: &TickHeader,
+                     context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+        match self.child.as_ref().tick(header, context).await {
             Ok(status) =>
                 Result::Ok(
                     match status {
@@ -30,6 +32,10 @@ impl BehaviorTreeNode for InvertDecoratorNode {
             Err(err) =>
                 Result::Err(err)
         }
+    }
+
+    fn get_id(&self) -> &i32 {
+        &self.id
     }
 }
 

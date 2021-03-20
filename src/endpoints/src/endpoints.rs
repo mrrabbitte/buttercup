@@ -11,13 +11,19 @@ use buttercup_values::ValuesPayload;
 
 type Listener = Arc<dyn Fn(&HashSet<String>) + Send + Sync>;
 
-#[derive(Default)]
 pub struct EndpointService {
 
     arbiter: Arbiter,
     blackboard_service: Arc<LocalBlackboardService>,
     listeners: DashMap<Uuid, Listener>
 
+}
+
+impl Default for EndpointService {
+    fn default() -> Self {
+        EndpointService::new(Arbiter::new(),
+                             Arc::new(LocalBlackboardService::default()))
+    }
 }
 
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]

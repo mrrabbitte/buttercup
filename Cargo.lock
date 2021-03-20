@@ -793,7 +793,7 @@ checksum = "2e8c087f005730276d1096a652e92a8bacee2e2472bcc9715a74d2bec38b5820"
 name = "buttercup"
 version = "0.1.0"
 dependencies = [
- "actix 0.9.0",
+ "actix 0.10.0",
  "actix-rt 1.1.1",
  "actix-web",
  "buttercup_agents",
@@ -855,9 +855,11 @@ dependencies = [
  "buttercup_endpoints",
  "buttercup_values",
  "buttercup_variables",
+ "chrono",
  "dashmap 4.0.2",
  "derivative",
  "futures",
+ "log",
  "serde",
  "serde_json",
  "uuid",
@@ -887,6 +889,7 @@ name = "buttercup_endpoints"
 version = "0.1.0"
 dependencies = [
  "actix 0.10.0",
+ "actix-rt 2.1.0",
  "buttercup_blackboards",
  "buttercup_values",
  "dashmap 4.0.2",

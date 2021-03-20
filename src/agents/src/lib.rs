@@ -53,6 +53,7 @@ impl Agent {
         Result::Ok(
             Abortable::new(
                 self.tree.tick(
+                    Uuid::new_v4(),
                     self.context.get_context()), abort_registration)
                 .await??)
     }
@@ -114,6 +115,7 @@ impl AgentExecutionResult {
 mod tests {
     use std::sync::Arc;
 
+    use actix_rt::System;
     use dashmap::DashMap;
 
     use buttercup_blackboards::LocalBlackboard;
@@ -128,6 +130,7 @@ mod tests {
         let path = {
             let context: Arc<BTNodeExecutionContextHolder> =
                 Arc::new(BTNodeContextService::default().build_new().unwrap());
+
             let mut agent = Agent::new(Uuid::new_v4(),
                                        context.clone(),
                                        Arc::new(

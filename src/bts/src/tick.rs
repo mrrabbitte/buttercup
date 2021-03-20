@@ -1,15 +1,16 @@
 use std::future::Future;
 use std::pin::Pin;
+use std::sync::Arc;
 use std::task::{Context, Poll};
 
 use actix::Message;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
-use crate::context::reactive::ReactiveContextError;
 use buttercup_blackboards::LocalBlackboardError;
 use buttercup_variables::VariableValueAccessError;
-use std::sync::Arc;
 
+use crate::context::reactive::ReactiveContextError;
 
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum TickStatus {
@@ -44,5 +45,38 @@ impl TickError {
 
 }
 
+#[derive(Default)]
+pub struct TickHeader {
 
+    correlation_id: Uuid,
+    tree_id: i32,
+    tree_tick_id: Uuid
+
+}
+
+impl TickHeader {
+
+    pub fn new(correlation_id: Uuid,
+               tree_id: i32,
+               tree_tick_id: Uuid) -> TickHeader {
+        TickHeader {
+            correlation_id,
+            tree_id,
+            tree_tick_id
+        }
+    }
+
+    pub fn get_correlation_id(&self) -> &Uuid {
+        &self.correlation_id
+    }
+
+    pub fn get_tree_id(&self) -> &i32 {
+        &self.tree_id
+    }
+
+    pub fn get_tree_tick_id(&self) -> &Uuid {
+        &self.tree_tick_id
+    }
+
+}
 
