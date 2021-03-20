@@ -52,7 +52,8 @@ pub trait BehaviorTreeNode {
 
         context.consume_execution_started_event(
             BTNodeExecutionStartedEvent::new(
-                &node_id, &node_tick_id, &started_at, header));
+                &node_id, &node_tick_id, &started_at, header)
+        ).await;
 
         let result = self.do_tick(header, context).await;
 
@@ -63,7 +64,7 @@ pub trait BehaviorTreeNode {
             BTNodeExecutionEndedEvent::new(
                 &ended_at, &node_id, &node_tick_id, &result, &started_at, header, took_ms
             )
-        );
+        ).await;
 
         result
     }
