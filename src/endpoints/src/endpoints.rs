@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::sync::Arc;
 
-use actix::Arbiter;
+use actix_rt::Arbiter;
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -11,7 +11,6 @@ use buttercup_values::ValuesPayload;
 
 type Listener = Arc<dyn Fn(&HashSet<String>) + Send + Sync>;
 
-#[derive(Default)]
 pub struct EndpointService {
 
     arbiter: Arbiter,
@@ -20,9 +19,17 @@ pub struct EndpointService {
 
 }
 
+impl Default for EndpointService {
+    fn default() -> Self {
+        EndpointService::new(Arbiter::new(),
+                             Arc::new(LocalBlackboardService::default()))
+    }
+}
+
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum EndpointError {
 
+    ArbiterDied,
     BlackboardError(LocalBlackboardError),
     LockPoisonedError
 
@@ -62,11 +69,15 @@ impl EndpointService {
                 .collect()
         };
 
-        self.arbiter.exec_fn(move || {
+        let success = self.arbiter.spawn_fn(move || {
             for listener in listeners {
                 listener(&keys);
             }
         });
+
+        if !success {
+            return Result::Err(EndpointError::ArbiterDied);
+        }
 
         Result::Ok(())
     }

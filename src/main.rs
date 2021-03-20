@@ -1,7 +1,8 @@
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use actix::{Actor, Addr, Arbiter};
+use actix::{Actor, Addr};
+use actix_rt::Arbiter;
 use actix_web::{App, http, HttpRequest, HttpServer, middleware};
 use actix_web::{post, Responder, web};
 use actix_web::web::{Data, get, resource};
