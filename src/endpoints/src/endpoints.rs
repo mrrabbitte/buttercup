@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::sync::Arc;
 
-use actix_rt::Arbiter;
+use actix::Arbiter;
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -29,7 +29,6 @@ impl Default for EndpointService {
 #[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum EndpointError {
 
-    ArbiterDied,
     BlackboardError(LocalBlackboardError),
     LockPoisonedError
 
@@ -69,15 +68,11 @@ impl EndpointService {
                 .collect()
         };
 
-        let success = self.arbiter.spawn_fn(move || {
+        self.arbiter.exec_fn(move || {
             for listener in listeners {
                 listener(&keys);
             }
         });
-
-        if !success {
-            return Result::Err(EndpointError::ArbiterDied);
-        }
 
         Result::Ok(())
     }

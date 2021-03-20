@@ -1,8 +1,7 @@
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use actix::{Actor, Addr};
-use actix_rt::Arbiter;
+use actix::{Actor, Addr, Arbiter};
 use actix_web::{App, http, HttpRequest, HttpServer, middleware};
 use actix_web::{post, Responder, web};
 use actix_web::web::{Data, get, resource};
@@ -65,7 +64,7 @@ async fn stop_agent(agent_service: Data<Arc<AgentService>>,
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    std::env::set_var("RUST_LOG", "actix_web=info");
+    std::env::set_var("RUST_LOG", "info");
 
     env_logger::init();
 

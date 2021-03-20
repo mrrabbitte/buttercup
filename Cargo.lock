@@ -794,7 +794,7 @@ name = "buttercup"
 version = "0.1.0"
 dependencies = [
  "actix 0.10.0",
- "actix-rt 2.1.0",
+ "actix-rt 1.1.1",
  "actix-web",
  "buttercup_agents",
  "buttercup_blackboards",
