@@ -17,7 +17,7 @@ use crate::context::BTNodeExecutionContext;
 use crate::context::reactive::ReactiveContextError;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::decorator::DecoratorBTNode;
-use crate::tick::{TickError, TickStatus};
+use crate::tick::{TickError, TickStatus, TickHeader};
 
 #[derive(Debug)]
 pub struct ReactiveConditionDecoratorNode {
@@ -62,16 +62,22 @@ impl ReactiveConditionDecoratorNode {
 
 #[async_trait]
 impl BehaviorTreeNode for ReactiveConditionDecoratorNode {
-    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+    async fn do_tick(&self,
+                     header: &TickHeader,
+                     context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match self.inner.register_abortable(&self.inner, context)? {
             None => Result::Ok(TickStatus::Failure),
             Some(abort_registration) =>
-                match Abortable::new(self.child.tick(context),
+                match Abortable::new(self.child.tick(header, context),
                                      abort_registration).await {
                     Ok(result) => result,
                     Err(_) => Result::Ok(TickStatus::Failure)
                 },
         }
+    }
+
+    fn get_id(&self) -> &i32 {
+        self.inner.get_id()
     }
 }
 

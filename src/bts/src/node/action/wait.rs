@@ -13,7 +13,7 @@ use buttercup_variables::{VariableSpecification, VariableValueAccessError};
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::action::ActionBTNode;
-use crate::tick::{TickError, TickStatus};
+use crate::tick::{TickError, TickHeader, TickStatus};
 
 #[derive(Derivative)]
 #[derivative(Debug)]
@@ -51,7 +51,10 @@ impl WaitDurationActionNode {
 
 #[async_trait]
 impl BehaviorTreeNode for WaitDurationActionNode {
-    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+
+    async fn do_tick(&self,
+                     _: &TickHeader,
+                     context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match self.duration.get_value(context) {
             Ok(duration) => {
                 task::sleep(duration.deref().clone()).await;
@@ -60,6 +63,10 @@ impl BehaviorTreeNode for WaitDurationActionNode {
             Err(err) =>
                 Result::Err(TickError::VariableValueAccessError(self.id, err))
         }
+    }
+
+    fn get_id(&self) -> &i32 {
+        &self.id
     }
 }
 

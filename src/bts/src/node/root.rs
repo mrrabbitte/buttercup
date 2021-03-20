@@ -6,7 +6,7 @@ use crate::node::root::one_off::OneOffRootBTNode;
 use crate::node::root::reactive::ReactiveRootBTNode;
 use crate::node::root::to_first::{ToFirstErrorRootBTNode, ToFirstFailureRootBTNode};
 use crate::node::root::until_stopped::UntilStoppedRootBTNode;
-use crate::tick::{TickError, TickStatus};
+use crate::tick::{TickError, TickStatus, TickHeader};
 
 pub mod to_first;
 pub mod one_off;
@@ -25,16 +25,34 @@ pub enum RootBTNode {
 
 #[async_trait]
 impl BehaviorTreeNode for RootBTNode {
-    async fn tick(&self,
-                  context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+
+    async fn do_tick(&self,
+                     header: &TickHeader,
+                     context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         match self {
-            RootBTNode::OneOff(node) => node.tick(context).await,
-            RootBTNode::Reactive(node) => node.tick(context).await,
-            RootBTNode::ToFirstError(node) => node.tick(context).await,
-            RootBTNode::ToFirstFailure(node) => node.tick(context).await,
-            RootBTNode::UntilStopped(node) => node.tick(context).await
+            RootBTNode::OneOff(node) =>
+                node.do_tick(header, context).await,
+            RootBTNode::Reactive(node) =>
+                node.do_tick(header, context).await,
+            RootBTNode::ToFirstError(node) =>
+                node.do_tick(header, context).await,
+            RootBTNode::ToFirstFailure(node) =>
+                node.do_tick(header, context).await,
+            RootBTNode::UntilStopped(node) =>
+                node.do_tick(header, context).await
         }
     }
+
+    fn get_id(&self) -> &i32 {
+        match self {
+            RootBTNode::OneOff(node) => node.get_id(),
+            RootBTNode::Reactive(node) => node.get_id(),
+            RootBTNode::ToFirstError(node) => node.get_id(),
+            RootBTNode::ToFirstFailure(node) => node.get_id(),
+            RootBTNode::UntilStopped(node) => node.get_id(),
+        }
+    }
+
 }
 
 impl RootBTNode {

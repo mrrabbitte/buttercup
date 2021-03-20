@@ -53,6 +53,7 @@ impl Agent {
         Result::Ok(
             Abortable::new(
                 self.tree.tick(
+                    Uuid::new_v4(),
                     self.context.get_context()), abort_registration)
                 .await??)
     }

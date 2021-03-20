@@ -4,7 +4,7 @@ use async_trait::async_trait;
 
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
-use crate::tick::{TickError, TickStatus};
+use crate::tick::{TickError, TickStatus, TickHeader};
 
 pub struct OneOffRootBTNode {
 
@@ -27,7 +27,13 @@ impl OneOffRootBTNode {
 
 #[async_trait]
 impl BehaviorTreeNode for OneOffRootBTNode {
-    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
-        self.child.tick(context).await
+    async fn do_tick(&self,
+                     header: &TickHeader,
+                     context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+        self.child.tick(header, context).await
+    }
+
+    fn get_id(&self) -> &i32 {
+        &self.id
     }
 }

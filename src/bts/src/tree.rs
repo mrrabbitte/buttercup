@@ -2,11 +2,12 @@ use std::sync::Arc;
 
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::root::RootBTNode;
-use crate::tick::{TickError, TickStatus};
+use crate::tick::{TickError, TickHeader, TickStatus};
 
 pub struct BehaviorTree {
 
@@ -26,8 +27,17 @@ impl BehaviorTree {
     }
 
     pub async fn tick(&self,
+                      correlation_id: Uuid,
                       context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
-        self.root.tick(context).await
+        self.root.tick(
+            &TickHeader::new(correlation_id, self.id, Uuid::new_v4()),
+            context).await
+    }
+
+    pub async fn subtree_tick(&self,
+                              header: &TickHeader,
+                              context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+        self.root.tick(header, context).await
     }
 
     pub fn get_id(&self) -> &i32 {
@@ -87,7 +97,7 @@ mod tests {
                                                                PrintLogActionNode::new(
                                              1, "hello".to_owned())
                                              .into()).into())
-                           .tick(&context).await);
+                           .tick(Uuid::new_v4(), &context).await);
 
             test_utils::get_path(&context)
         };

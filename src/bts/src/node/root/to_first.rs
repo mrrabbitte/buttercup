@@ -4,7 +4,7 @@ use async_trait::async_trait;
 
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
-use crate::tick::{TickError, TickStatus};
+use crate::tick::{TickError, TickStatus, TickHeader};
 
 pub struct ToFirstFailureRootBTNode {
 
@@ -30,9 +30,11 @@ impl ToFirstFailureRootBTNode {
 
 #[async_trait]
 impl BehaviorTreeNode for ToFirstFailureRootBTNode {
-    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+    async fn do_tick(&self,
+                     header: &TickHeader,
+                     context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         loop {
-            let result = self.child.tick(context).await;
+            let result = self.child.tick(header, context).await;
             if !self.ignore_errors {
                 if let Err(_) = result {
                     return result;
@@ -42,6 +44,10 @@ impl BehaviorTreeNode for ToFirstFailureRootBTNode {
                 return result;
             }
         }
+    }
+
+    fn get_id(&self) -> &i32 {
+        &self.id
     }
 }
 
@@ -66,11 +72,17 @@ impl ToFirstErrorRootBTNode {
 
 #[async_trait]
 impl BehaviorTreeNode for ToFirstErrorRootBTNode {
-    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+    async fn do_tick(&self,
+                     header: &TickHeader,
+                     context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         loop {
-            if let Err(err) = self.child.tick(context).await {
+            if let Err(err) = self.child.do_tick(header, context).await {
                 return Result::Err(err);
             }
         }
+    }
+
+    fn get_id(&self) -> &i32 {
+        &self.id
     }
 }

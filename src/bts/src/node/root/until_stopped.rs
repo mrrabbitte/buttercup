@@ -4,7 +4,7 @@ use async_trait::async_trait;
 
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
-use crate::tick::{TickError, TickStatus};
+use crate::tick::{TickError, TickHeader, TickStatus};
 
 pub struct UntilStoppedRootBTNode {
 
@@ -26,9 +26,15 @@ impl UntilStoppedRootBTNode {
 
 #[async_trait]
 impl BehaviorTreeNode for UntilStoppedRootBTNode {
-    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+    async fn do_tick(&self,
+                     header: &TickHeader,
+                     context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         loop {
-            self.child.tick(&context).await;
+            self.child.tick(header, context).await;
         }
+    }
+
+    fn get_id(&self) -> &i32 {
+        &self.id
     }
 }

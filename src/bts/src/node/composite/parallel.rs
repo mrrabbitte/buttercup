@@ -1,4 +1,5 @@
 use std::future::Future;
+use std::sync::Arc;
 
 use actix_rt::Arbiter;
 use async_trait::async_trait;
@@ -7,8 +8,7 @@ use futures::future::select_all;
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::composite::CompositeBTNode;
-use crate::tick::{TickError, TickStatus};
-use std::sync::Arc;
+use crate::tick::{TickError, TickStatus, TickHeader};
 
 #[derive(Derivative)]
 #[derivative(Debug)]
@@ -44,11 +44,13 @@ impl ParallelCompositeNode {
 
 #[async_trait]
 impl BehaviorTreeNode for ParallelCompositeNode {
-    async fn tick(&self, context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
+    async fn do_tick(&self,
+                     header: &TickHeader,
+                     context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         let mut futures = Vec::new();
 
         for child in &self.children {
-            futures.push(child.tick(context));
+            futures.push(child.tick(header, context));
         }
 
         let mut num_failures: usize = 0;
@@ -89,6 +91,10 @@ impl BehaviorTreeNode for ParallelCompositeNode {
         }
         Result::Ok(TickStatus::Success)
     }
+
+    fn get_id(&self) -> &i32 {
+        &self.id
+    }
 }
 
 impl From<ParallelCompositeNode> for BTNode {
@@ -121,7 +127,7 @@ mod tests {
                 PrintLogActionNode::new(4, "I am four.".to_string()).into()];
             match ParallelCompositeNode::new(5, children, 3)
                 .unwrap()
-                .tick(&context)
+                .do_tick(&TickHeader::default(), &context)
                 .await {
                 Ok(status) => {
                     assert_eq!(TickStatus::Success, status)
