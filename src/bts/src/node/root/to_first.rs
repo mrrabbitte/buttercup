@@ -5,6 +5,7 @@ use async_trait::async_trait;
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::tick::{TickError, TickStatus, TickHeader};
+use uuid::Uuid;
 
 pub struct ToFirstFailureRootBTNode {
 
@@ -30,16 +31,21 @@ impl ToFirstFailureRootBTNode {
 
 #[async_trait]
 impl BehaviorTreeNode for ToFirstFailureRootBTNode {
+
     async fn do_tick(&self,
                      header: &TickHeader,
                      context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         loop {
-            let result = self.child.tick(header, context).await;
+            let new_header = header.with_new_root_tick_id(Uuid::new_v4());
+
+            let result = self.child.tick(&new_header, context).await;
+
             if !self.ignore_errors {
                 if let Err(_) = result {
                     return result;
                 }
             }
+
             if let Ok(TickStatus::Failure) = result {
                 return result;
             }

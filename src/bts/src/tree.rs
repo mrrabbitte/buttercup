@@ -30,7 +30,8 @@ impl BehaviorTree {
                       correlation_id: Uuid,
                       context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
         self.root.tick(
-            &TickHeader::new(correlation_id, self.id, Uuid::new_v4()),
+            &TickHeader::new(
+                correlation_id, Uuid::new_v4(),self.id, Uuid::new_v4()),
             context).await
     }
 

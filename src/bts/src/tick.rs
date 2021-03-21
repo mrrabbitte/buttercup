@@ -49,6 +49,9 @@ impl TickError {
 pub struct TickHeader {
 
     correlation_id: Uuid,
+
+    root_tick_id: Uuid,
+
     tree_id: i32,
     tree_tick_id: Uuid
 
@@ -57,10 +60,12 @@ pub struct TickHeader {
 impl TickHeader {
 
     pub fn new(correlation_id: Uuid,
+               root_tick_id: Uuid,
                tree_id: i32,
                tree_tick_id: Uuid) -> TickHeader {
         TickHeader {
             correlation_id,
+            root_tick_id,
             tree_id,
             tree_tick_id
         }
@@ -70,12 +75,21 @@ impl TickHeader {
         &self.correlation_id
     }
 
+    pub fn get_root_tick_id(&self) -> &Uuid {
+        &self.root_tick_id
+    }
+
     pub fn get_tree_id(&self) -> &i32 {
         &self.tree_id
     }
 
     pub fn get_tree_tick_id(&self) -> &Uuid {
         &self.tree_tick_id
+    }
+
+    pub fn with_new_root_tick_id(&self,
+                                 new_root_tick_id: Uuid) -> TickHeader {
+        TickHeader::new(self.correlation_id, new_root_tick_id, self.tree_id, self.tree_tick_id)
     }
 
 }

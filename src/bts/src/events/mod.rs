@@ -17,6 +17,8 @@ pub struct BTNodeExecutionEndedEvent<'e> {
 
     result: &'e Result<TickStatus, TickError>,
 
+    root_tick_id: &'e Uuid,
+
     started_at: &'e NaiveDateTime,
 
     took_ms: i64,
@@ -42,6 +44,7 @@ impl<'e> BTNodeExecutionEndedEvent<'e> {
             node_id,
             node_tick_id,
             result,
+            root_tick_id: tick_header.get_root_tick_id(),
             started_at,
             took_ms,
             tree_id: tick_header.get_tree_id(),
@@ -62,6 +65,8 @@ pub struct BTNodeExecutionStartedEvent<'e> {
     node_id: &'e i32,
     node_tick_id: &'e Uuid,
 
+    root_tick_id: &'e Uuid,
+
     started_at: &'e NaiveDateTime,
 
     tree_id: &'e i32,
@@ -81,6 +86,7 @@ impl<'e> BTNodeExecutionStartedEvent<'e> {
             correlation_id: tick_header.get_correlation_id(),
             node_id,
             node_tick_id,
+            root_tick_id: tick_header.get_root_tick_id(),
             started_at,
             tree_id: tick_header.get_tree_id(),
             tree_tick_id: tick_header.get_tree_tick_id(),
