@@ -101,7 +101,6 @@ fn build_tree_with_subtree(subtree: Arc<BehaviorTree>) -> BehaviorTree {
                                                       .into(),
                                                   ExecuteSubTreeActionNode::new(
                                                       15,
-                                                      &4,
                                                       subtree
                                                   ).unwrap().into()
                                               ]

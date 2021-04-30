@@ -51,10 +51,18 @@ impl BehaviorTree {
 
 }
 
+pub struct BehaviorTreeDefinition {
+
+    id: i32,
+    root_node_id: i32
+
+}
+
 #[derive(Default)]
 pub struct BehaviorTreeService {
 
-    trees: DashMap<i32, Arc<BehaviorTree>>
+    trees: DashMap<i32, Arc<BehaviorTree>>,
+
 
 }
 
@@ -71,6 +79,7 @@ impl BehaviorTreeService {
     }
 
 }
+
 
 #[cfg(test)]
 mod tests {

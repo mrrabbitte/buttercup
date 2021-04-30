@@ -1,9 +1,11 @@
+use std::collections::HashSet;
 use std::sync::Arc;
 
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::context::BTNodeExecutionContext;
+use crate::definitions::{BehaviorTreeBuildingContext, BehaviorTreeBuildingError, BehaviorTreeDefinition, BehaviorTreeDefinitionService, BehaviorTreeNodeDefinition};
 use crate::node::{BehaviorTreeNode, BTNode};
 use crate::node::action::ActionBTNode;
 use crate::tick::{TickError, TickHeader, TickStatus};
@@ -23,14 +25,10 @@ pub struct ExecuteSubTreeActionNode {
 impl ExecuteSubTreeActionNode {
 
     pub fn new(id: i32,
-               parent_tree_id: &i32,
-               tree: Arc<BehaviorTree>) -> Result<ExecuteSubTreeActionNode, ExecuteSubTreeActionNodeError> {
+               tree: Arc<BehaviorTree>)
+        -> Result<ExecuteSubTreeActionNode, ()> {
         if !tree.can_be_subtree() {
-            return Result::Err(ExecuteSubTreeActionNodeError::ProvidedTreeCannotBeASubtree);
-        }
-
-        if tree.get_id() == parent_tree_id {
-            return Result::Err(ExecuteSubTreeActionNodeError::SubtreeIsParentTree);
+            return Result::Err(());
         }
 
         Result::Ok(
@@ -50,17 +48,41 @@ impl ExecuteSubTreeActionNode {
 
 }
 
-#[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
-pub enum ExecuteSubTreeActionNodeError {
+pub struct ExecuteSubTreeActionNodeDefinition {
 
-    ProvidedTreeCannotBeASubtree,
-    SubtreeIsParentTree,
+    id: i32,
+    tree_id: i32
 
+}
+
+impl BehaviorTreeNodeDefinition for ExecuteSubTreeActionNodeDefinition {
+    fn build(&self,
+             context: &BehaviorTreeBuildingContext) -> Result<BTNode, BehaviorTreeBuildingError> {
+        let subtree = context.get_subtree(&self.tree_id)?;
+
+        Result::Ok(ExecuteSubTreeActionNode::new(self.id, subtree)?.into())
+    }
+
+    fn get_subtree_ids(&self,
+                       service: &BehaviorTreeDefinitionService)
+        -> Result<HashSet<i32>, BehaviorTreeBuildingError> {
+        match service.get_definition(&self.tree_id) {
+            None => Result::Err(BehaviorTreeBuildingError::CouldNotFindSubtreeWithId(self.tree_id)),
+
+            Some(subtree) => {
+                let mut subtree_ids = subtree.get_subtree_ids(service)?;
+
+                subtree_ids.insert(self.tree_id);
+
+                Result::Ok(subtree_ids)
+            }
+
+        }
+    }
 }
 
 #[async_trait]
 impl BehaviorTreeNode for ExecuteSubTreeActionNode {
-
     async fn do_tick(&self,
                      header: &TickHeader,
                      context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
@@ -75,5 +97,11 @@ impl BehaviorTreeNode for ExecuteSubTreeActionNode {
 impl From<ExecuteSubTreeActionNode> for BTNode {
     fn from(node: ExecuteSubTreeActionNode) -> Self {
         BTNode::Action(ActionBTNode::ExecuteSubTree(node))
+    }
+}
+
+impl From<()> for BehaviorTreeBuildingError {
+    fn from(_: ()) -> Self {
+        BehaviorTreeBuildingError::ProvidedTreeCannotBeASubtreeError
     }
 }
