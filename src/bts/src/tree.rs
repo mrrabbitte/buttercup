@@ -70,7 +70,11 @@ impl BehaviorTreeService {
 
     pub fn insert(&self,
                   tree: BehaviorTree) {
-        self.trees.insert(tree.id, Arc::new(tree));
+        self.insert_arc(Arc::new(tree));
+    }
+
+    pub fn insert_arc(&self, tree: Arc<BehaviorTree>) {
+        self.trees.insert(tree.id, tree);
     }
 
     pub fn get_by_id(&self,

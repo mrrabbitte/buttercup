@@ -3,10 +3,11 @@ use std::ops::Deref;
 use std::sync::Arc;
 
 use dashmap::DashMap;
+use dashmap::mapref::one::Ref;
 
 use crate::node::BTNode;
 use crate::node::root::RootBTNodeDefinition;
-use crate::tree::BehaviorTree;
+use crate::tree::{BehaviorTree, BehaviorTreeService};
 
 pub struct BehaviorTreeDefinitionService {
 
@@ -17,8 +18,8 @@ pub struct BehaviorTreeDefinitionService {
 impl BehaviorTreeDefinitionService {
 
     pub fn get_definition(&self,
-                          id: &i32) -> Option<&BehaviorTreeDefinition> {
-        self.definitions.get(id).map(|reference| reference.deref())
+                          id: &i32) -> Option<Ref<i32, BehaviorTreeDefinition>> {
+        self.definitions.get(id)
     }
 
 }
@@ -26,8 +27,8 @@ impl BehaviorTreeDefinitionService {
 pub struct BehaviorTreeDefinition {
 
     id: i32,
-    root_node: Box<dyn RootBTNodeDefinition>,
-    definitions: Vec<Box<dyn BehaviorTreeNodeDefinition>>
+    definitions: Vec<Arc<dyn BehaviorTreeNodeDefinition>>,
+    root_node: Box<dyn RootBTNodeDefinition>
 
 }
 
@@ -38,12 +39,16 @@ impl BehaviorTreeDefinition {
         Result::Ok(BehaviorTree::new(self.id, self.root_node.build(&context)?))
     }
 
+    pub fn get_definitions(&self) -> &Vec<Arc<dyn BehaviorTreeNodeDefinition>> {
+        &self.definitions
+    }
+
     pub fn get_subtree_ids(&self,
                            service: &BehaviorTreeDefinitionService)
         -> Result<HashSet<i32>, BehaviorTreeBuildingError> {
         let mut ids = HashSet::new();
 
-        for node_definition in self.definitions {
+        for node_definition in self.get_definitions() {
             let subtree_ids = node_definition.get_subtree_ids(service)?;
 
             if !subtree_ids.is_empty() {
@@ -53,7 +58,6 @@ impl BehaviorTreeDefinition {
 
         Result::Ok(ids)
     }
-
 }
 
 
@@ -61,6 +65,8 @@ pub trait BehaviorTreeNodeDefinition {
 
     fn build(&self,
              context: &BehaviorTreeBuildingContext) -> Result<BTNode, BehaviorTreeBuildingError>;
+
+    fn get_id(&self) -> &i32;
 
     fn get_subtree_ids(&self,
                        _: &BehaviorTreeDefinitionService)
@@ -73,6 +79,7 @@ pub trait BehaviorTreeNodeDefinition {
 
 pub struct BehaviorTreeBuildingService {
 
+    behavior_tree_service: Arc<BehaviorTreeService>,
     definition_service: Arc<BehaviorTreeDefinitionService>
 
 }
@@ -84,7 +91,8 @@ impl BehaviorTreeBuildingService {
         match self.definition_service.get_definition(&id) {
             None => Result::Err(BehaviorTreeBuildingError::CouldNotFindSubtreeWithId(*id)),
             Some(definition) => {
-                let context = self.get_context(definition)?;
+                let context =
+                    self.get_context(definition.value())?;
 
                 definition.build(&context)
             }
@@ -96,7 +104,29 @@ impl BehaviorTreeBuildingService {
         -> Result<BehaviorTreeBuildingContext, BehaviorTreeBuildingError> {
         let subtree_ids = tree_definition.get_subtree_ids(&self.definition_service)?;
 
+        let mut subtrees = HashMap::new();
 
+        for subtree_id in subtree_ids {
+            let subtree = match self.behavior_tree_service.get_by_id(&subtree_id) {
+                None => {
+                    let subtree = Arc::new(self.build(&subtree_id)?);
+                    self.behavior_tree_service.insert_arc(subtree.clone());
+                    subtree
+                },
+
+                Some(subtree) => subtree
+            };
+
+            subtrees.insert(*subtree.get_id(), subtree);
+        }
+
+        Result::Ok(
+            BehaviorTreeBuildingContext::new(
+                tree_definition.get_definitions()
+                    .into_iter()
+                    .map(|def| (*def.get_id(), def.clone()))
+                    .collect(),
+                subtrees))
     }
 
 }
@@ -113,14 +143,14 @@ pub enum BehaviorTreeBuildingError {
 
 pub struct BehaviorTreeBuildingContext {
 
-    node_definitions: HashMap<i32, Box<dyn BehaviorTreeNodeDefinition>>,
+    node_definitions: HashMap<i32, Arc<dyn BehaviorTreeNodeDefinition>>,
     subtrees: HashMap<i32, Arc<BehaviorTree>>
 
 }
 
 impl BehaviorTreeBuildingContext {
 
-    pub fn new(node_definitions: HashMap<i32, Box<dyn BehaviorTreeNodeDefinition>>,
+    pub fn new(node_definitions: HashMap<i32, Arc<dyn BehaviorTreeNodeDefinition>>,
                subtrees: HashMap<i32, Arc<BehaviorTree>>) -> BehaviorTreeBuildingContext {
         BehaviorTreeBuildingContext {
             node_definitions,

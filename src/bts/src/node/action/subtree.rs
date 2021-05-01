@@ -63,6 +63,10 @@ impl BehaviorTreeNodeDefinition for ExecuteSubTreeActionNodeDefinition {
         Result::Ok(ExecuteSubTreeActionNode::new(self.id, subtree)?.into())
     }
 
+    fn get_id(&self) -> &i32 {
+        &self.id
+    }
+
     fn get_subtree_ids(&self,
                        service: &BehaviorTreeDefinitionService)
         -> Result<HashSet<i32>, BehaviorTreeBuildingError> {
