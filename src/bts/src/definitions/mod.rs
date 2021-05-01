@@ -136,7 +136,8 @@ pub enum BehaviorTreeBuildingError {
     CouldNotFindChildDefinitionWithId(i32),
     CouldNotFindTreeWithId(i32),
     CouldNotFindSubtreeWithId(i32),
-    ProvidedTreeCannotBeASubtreeError
+    GotUnexpectedNodeType(i32),
+    ProvidedTreeCannotBeASubtreeError,
 
 }
 
