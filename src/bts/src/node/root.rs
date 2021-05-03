@@ -6,8 +6,7 @@ use crate::node::root::one_off::OneOffRootBTNode;
 use crate::node::root::reactive::ReactiveRootBTNode;
 use crate::node::root::to_first::{ToFirstErrorRootBTNode, ToFirstFailureRootBTNode};
 use crate::node::root::until_stopped::UntilStoppedRootBTNode;
-use crate::tick::{TickError, TickStatus, TickHeader};
-use crate::definitions::{BehaviorTreeBuildingContext, BehaviorTreeBuildingError};
+use crate::tick::{TickError, TickHeader, TickStatus};
 
 pub mod to_first;
 pub mod one_off;
@@ -63,13 +62,6 @@ impl RootBTNode {
             _ => false
         }
     }
-}
-
-pub trait RootBTNodeDefinition {
-
-    fn build(&self,
-             context: &BehaviorTreeBuildingContext) -> Result<RootBTNode, BehaviorTreeBuildingError>;
-
 }
 
 impl From<OneOffRootBTNode> for RootBTNode {

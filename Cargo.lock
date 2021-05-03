@@ -828,6 +828,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "buttercup_api"
+version = "0.1.0"
+dependencies = [
+ "buttercup_bts",
+ "dashmap 4.0.2",
+]
+
+[[package]]
 name = "buttercup_blackboards"
 version = "0.1.0"
 dependencies = [

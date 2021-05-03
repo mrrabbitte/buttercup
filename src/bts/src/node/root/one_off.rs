@@ -3,9 +3,8 @@ use std::sync::Arc;
 use async_trait::async_trait;
 
 use crate::context::BTNodeExecutionContext;
-use crate::definitions::{BehaviorTreeBuildingContext, BehaviorTreeBuildingError};
 use crate::node::{BehaviorTreeNode, BTNode};
-use crate::node::root::{RootBTNode, RootBTNodeDefinition};
+use crate::node::root::RootBTNode;
 use crate::tick::{TickError, TickHeader, TickStatus};
 
 pub struct OneOffRootBTNode {
@@ -38,20 +37,5 @@ impl BehaviorTreeNode for OneOffRootBTNode {
 
     fn get_id(&self) -> &i32 {
         &self.id
-    }
-}
-
-pub struct OneOffRootBTNodeDefinition {
-
-    id: i32,
-    child_id: i32
-
-}
-
-impl RootBTNodeDefinition for OneOffRootBTNodeDefinition {
-    fn build(&self,
-             context: &BehaviorTreeBuildingContext) -> Result<RootBTNode, BehaviorTreeBuildingError> {
-        Result::Ok(
-            OneOffRootBTNode::new(self.id, context.build_child(&self.child_id)?).into())
     }
 }
