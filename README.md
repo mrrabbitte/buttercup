@@ -26,6 +26,6 @@ After the POC (https://github.com/pgliniecki/buttercup/projects/1) we're going t
 The most important part of 1.0 version (https://github.com/pgliniecki/buttercup/projects/2), just after getting the coverage to 80%, is to implement a distributed mode, where each execution can be repeated (at-least-once) even if a node running a certain agent fails, at the moment looking at https://github.com/async-raft/async-raft, but it may change in the future. 
 
 
-## Why Buttercup?
+## Why buttercup?
 
 Well, it's going to be one of the three, next are Blossom and Bubbles, I suppose. 
