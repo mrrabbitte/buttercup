@@ -1,5 +1,7 @@
 # buttercup - small and brave behavior tree engine written in Rust
 
+**NOTE:** this is very much a WIP project, not accepting contributions yet - although happy to talk if you think it's something worth doing.
+
 ## Concept
 
 Behavior Tree is an abstraction widely used in gaming and robotics industry, it provides an easy to comprehend and extendable interface for designing complex behavior. 
