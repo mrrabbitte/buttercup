@@ -6,9 +6,7 @@
 
 Behavior Tree is an abstraction widely used in gaming and robotics industry, it provides an easy to comprehend and extendable interface for designing complex behavior. 
 
-So what about complex behavior for the Web? 
-
-Buttercup aims to provide a platform for designing and running complex behavior for the Web.
+Buttercup aims to provide a platform for designing and running agents executing complex behavior in the Web environment. It has to work, right? ;) 
 
 Handful of links about Behavior Trees: 
 - https://ieeexplore.ieee.org/abstract/document/6907656
