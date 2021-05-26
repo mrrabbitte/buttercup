@@ -36,9 +36,13 @@ Here are some well known features that BTs implementations may have:
 
 ## Roadmap
 
-After [the POC](https://github.com/pgliniecki/buttercup/projects/1) we're going to have some more fun, I promise. ;)
+After [the POC](https://github.com/pgliniecki/buttercup/projects/1) we're going to have some more fun.
 
-The most important part of 1.0 version (https://github.com/pgliniecki/buttercup/projects/2), just after getting the coverage to 80%, is to implement a distributed mode, where each execution can be repeated - with at-least-once execution guarantees - even if a node running a certain agent fails. At the moment looking at https://github.com/async-raft/async-raft, but it may change in the future. 
+The most important part of [the 1.0 version](https://github.com/pgliniecki/buttercup/projects/2) is getting the test coverage to 80% and a stable API.
+
+As an ideal to chase, it would be grand if there was a distributed mode, where each execution can be repeated - with at-least-once execution guarantees - even if a node running a certain agent fails, this would allow to run a swarm of agents which could, in theory be orchestrated by a common source of truth. 
+
+At the moment looking at https://github.com/async-raft/async-raft, but it may change in the future. 
 
 
 ## Why buttercup?
