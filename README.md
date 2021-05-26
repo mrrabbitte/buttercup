@@ -1,4 +1,4 @@
-# buttercup - small and brave behavior tree engine written in Rust
+# buttercup - small yet brave behavior tree engine written in Rust
 
 **NOTE:** this is very much a WIP project, not accepting contributions yet - although happy to talk if you think it's something worth doing.
 
@@ -12,6 +12,7 @@ Handful of links about Behavior Trees:
 - https://ieeexplore.ieee.org/abstract/document/6907656
 - https://link.springer.com/chapter/10.1007/978-3-642-25090-3_13
 - https://link.springer.com/chapter/10.1007/978-3-319-17518-8_29
+- 
 
 ## State of the project
 
@@ -28,4 +29,7 @@ The most important part of 1.0 version (https://github.com/pgliniecki/buttercup/
 
 ## Why buttercup?
 
-Well, it's going to be one of the three, next are Blossom and Bubbles, I suppose. 
+![Buttercup-pic](https://user-images.githubusercontent.com/7830639/119693062-3ae7e500-be4c-11eb-8347-cd161f877578.png)
+
+Small yet brave! :)
+
