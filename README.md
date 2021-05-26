@@ -6,7 +6,7 @@
 
 Behavior Tree is an abstraction widely used in gaming and robotics industry, it provides an easy to comprehend and extendable interface for designing complex behavior. 
 
-Buttercup aims to provide a platform for designing and running agents executing complex behavior in the Web environment. 
+Buttercup aims to provide a platform for designing and running agents executing complex behavior in the Web environment, so instead of using actuators or moving in a game you can send emails, scrape the web, perform http requests, etc. 
 
 Quite awesome book on BTs:
 - [Colledanchise, Michele, and Petter Ögren. Behavior trees in robotics and AI: An introduction. CRC Press, 2018.](https://books.google.de/books?hl=pl&lr=&id=YVOWDwAAQBAJ&oi=fnd&pg=PP1&dq=behavior+trees+in+robotics+and+ai&ots=hyCuh4L8lO&sig=HKHCu1tWhEhtf9xo4NfStu-qt1c&redir_esc=y#v=onepage&q=behavior%20trees%20in%20robotics%20and%20ai&f=false)
