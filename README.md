@@ -40,7 +40,7 @@ After [the POC](https://github.com/pgliniecki/buttercup/projects/1) we're going 
 
 The most important part of [the 1.0 version](https://github.com/pgliniecki/buttercup/projects/2) is getting the test coverage to 80% and a stable API.
 
-As an ideal to chase, it would be grand if there was a distributed mode, where each execution can be repeated - with at-least-once execution guarantees - even if a node running a certain agent fails, this would allow to run a swarm of agents which could, in theory be orchestrated by a common source of truth. 
+After that, it would be grand if there was a distributed mode, where each execution can be repeated - with at-least-once execution guarantees - even if a node running a certain agent fails, this would allow to run a swarm of agents which could, in theory be orchestrated by a common source of truth. 
 
 At the moment looking at https://github.com/async-raft/async-raft, but it may change in the future. 
 
