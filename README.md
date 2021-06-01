@@ -55,7 +55,7 @@ At the moment looking at (Raft)[https://github.com/async-raft/async-raft] in a m
 Some visions on how this project can be used and specialize in the future, mentioned in order from most probable to most adventurous:
 
 - **Pentesting**: BTs allows for designing clear and auditable scenarios, where groups of agents can coordinate parts of the attack, e.g. on group hammers a given service for others to abuse the downtime in other parts of the system;
-- **IoT**: the engine is written in Rust and will run on whatever can execute `async-await` so potentially you could design BTs on the server and send those to connected devices;
+- **IoT**: the engine is written in Rust and will run on whatever can execute `async-await` so potentially you could design BTs on the server and broadcast those to connected devices;
 - **Web3**: fast and lean implementation could provide desired latencies for crypto use cases.
 
 ## Why buttercup?
