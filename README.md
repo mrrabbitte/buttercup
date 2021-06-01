@@ -48,7 +48,7 @@ After that, we should ask about the distributed mode, where each execution can b
 
 This would allow to run a swarm of agents which could be orchestrated with or without a centralised source of truth with quite decent guarantees.  
 
-At the moment looking at (Raft)[https://github.com/async-raft/async-raft] in a multi-raft variant, where agents would be partitioned and each partition would have 1 node selected as the leader but it's an early concept. 
+At the moment looking at [Raft](https://github.com/async-raft/async-raft) in a multi-raft variant, where agents would be partitioned and each partition would have 1 node selected as the leader but it's an early concept. 
 
 ## Potential use cases
 
