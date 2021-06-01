@@ -44,7 +44,7 @@ After [the POC](https://github.com/pgliniecki/buttercup/projects/1) we're going 
 
 The most important part of [the 1.0 version](https://github.com/pgliniecki/buttercup/projects/2) is getting the test coverage to 80% and a stable API.
 
-After that, it would be grand if there was a distributed mode, where each execution can be repeated, e.g. with at-least-once execution guarantees, so even if a node running a certain agent fails, another can pick up almost where the other ended and continue the execution. 
+After that, we should ask about the distributed mode, where each execution can be repeated, e.g. with at-least-once execution guarantees, so even if a node running a certain agent fails another can pick up almost at the point where the other ended and continue the execution. 
 
 This would allow to run a swarm of agents which could be orchestrated with or without a centralised source of truth with quite decent guarantees.  
 
