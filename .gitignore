@@ -5,6 +5,7 @@
 .idea
 /.idea/
 .idea/
+.idea/*
 target/
 debug/
 temp_test/
