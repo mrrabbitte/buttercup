@@ -5,9 +5,6 @@ use std::sync::Arc;
 use dashmap::DashMap;
 use dashmap::mapref::one::Ref;
 
-use crate::node::BTNode;
-use crate::node::root::RootBTNodeDefinition;
-use crate::tree::{BehaviorTree, BehaviorTreeService};
 use buttercup_bts::node::BTNode;
 use buttercup_bts::tree::{BehaviorTree, BehaviorTreeService};
 use crate::bts::root::RootBTNodeDefinition;
@@ -193,3 +190,4 @@ impl BehaviorTreeBuildingContext {
     }
 
 }
+
