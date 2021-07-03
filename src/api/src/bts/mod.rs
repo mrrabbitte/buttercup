@@ -10,6 +10,7 @@ use buttercup_bts::tree::{BehaviorTree, BehaviorTreeService};
 use crate::bts::root::RootBTNodeDefinition;
 
 pub mod action;
+pub mod composite;
 pub mod root;
 
 pub struct BehaviorTreeDefinitionService {
