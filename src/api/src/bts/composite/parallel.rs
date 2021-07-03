@@ -17,7 +17,7 @@ impl BehaviorTreeNodeDefinition for ParallelCompositeNodeDefinition {
             ParallelCompositeNode::new(
                 self.id,
                 context.build_children(&self.children_ids)?,
-                self.num_successes_to_succeed)
+                self.num_successes_to_succeed)?
                 .into()
         )
     }

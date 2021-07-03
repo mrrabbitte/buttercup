@@ -8,4 +8,5 @@ edition = "2018"
 
 [dependencies]
 buttercup_bts = { path = "../bts" }
+buttercup_variables = { path = "../variables" }
 dashmap = "4"

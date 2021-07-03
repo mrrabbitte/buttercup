@@ -49,7 +49,7 @@ fn build_until_stopped_tree() -> BehaviorTree {
                                     SequenceCompositeNode::new(
                                         4, vec![
                                             WaitDurationActionNode::new(4,
-                                                                        Duration::from_secs(3),
+                                                                        Duration::from_secs(3).into(),
                                             )
                                                 .into(),
                                             PrintLogActionNode::new(5,
@@ -71,7 +71,8 @@ fn build_to_first_fail_tree() -> BehaviorTree {
                                           SequenceCompositeNode::new(
                                               8, vec![
                                                   WaitDurationActionNode::new(9,
-                                                                              Duration::from_secs(3),
+                                                                              Duration::from_secs(3)
+                                                                                  .into(),
                                                   )
                                                       .into(),
                                                   PrintLogActionNode::new(10,
@@ -93,7 +94,7 @@ fn build_tree_with_subtree(subtree: Arc<BehaviorTree>) -> BehaviorTree {
                                           SequenceCompositeNode::new(
                                               12, vec![
                                                   WaitDurationActionNode::new(13,
-                                                                              Duration::from_secs(3),
+                                                                              Duration::from_secs(3).into(),
                                                   )
                                                       .into(),
                                                   PrintLogActionNode::new(14,

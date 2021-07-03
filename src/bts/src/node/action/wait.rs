@@ -29,10 +29,10 @@ pub struct WaitDurationActionNode {
 impl WaitDurationActionNode {
 
     pub fn new(id: i32,
-               duration: Duration) -> WaitDurationActionNode {
+               duration: VariableSpecification<Duration>) -> WaitDurationActionNode {
         WaitDurationActionNode {
             id,
-            duration: duration.into()
+            duration
         }
     }
 

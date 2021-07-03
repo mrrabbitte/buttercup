@@ -832,6 +832,7 @@ name = "buttercup_api"
 version = "0.1.0"
 dependencies = [
  "buttercup_bts",
+ "buttercup_variables",
  "dashmap 4.0.2",
 ]
 
