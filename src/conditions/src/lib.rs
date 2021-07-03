@@ -10,6 +10,9 @@ use crate::relational::{ContainsRelationalExpression, EndsWithRelationalExpressi
 
 pub mod relational;
 
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub enum ConditionExpression {
 
     RelationExpression(RelationalExpression),
@@ -51,6 +54,7 @@ impl ConditionExpressionWrapper {
 
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub enum LogicalExpression {
 
     And(Vec<ConditionExpression>),
@@ -59,6 +63,7 @@ pub enum LogicalExpression {
 
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub enum RelationalExpression {
 
     Contains(ContainsRelationalExpression),
@@ -93,6 +98,7 @@ impl RelationalExpression {
 
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub enum RelationalExpressionSpecification {
 
     NameAndName(String, String),
