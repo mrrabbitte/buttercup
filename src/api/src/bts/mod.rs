@@ -70,7 +70,7 @@ impl BehaviorTreeDefinition {
 pub trait BehaviorTreeNodeDefinition {
 
     fn build(&self,
-             context: &BehaviorTreeBuildingContext) -> Result<BTNode, BehaviorTreeBuildingError>;
+             ctx: &BehaviorTreeBuildingContext) -> Result<BTNode, BehaviorTreeBuildingError>;
 
     fn get_id(&self) -> &i32;
 

@@ -16,6 +16,17 @@ pub struct InvertDecoratorNode {
 
 }
 
+impl InvertDecoratorNode {
+
+    pub fn new(id: i32, child: Box<BTNode>) -> InvertDecoratorNode {
+        InvertDecoratorNode {
+            id,
+            child
+        }
+    }
+
+}
+
 #[async_trait]
 impl BehaviorTreeNode for InvertDecoratorNode {
     async fn do_tick(&self,

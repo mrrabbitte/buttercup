@@ -1,10 +1,10 @@
-use buttercup_bts::node::{BehaviorTreeNode, BTNode};
-use buttercup_bts::node::decorator::condition::ConditionDecoratorNode;
+use buttercup_bts::node::BTNode;
+use buttercup_bts::node::decorator::reactive::ReactiveConditionDecoratorNode;
 use buttercup_conditions::{ConditionExpression, ConditionExpressionWrapper};
 
 use crate::bts::{BehaviorTreeBuildingContext, BehaviorTreeBuildingError, BehaviorTreeNodeDefinition};
 
-pub struct ConditionDecoratorNodeDefinition {
+pub struct ReactiveConditionDecoratorNodeDefinition {
 
     id: i32,
     child_id: i32,
@@ -12,11 +12,11 @@ pub struct ConditionDecoratorNodeDefinition {
 
 }
 
-impl BehaviorTreeNodeDefinition for ConditionDecoratorNodeDefinition {
+impl BehaviorTreeNodeDefinition for ReactiveConditionDecoratorNodeDefinition {
     fn build(&self,
              ctx: &BehaviorTreeBuildingContext) -> Result<BTNode, BehaviorTreeBuildingError> {
         Ok(
-            ConditionDecoratorNode::new(
+            ReactiveConditionDecoratorNode::new(
                 self.id,
                 ctx.build_child(&self.child_id)?,
                 ConditionExpressionWrapper::new(self.expression.clone())
@@ -25,6 +25,6 @@ impl BehaviorTreeNodeDefinition for ConditionDecoratorNodeDefinition {
     }
 
     fn get_id(&self) -> &i32 {
-        &self.id 
+        &self.id
     }
 }
