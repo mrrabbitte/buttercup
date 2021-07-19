@@ -40,6 +40,7 @@ pub trait VariableService {
 
 }
 
+#[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Clone)]
 pub enum VariableSpecification<T: TryFrom<ValueHolder> + Copy> {
 
     Literal(Arc<T>),

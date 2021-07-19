@@ -51,10 +51,17 @@ impl BehaviorTree {
 
 }
 
+pub struct BehaviorTreeDefinition {
+
+    id: i32,
+    root_node_id: i32
+
+}
+
 #[derive(Default)]
 pub struct BehaviorTreeService {
 
-    trees: DashMap<i32, Arc<BehaviorTree>>
+    trees: DashMap<i32, Arc<BehaviorTree>>,
 
 }
 
@@ -62,7 +69,11 @@ impl BehaviorTreeService {
 
     pub fn insert(&self,
                   tree: BehaviorTree) {
-        self.trees.insert(tree.id, Arc::new(tree));
+        self.insert_arc(Arc::new(tree));
+    }
+
+    pub fn insert_arc(&self, tree: Arc<BehaviorTree>) {
+        self.trees.insert(tree.id, tree);
     }
 
     pub fn get_by_id(&self,
@@ -71,6 +82,7 @@ impl BehaviorTreeService {
     }
 
 }
+
 
 #[cfg(test)]
 mod tests {

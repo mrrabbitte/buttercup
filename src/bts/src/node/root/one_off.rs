@@ -4,7 +4,8 @@ use async_trait::async_trait;
 
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
-use crate::tick::{TickError, TickStatus, TickHeader};
+use crate::node::root::RootBTNode;
+use crate::tick::{TickError, TickHeader, TickStatus};
 
 pub struct OneOffRootBTNode {
 

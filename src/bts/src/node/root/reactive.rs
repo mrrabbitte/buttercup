@@ -4,8 +4,10 @@ use async_trait::async_trait;
 use uuid::Uuid;
 
 use crate::context::BTNodeExecutionContext;
-use crate::node::BehaviorTreeNode;
+use crate::node::{BehaviorTreeNode, BTNode};
+use crate::node::decorator::DecoratorBTNode;
 use crate::node::decorator::reactive::ReactiveConditionDecoratorNode;
+use crate::node::root::RootBTNode;
 use crate::tick::{TickError, TickHeader, TickStatus};
 
 pub struct ReactiveRootBTNode {
@@ -37,5 +39,18 @@ impl BehaviorTreeNode for ReactiveRootBTNode {
 
     fn get_id(&self) -> &i32 {
         &self.id
+    }
+}
+
+impl ReactiveRootBTNode {
+
+    pub fn new(id: i32,
+               child: Box<ReactiveConditionDecoratorNode>,
+               stop_on_error: bool) -> ReactiveRootBTNode {
+        ReactiveRootBTNode {
+            id,
+            child,
+            stop_on_error
+        }
     }
 }

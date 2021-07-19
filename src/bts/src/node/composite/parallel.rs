@@ -122,7 +122,8 @@ mod tests {
             let context = Default::default();
             let children: Vec<BTNode> = vec![
                 PrintLogActionNode::new(1, "I am one.".to_string()).into(),
-                WaitDurationActionNode::new(2, Duration::from_millis(10)).into(),
+                WaitDurationActionNode::new(2,
+                                            Duration::from_millis(10).into()).into(),
                 PrintLogActionNode::new(3, "I am two.".to_string()).into(),
                 PrintLogActionNode::new(4, "I am four.".to_string()).into()];
             match ParallelCompositeNode::new(5, children, 3)

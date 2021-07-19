@@ -5,7 +5,6 @@ use std::ops::Deref;
 
 use actix_web::guard::Guard;
 use async_trait::async_trait;
-use futures::future::{Abortable, Aborted, AbortHandle};
 
 use buttercup_blackboards::LocalBlackboardError;
 use buttercup_conditions::ConditionExpressionWrapper;

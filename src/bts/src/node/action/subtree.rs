@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::sync::Arc;
 
 use async_trait::async_trait;
@@ -23,14 +24,10 @@ pub struct ExecuteSubTreeActionNode {
 impl ExecuteSubTreeActionNode {
 
     pub fn new(id: i32,
-               parent_tree_id: &i32,
-               tree: Arc<BehaviorTree>) -> Result<ExecuteSubTreeActionNode, ExecuteSubTreeActionNodeError> {
+               tree: Arc<BehaviorTree>)
+        -> Result<ExecuteSubTreeActionNode, ()> {
         if !tree.can_be_subtree() {
-            return Result::Err(ExecuteSubTreeActionNodeError::ProvidedTreeCannotBeASubtree);
-        }
-
-        if tree.get_id() == parent_tree_id {
-            return Result::Err(ExecuteSubTreeActionNodeError::SubtreeIsParentTree);
+            return Result::Err(());
         }
 
         Result::Ok(
@@ -50,17 +47,8 @@ impl ExecuteSubTreeActionNode {
 
 }
 
-#[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
-pub enum ExecuteSubTreeActionNodeError {
-
-    ProvidedTreeCannotBeASubtree,
-    SubtreeIsParentTree,
-
-}
-
 #[async_trait]
 impl BehaviorTreeNode for ExecuteSubTreeActionNode {
-
     async fn do_tick(&self,
                      header: &TickHeader,
                      context: &BTNodeExecutionContext) -> Result<TickStatus, TickError> {
@@ -77,3 +65,4 @@ impl From<ExecuteSubTreeActionNode> for BTNode {
         BTNode::Action(ActionBTNode::ExecuteSubTree(node))
     }
 }
+

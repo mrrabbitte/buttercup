@@ -3,7 +3,10 @@ use buttercup_values::{ValueHolder, ValuesPayload};
 
 use crate::{RelationalExpressionSpecification, ValuesPayloadPredicateSupplier};
 
-#[derive(RelationalExpression)]
+use serde::{Deserialize, Serialize};
+
+#[derive(RelationalExpression, Serialize, Deserialize,
+        Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 #[predicate(contains)]
 pub struct ContainsRelationalExpression {
 
@@ -11,7 +14,8 @@ pub struct ContainsRelationalExpression {
 
 }
 
-#[derive(RelationalExpression)]
+#[derive(RelationalExpression, Serialize, Deserialize,
+        Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 #[predicate(ends_with)]
 pub struct EndsWithRelationalExpression {
 
@@ -19,7 +23,8 @@ pub struct EndsWithRelationalExpression {
 
 }
 
-#[derive(RelationalExpression)]
+#[derive(RelationalExpression, Serialize, Deserialize,
+        Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 #[predicate(eq)]
 pub struct EqualsRelationalExpression {
 
@@ -27,7 +32,8 @@ pub struct EqualsRelationalExpression {
 
 }
 
-#[derive(RelationalExpression)]
+#[derive(RelationalExpression, Serialize, Deserialize,
+        Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 #[predicate(ge)]
 pub struct GreaterThanOrEqualsRelationalExpression {
 
@@ -35,7 +41,8 @@ pub struct GreaterThanOrEqualsRelationalExpression {
 
 }
 
-#[derive(RelationalExpression)]
+#[derive(RelationalExpression, Serialize, Deserialize,
+        Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 #[predicate(gt)]
 pub struct GreaterThanRelationalExpression {
 
@@ -43,7 +50,8 @@ pub struct GreaterThanRelationalExpression {
 
 }
 
-#[derive(RelationalExpression)]
+#[derive(RelationalExpression, Serialize, Deserialize,
+        Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 #[predicate(is_in)]
 pub struct IsInRelationalExpression {
 
@@ -51,7 +59,8 @@ pub struct IsInRelationalExpression {
 
 }
 
-#[derive(RelationalExpression)]
+#[derive(RelationalExpression, Serialize, Deserialize,
+        Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 #[predicate(le)]
 pub struct LessThanOrEqualsRelationalExpression {
 
@@ -59,7 +68,8 @@ pub struct LessThanOrEqualsRelationalExpression {
 
 }
 
-#[derive(RelationalExpression)]
+#[derive(RelationalExpression, Serialize, Deserialize,
+        Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 #[predicate(lt)]
 pub struct LessThanRelationalExpression {
 
@@ -67,7 +77,8 @@ pub struct LessThanRelationalExpression {
 
 }
 
-#[derive(RelationalExpression)]
+#[derive(RelationalExpression, Serialize, Deserialize,
+        Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 #[predicate(ne)]
 pub struct NotEqualsRelationalExpression {
 
@@ -75,7 +86,8 @@ pub struct NotEqualsRelationalExpression {
 
 }
 
-#[derive(RelationalExpression)]
+#[derive(RelationalExpression, Serialize, Deserialize,
+        Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 #[predicate(starts_with)]
 pub struct StartsWithRelationalExpression {
 

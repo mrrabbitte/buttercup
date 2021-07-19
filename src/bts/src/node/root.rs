@@ -6,7 +6,7 @@ use crate::node::root::one_off::OneOffRootBTNode;
 use crate::node::root::reactive::ReactiveRootBTNode;
 use crate::node::root::to_first::{ToFirstErrorRootBTNode, ToFirstFailureRootBTNode};
 use crate::node::root::until_stopped::UntilStoppedRootBTNode;
-use crate::tick::{TickError, TickStatus, TickHeader};
+use crate::tick::{TickError, TickHeader, TickStatus};
 
 pub mod to_first;
 pub mod one_off;
@@ -93,3 +93,5 @@ impl From<UntilStoppedRootBTNode> for RootBTNode {
         RootBTNode::UntilStopped(node)
     }
 }
+
+

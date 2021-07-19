@@ -1,11 +1,12 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use uuid::Uuid;
 
 use crate::context::BTNodeExecutionContext;
 use crate::node::{BehaviorTreeNode, BTNode};
-use crate::tick::{TickError, TickStatus, TickHeader};
-use uuid::Uuid;
+use crate::node::root::RootBTNode;
+use crate::tick::{TickError, TickHeader, TickStatus};
 
 pub struct ToFirstFailureRootBTNode {
 
@@ -92,3 +93,4 @@ impl BehaviorTreeNode for ToFirstErrorRootBTNode {
         &self.id
     }
 }
+

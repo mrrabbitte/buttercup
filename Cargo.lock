@@ -828,6 +828,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "buttercup_api"
+version = "0.1.0"
+dependencies = [
+ "buttercup_bts",
+ "buttercup_conditions",
+ "buttercup_variables",
+ "dashmap 4.0.2",
+]
+
+[[package]]
 name = "buttercup_blackboards"
 version = "0.1.0"
 dependencies = [
@@ -874,6 +884,7 @@ dependencies = [
  "lazy_static",
  "num",
  "num-rational",
+ "serde",
 ]
 
 [[package]]
