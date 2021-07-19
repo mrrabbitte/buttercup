@@ -1,6 +1,6 @@
 # buttercup - small yet brave behavior tree engine written in Rust
 
-**NOTE:** this is very much a WIP project, not accepting contributions yet - although happy to talk if you think it's something worth doing.
+**NOTE:** this is very much a WIP project - happy to talk if you think contributing is something worth doing.
 
 ## Concept
 
