@@ -63,7 +63,6 @@ pub struct BehaviorTreeService {
 
     trees: DashMap<i32, Arc<BehaviorTree>>,
 
-
 }
 
 impl BehaviorTreeService {

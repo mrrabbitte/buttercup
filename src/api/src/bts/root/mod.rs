@@ -22,6 +22,18 @@ pub struct OneOffRootBTNodeDefinition {
 
 }
 
+impl OneOffRootBTNodeDefinition {
+
+    pub fn new(id: i32,
+               child_id: i32) -> OneOffRootBTNodeDefinition {
+        OneOffRootBTNodeDefinition {
+            id,
+            child_id
+        }
+    }
+
+}
+
 impl RootBTNodeDefinition for OneOffRootBTNodeDefinition {
     fn build(&self,
              context: &BehaviorTreeBuildingContext) -> Result<RootBTNode, BehaviorTreeBuildingError> {

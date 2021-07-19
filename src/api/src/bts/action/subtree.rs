@@ -27,7 +27,7 @@ impl BehaviorTreeNodeDefinition for ExecuteSubTreeActionNodeDefinition {
     fn get_subtree_ids(&self,
                        service: &BehaviorTreeDefinitionService)
                        -> Result<HashSet<i32>, BehaviorTreeBuildingError> {
-        match service.get_definition(&self.tree_id) {
+        match service.get(&self.tree_id) {
             None => Result::Err(BehaviorTreeBuildingError::CouldNotFindSubtreeWithId(self.tree_id)),
 
             Some(subtree) => {

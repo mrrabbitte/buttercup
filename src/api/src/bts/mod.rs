@@ -15,6 +15,7 @@ pub mod composite;
 pub mod decorator;
 pub mod root;
 
+#[derive(Default)]
 pub struct BehaviorTreeDefinitionService {
 
     definitions: DashMap<i32, BehaviorTreeDefinition>
@@ -23,9 +24,13 @@ pub struct BehaviorTreeDefinitionService {
 
 impl BehaviorTreeDefinitionService {
 
-    pub fn get_definition(&self,
-                          id: &i32) -> Option<Ref<i32, BehaviorTreeDefinition>> {
+    pub fn get(&self,
+               id: &i32) -> Option<Ref<i32, BehaviorTreeDefinition>> {
         self.definitions.get(id)
+    }
+
+    pub fn insert(&self, definition: BehaviorTreeDefinition) {
+        self.definitions.insert(definition.id, definition);
     }
 
 }
@@ -43,6 +48,10 @@ impl BehaviorTreeDefinition {
     pub fn build(&self,
                  context: &BehaviorTreeBuildingContext) -> Result<BehaviorTree, BehaviorTreeBuildingError> {
         Result::Ok(BehaviorTree::new(self.id, self.root_node.build(&context)?))
+    }
+
+    pub fn get_id(&self) -> &i32 {
+        &self.id
     }
 
     pub fn get_definitions(&self) -> &Vec<Arc<dyn BehaviorTreeNodeDefinition>> {
@@ -64,6 +73,16 @@ impl BehaviorTreeDefinition {
 
         Result::Ok(ids)
     }
+
+    pub fn new(id: i32,
+               definitions: Vec<Arc<dyn BehaviorTreeNodeDefinition>>,
+               root_node: Box<dyn RootBTNodeDefinition>) -> BehaviorTreeDefinition {
+        BehaviorTreeDefinition {
+            id,
+            definitions,
+            root_node
+        }
+    }
 }
 
 
@@ -82,7 +101,7 @@ pub trait BehaviorTreeNodeDefinition {
 
 }
 
-
+#[derive(Default)]
 pub struct BehaviorTreeBuildingService {
 
     behavior_tree_service: Arc<BehaviorTreeService>,
@@ -92,9 +111,17 @@ pub struct BehaviorTreeBuildingService {
 
 impl BehaviorTreeBuildingService {
 
+    pub fn new(behavior_tree_service: Arc<BehaviorTreeService>,
+               definition_service: Arc<BehaviorTreeDefinitionService>) -> BehaviorTreeBuildingService {
+        BehaviorTreeBuildingService {
+            behavior_tree_service,
+            definition_service
+        }
+    }
+
     pub fn build(&self,
                  id: &i32) -> Result<BehaviorTree, BehaviorTreeBuildingError> {
-        match self.definition_service.get_definition(&id) {
+        match self.definition_service.get(&id) {
             None => Result::Err(BehaviorTreeBuildingError::CouldNotFindSubtreeWithId(*id)),
             Some(definition) => {
                 let context =
