@@ -10,6 +10,17 @@ pub struct PrintLogActionNodeDefinition {
 
 }
 
+impl PrintLogActionNodeDefinition {
+
+    pub fn new(id: i32,
+               message: String) -> PrintLogActionNodeDefinition {
+        PrintLogActionNodeDefinition{
+            id,
+            message
+        }
+    }
+}
+
 impl BehaviorTreeNodeDefinition for PrintLogActionNodeDefinition {
 
     fn build(&self,
