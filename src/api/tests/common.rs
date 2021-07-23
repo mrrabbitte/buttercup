@@ -1,7 +1,8 @@
 use std::sync::Arc;
 
-use buttercup_api::bts::{BehaviorTreeBuildingError, BehaviorTreeBuildingService, BehaviorTreeDefinition, BehaviorTreeDefinitionService};
+use buttercup_api::bts::{BehaviorTreeBuildingError, BehaviorTreeBuildingService, BehaviorTreeDefinition, BehaviorTreeDefinitionService, BehaviorTreeNodeDefinition};
 use buttercup_bts::tree::{BehaviorTree, BehaviorTreeService};
+use buttercup_api::bts::root::OneOffRootBTNodeDefinition;
 
 pub fn check_builds_ok(definition: BehaviorTreeDefinition) {
     build_and_check(definition, true);
@@ -9,6 +10,16 @@ pub fn check_builds_ok(definition: BehaviorTreeDefinition) {
 
 pub fn check_build_fails(definition: BehaviorTreeDefinition) {
     build_and_check(definition, false);
+}
+
+pub fn one_off_root_tree(child_id: i32,
+                         definitions: Vec<Arc<dyn BehaviorTreeNodeDefinition>>)
+                         -> BehaviorTreeDefinition {
+    BehaviorTreeDefinition::new(1,
+                                definitions,
+                                Box::new(
+                                    OneOffRootBTNodeDefinition::new(5436, child_id))
+    )
 }
 
 fn build_and_check(definition: BehaviorTreeDefinition,
