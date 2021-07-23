@@ -17,11 +17,7 @@ fn test_builds_fallback_node_correctly() {
                     1, "Hello!".to_owned()))]
     );
 
-    let tree_definition =
-        common::one_off_root_tree(fallback_node_id,
-                                  children);
-
-    common::check_builds_ok(tree_definition);
+    build_and_check_bt_with_composite(children, fallback_node_id);
 }
 
 #[test]
@@ -39,8 +35,18 @@ fn test_builds_multiple_fallback_nodes_correctly() {
             ]
         );
 
+    build_and_check_bt_with_composite(children, fallback_node_id);
+}
+
+#[test]
+fn test_builds_multiple_sequence_nodes_correctly() {
+
+}
+
+fn build_and_check_bt_with_composite(children: Vec<Arc<dyn BehaviorTreeNodeDefinition>>,
+                                     composite_node_id: i32) {
     let tree_definition =
-        common::one_off_root_tree(fallback_node_id,
+        common::one_off_root_tree(composite_node_id,
                                   children);
 
     common::check_builds_ok(tree_definition);
@@ -48,13 +54,22 @@ fn test_builds_multiple_fallback_nodes_correctly() {
 
 fn add_fallback_node(responses: Vec<(Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32)>)
     -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32) {
+    add_composite_node(responses, |id, children_ids|
+        Arc::new(FallbackCompositeNodeDefinition::new(id, children_ids))
+    )
+}
+
+fn add_composite_node<F>(responses: Vec<(Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32)>,
+                      constructor: F)
+                      -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32)
+    where F: Fn(i32, Vec<i32>) -> Arc<dyn BehaviorTreeNodeDefinition> {
     let mut children: Vec<Arc<dyn BehaviorTreeNodeDefinition>> =
         responses
             .into_iter()
             .flat_map(|entry| entry.0)
             .collect();
 
-    fallback_node(children)
+    composite_node(children, constructor)
 }
 
 fn fallback_node_with_print_log_actions(ids: Vec<i32>)
@@ -72,6 +87,16 @@ fn fallback_node_with_print_log_actions(ids: Vec<i32>)
 
 fn fallback_node(children: Vec<Arc<dyn BehaviorTreeNodeDefinition>>)
     -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32) {
+    composite_node(children,
+                   |id, children_ids|
+                       Arc::new(FallbackCompositeNodeDefinition::new(id, children_ids))
+    )
+}
+
+fn composite_node<F>(children: Vec<Arc<dyn BehaviorTreeNodeDefinition>>,
+                  constructor: F)
+                  -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32)
+    where F: Fn(i32, Vec<i32>) -> Arc<dyn BehaviorTreeNodeDefinition> {
     let ids: Vec<i32> = children
         .iter()
         .map(Deref::deref)
@@ -85,11 +110,7 @@ fn fallback_node(children: Vec<Arc<dyn BehaviorTreeNodeDefinition>>)
 
     response.extend(children);
 
-    response.push(
-        Arc::new(FallbackCompositeNodeDefinition::new(
-            fallback_id,ids)
-        )
-    );
+    response.push(constructor(fallback_id, ids));
 
     (response, fallback_id)
 }
