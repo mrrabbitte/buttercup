@@ -12,6 +12,20 @@ pub struct ConditionDecoratorNodeDefinition {
 
 }
 
+impl ConditionDecoratorNodeDefinition {
+
+    pub fn new(id: i32,
+               child_id: i32,
+               expression: ConditionExpression) -> ConditionDecoratorNodeDefinition {
+        ConditionDecoratorNodeDefinition {
+            id,
+            child_id,
+            expression
+        }
+    }
+
+}
+
 impl BehaviorTreeNodeDefinition for ConditionDecoratorNodeDefinition {
     fn build(&self,
              ctx: &BehaviorTreeBuildingContext) -> Result<BTNode, BehaviorTreeBuildingError> {

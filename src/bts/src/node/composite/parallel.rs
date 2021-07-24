@@ -44,7 +44,9 @@ impl ParallelCompositeNode {
 
 }
 
+#[derive(Debug)]
 pub enum ParallelCompositeNodeBuildingError {
+
     NumOfSuccessesIsGreaterThanNumOfChildren
 
 }

@@ -15,6 +15,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub enum ConditionExpression {
 
+    ConstantExpression(bool),
     RelationExpression(RelationalExpression),
     LogicalExpression(Box<LogicalExpression>)
 
@@ -133,6 +134,8 @@ impl ValuesPayloadPredicateSupplier for ConditionExpression {
 
     fn get_predicate(self) -> Box<dyn Fn(&ValuesPayload) -> bool + Send + Sync> {
         match self {
+            ConditionExpression::ConstantExpression(constant) =>
+                Box::new(move |_| constant),
             ConditionExpression::RelationExpression(expr) => expr.get_predicate(),
             ConditionExpression::LogicalExpression(expr) => expr.get_predicate()
         }
@@ -140,6 +143,7 @@ impl ValuesPayloadPredicateSupplier for ConditionExpression {
 
     fn get_value_names(&self) -> Vec<String> {
         match self {
+            ConditionExpression::ConstantExpression(_) => Vec::new(),
             ConditionExpression::RelationExpression(expr) =>
                 expr.get_value_names(),
             ConditionExpression::LogicalExpression(expr) =>
