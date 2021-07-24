@@ -12,6 +12,18 @@ pub struct ExecuteSubTreeActionNodeDefinition {
 
 }
 
+impl ExecuteSubTreeActionNodeDefinition {
+
+    pub fn new(id: i32,
+               tree_id: i32) -> ExecuteSubTreeActionNodeDefinition {
+        ExecuteSubTreeActionNodeDefinition {
+            id,
+            tree_id
+        }
+    }
+
+}
+
 impl BehaviorTreeNodeDefinition for ExecuteSubTreeActionNodeDefinition {
     fn build(&self,
              context: &BehaviorTreeBuildingContext) -> Result<BTNode, BehaviorTreeBuildingError> {

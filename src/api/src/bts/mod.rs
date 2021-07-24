@@ -176,7 +176,6 @@ pub enum BehaviorTreeBuildingError {
 
 }
 
-
 pub struct BehaviorTreeBuildingContext {
 
     node_definitions: HashMap<i32, Arc<dyn BehaviorTreeNodeDefinition>>,
@@ -222,4 +221,3 @@ impl BehaviorTreeBuildingContext {
     }
 
 }
-
