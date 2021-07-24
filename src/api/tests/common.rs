@@ -3,6 +3,8 @@ use std::sync::Arc;
 use buttercup_api::bts::{BehaviorTreeBuildingError, BehaviorTreeBuildingService, BehaviorTreeDefinition, BehaviorTreeDefinitionService, BehaviorTreeNodeDefinition};
 use buttercup_api::bts::root::OneOffRootBTNodeDefinition;
 use buttercup_bts::tree::{BehaviorTree, BehaviorTreeService};
+use std::ops::Deref;
+use buttercup_api::bts::composite::sequence::SequenceCompositeNodeDefinition;
 
 pub fn check_builds_ok(definition: BehaviorTreeDefinition) {
     build(definition).expect("Expected result to be OK.");
@@ -72,4 +74,34 @@ fn build(definition: BehaviorTreeDefinition) -> Result<BehaviorTree, BehaviorTre
         bt_building_service.build(&definition_id);
 
     result
+}
+
+pub fn composite_node<F>(children: Vec<Arc<dyn BehaviorTreeNodeDefinition>>,
+                     constructor: F)
+                     -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32)
+    where F: Fn(i32, Vec<i32>) -> Arc<dyn BehaviorTreeNodeDefinition> {
+    let ids: Vec<i32> = children
+        .iter()
+        .map(Deref::deref)
+        .map(BehaviorTreeNodeDefinition::get_id)
+        .map(Clone::clone)
+        .collect();
+
+    let fallback_id = *ids.iter().max().expect("Got empty child ids vec.") + 1;
+
+    let mut response = Vec::new();
+
+    response.extend(children);
+
+    response.push(constructor(fallback_id, ids));
+
+    (response, fallback_id)
+}
+
+pub fn sequence_node(children: Vec<Arc<dyn BehaviorTreeNodeDefinition>>)
+                     -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32) {
+    composite_node(children,
+                           |id, children_ids|
+                               Arc::new(SequenceCompositeNodeDefinition::new(id, children_ids))
+    )
 }

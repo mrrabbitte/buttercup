@@ -58,7 +58,8 @@ fn test_builds_multiple_sequence_nodes_correctly() {
                                 sequence_node_with_print_log_actions(vec![15, 16])
                             ]),
                         sequence_node_with_print_log_actions(vec![7]),
-                        sequence_node_with_print_log_actions(vec![8, 9, 10])]),
+                        sequence_node_with_print_log_actions(vec![8, 9, 10])
+                    ]),
                 sequence_node_with_print_log_actions(vec![11, 12]),
                 sequence_node_with_print_log_actions(vec![13, 14])
             ]
@@ -133,7 +134,7 @@ fn add_parallel_node(responses: Vec<(Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i
 
 fn add_sequence_node(responses: Vec<(Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32)>)
                      -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32) {
-    add_composite_node(responses, sequence_node)
+    add_composite_node(responses, common::sequence_node)
 }
 
 fn build_and_check_bt_with_composite(children: Vec<Arc<dyn BehaviorTreeNodeDefinition>>,
@@ -145,32 +146,11 @@ fn build_and_check_bt_with_composite(children: Vec<Arc<dyn BehaviorTreeNodeDefin
     common::check_builds_ok(tree_definition);
 }
 
-fn composite_node<F>(children: Vec<Arc<dyn BehaviorTreeNodeDefinition>>,
-                     constructor: F)
-                     -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32)
-    where F: Fn(i32, Vec<i32>) -> Arc<dyn BehaviorTreeNodeDefinition> {
-    let ids: Vec<i32> = children
-        .iter()
-        .map(Deref::deref)
-        .map(BehaviorTreeNodeDefinition::get_id)
-        .map(Clone::clone)
-        .collect();
-
-    let fallback_id = *ids.iter().max().expect("Got empty child ids vec.") + 1;
-
-    let mut response = Vec::new();
-
-    response.extend(children);
-
-    response.push(constructor(fallback_id, ids));
-
-    (response, fallback_id)
-}
-
 fn composite_node_with_print_log_actions<F>(composite_node_provider: F,
                                             ids: Vec<i32>)
                                             -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32)
-    where F: Fn(Vec<Arc<dyn BehaviorTreeNodeDefinition>>) -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32)  {
+    where F: Fn(Vec<Arc<dyn BehaviorTreeNodeDefinition>>)
+        -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32)  {
     let mut nodes: Vec<Arc<dyn BehaviorTreeNodeDefinition>> = Vec::new();
 
     for id in ids {
@@ -184,7 +164,7 @@ fn composite_node_with_print_log_actions<F>(composite_node_provider: F,
 
 fn fallback_node(children: Vec<Arc<dyn BehaviorTreeNodeDefinition>>)
                  -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32) {
-    composite_node(children,
+    common::composite_node(children,
                    |id, children_ids|
                        Arc::new(FallbackCompositeNodeDefinition::new(id, children_ids))
     )
@@ -197,7 +177,7 @@ fn fallback_node_with_print_log_actions(ids: Vec<i32>)
 
 fn parallel_node(children: Vec<Arc<dyn BehaviorTreeNodeDefinition>>)
                  -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32) {
-    composite_node(children,
+    common::composite_node(children,
                    |id, children_ids|
                        Arc::new(ParallelCompositeNodeDefinition::new(
                            id, children_ids, 1))
@@ -209,15 +189,7 @@ fn parallel_node_with_print_log_actions(ids: Vec<i32>)
     composite_node_with_print_log_actions(parallel_node, ids)
 }
 
-fn sequence_node(children: Vec<Arc<dyn BehaviorTreeNodeDefinition>>)
-                 -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32) {
-    composite_node(children,
-                   |id, children_ids|
-                       Arc::new(SequenceCompositeNodeDefinition::new(id, children_ids))
-    )
-}
-
 fn sequence_node_with_print_log_actions(ids: Vec<i32>)
                                         -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32) {
-    composite_node_with_print_log_actions(sequence_node, ids)
+    composite_node_with_print_log_actions(common::sequence_node, ids)
 }
