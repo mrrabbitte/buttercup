@@ -25,9 +25,11 @@ impl ParallelCompositeNode {
 
     pub fn new(id: i32,
                children: Vec<BTNode>,
-               num_successes_to_succeed: usize) -> Result<ParallelCompositeNode, ()> {
+               num_successes_to_succeed: usize)
+        -> Result<ParallelCompositeNode, ParallelCompositeNodeBuildingError> {
         if num_successes_to_succeed > children.len() {
-            return Result::Err(());
+            return Result::Err(
+                ParallelCompositeNodeBuildingError::NumOfSuccessesIsGreaterThanNumOfChildren);
         }
         let num_failures_to_fail = children.len() - num_successes_to_succeed + 1;
         Result::Ok(
@@ -39,6 +41,11 @@ impl ParallelCompositeNode {
             }
         )
     }
+
+}
+
+pub enum ParallelCompositeNodeBuildingError {
+    NumOfSuccessesIsGreaterThanNumOfChildren
 
 }
 
