@@ -27,31 +27,6 @@ dependencies = [
 
 [[package]]
 name = "actix"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1be241f88f3b1e7e9a3fbe3b5a8a0f6915b5a1d7ee0d9a248d3376d01068cc60"
-dependencies = [
- "actix-rt 1.1.1",
- "actix_derive 0.5.0",
- "bitflags",
- "bytes 0.5.6",
- "crossbeam-channel 0.4.3",
- "derive_more",
- "futures-channel",
- "futures-util",
- "log",
- "once_cell",
- "parking_lot 0.11.0",
- "pin-project 0.4.23",
- "smallvec",
- "tokio 0.2.22",
- "tokio-util 0.3.1",
- "trust-dns-proto 0.19.6",
- "trust-dns-resolver 0.19.6",
-]
-
-[[package]]
-name = "actix"
 version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3720d0064a0ce5c0de7bd93bdb0a6caebab2a9b5668746145d7b3b0c5da02914"
@@ -828,8 +803,8 @@ checksum = "2e8c087f005730276d1096a652e92a8bacee2e2472bcc9715a74d2bec38b5820"
 name = "buttercup"
 version = "0.1.0"
 dependencies = [
- "actix 0.10.0",
- "actix-rt 1.1.1",
+ "actix 0.12.0",
+ "actix-rt 2.1.0",
  "actix-web",
  "buttercup_agents",
  "buttercup_blackboards",
@@ -3218,7 +3193,6 @@ checksum = "be8242891f2b6cbef26a2d7e8605133c2c554cd35b3e4948ea892d6d68436499"
 dependencies = [
  "bytes 0.5.6",
  "futures-core",
- "futures-io",
  "futures-sink",
  "log",
  "pin-project-lite 0.1.7",
