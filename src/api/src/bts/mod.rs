@@ -171,6 +171,7 @@ pub enum BehaviorTreeBuildingError {
     CouldNotFindTreeWithId(i32),
     CouldNotFindSubtreeWithId(i32),
     GotUnexpectedNodeType(i32),
+    ParallelCompositeNodeBuildingError,
     ProvidedTreeCannotBeASubtreeError,
 
 }

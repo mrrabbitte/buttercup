@@ -5,13 +5,13 @@ use buttercup_api::bts::root::OneOffRootBTNodeDefinition;
 use buttercup_bts::tree::{BehaviorTree, BehaviorTreeService};
 
 pub fn check_builds_ok(definition: BehaviorTreeDefinition) {
-    build_and_check(definition, true);
+    build(definition, true).expect("Got error.");
 }
 
 pub fn check_build_fails(definition: BehaviorTreeDefinition,
                          expected_error: BehaviorTreeBuildingError) {
-    match build_and_check(definition, false) {
-        Ok(_) => {}
+    match build(definition, false) {
+        Ok(_) => panic!("Expected error."),
         Err(err) => assert_eq!(expected_error, err)
     }
 }
@@ -26,8 +26,8 @@ pub fn one_off_root_tree(child_id: i32,
     )
 }
 
-fn build_and_check(definition: BehaviorTreeDefinition,
-                   expected_result: bool) -> Result<BehaviorTree, BehaviorTreeBuildingError> {
+fn build(definition: BehaviorTreeDefinition,
+         expected_result: bool) -> Result<BehaviorTree, BehaviorTreeBuildingError> {
     let definition_service = BehaviorTreeDefinitionService::default();
 
     let definition_id = *definition.get_id();
@@ -40,8 +40,6 @@ fn build_and_check(definition: BehaviorTreeDefinition,
 
     let result =
         bt_building_service.build(&definition_id);
-
-    assert_eq!(expected_result, result.is_ok());
 
     result
 }
