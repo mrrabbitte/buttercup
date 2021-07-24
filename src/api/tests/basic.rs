@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use buttercup_api::bts::action::logging::PrintLogActionNodeDefinition;
-use buttercup_api::bts::BehaviorTreeDefinition;
+use buttercup_api::bts::{BehaviorTreeDefinition, BehaviorTreeBuildingError};
 use buttercup_api::bts::root::OneOffRootBTNodeDefinition;
 
 mod common;
@@ -27,5 +27,6 @@ fn test_fails_when_child_node_definition_is_missing() {
                                                           OneOffRootBTNodeDefinition::new(2, 1))
     );
 
-    common::check_build_fails(tree_definition);
+    common::check_build_fails(tree_definition,
+                              BehaviorTreeBuildingError::CouldNotFindChildDefinitionWithId(1));
 }

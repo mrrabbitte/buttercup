@@ -10,6 +10,18 @@ pub struct SequenceCompositeNodeDefinition {
 
 }
 
+impl SequenceCompositeNodeDefinition {
+
+    pub fn new(id: i32,
+               children_ids: Vec<i32>) -> SequenceCompositeNodeDefinition {
+        SequenceCompositeNodeDefinition {
+            id,
+            children_ids
+        }
+    }
+
+}
+
 impl BehaviorTreeNodeDefinition for SequenceCompositeNodeDefinition {
     fn build(&self, context: &BehaviorTreeBuildingContext) -> Result<BTNode, BehaviorTreeBuildingError> {
         Ok(

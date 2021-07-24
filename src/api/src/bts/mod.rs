@@ -164,6 +164,7 @@ impl BehaviorTreeBuildingService {
 
 }
 
+#[derive(Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum BehaviorTreeBuildingError {
 
     CouldNotFindChildDefinitionWithId(i32),
