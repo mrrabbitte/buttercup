@@ -68,7 +68,7 @@ impl EndpointService {
                 .collect()
         };
 
-        self.arbiter.exec_fn(move || {
+        self.arbiter.spawn_fn(move || {
             for listener in listeners {
                 listener(&keys);
             }
