@@ -242,6 +242,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_puts_and_gets_values_from_db() {
         {
             let mut values = HashMap::new();
@@ -267,6 +268,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_puts_and_gets_values_for_different_dbs() {
         {
             let mut values = HashMap::new();
