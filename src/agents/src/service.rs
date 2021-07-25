@@ -2,7 +2,6 @@ use std::ops::DerefMut;
 use std::sync::{Arc, Mutex};
 
 use actix::Arbiter;
-use actix_web::dev::Service;
 use dashmap::DashMap;
 use futures::future::AbortHandle;
 use futures::io::Error;

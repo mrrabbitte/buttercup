@@ -10,6 +10,18 @@ pub struct FallbackCompositeNodeDefinition {
 
 }
 
+impl FallbackCompositeNodeDefinition {
+
+    pub fn new(id: i32,
+               children_ids: Vec<i32>) -> FallbackCompositeNodeDefinition {
+        FallbackCompositeNodeDefinition {
+            id,
+            children_ids
+        }
+    }
+
+}
+
 impl BehaviorTreeNodeDefinition for FallbackCompositeNodeDefinition {
     fn build(&self, context: &BehaviorTreeBuildingContext) -> Result<BTNode, BehaviorTreeBuildingError> {
         Ok(

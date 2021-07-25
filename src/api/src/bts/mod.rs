@@ -164,16 +164,17 @@ impl BehaviorTreeBuildingService {
 
 }
 
+#[derive(Eq, Hash, PartialEq, PartialOrd, Debug, Clone)]
 pub enum BehaviorTreeBuildingError {
 
     CouldNotFindChildDefinitionWithId(i32),
     CouldNotFindTreeWithId(i32),
     CouldNotFindSubtreeWithId(i32),
     GotUnexpectedNodeType(i32),
+    ParallelCompositeNodeBuildingError,
     ProvidedTreeCannotBeASubtreeError,
 
 }
-
 
 pub struct BehaviorTreeBuildingContext {
 
@@ -220,4 +221,3 @@ impl BehaviorTreeBuildingContext {
     }
 
 }
-
