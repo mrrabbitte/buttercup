@@ -15,6 +15,10 @@ pub mod composite;
 pub mod decorator;
 pub mod root;
 
+use serde::{Serialize, Deserialize};
+use std::fmt::Debug;
+use std::hash::Hash;
+
 #[derive(Default)]
 pub struct BehaviorTreeDefinitionService {
 
@@ -86,7 +90,7 @@ impl BehaviorTreeDefinition {
 }
 
 
-pub trait BehaviorTreeNodeDefinition {
+pub trait BehaviorTreeNodeDefinition: Serialize + Debug  {
 
     fn build(&self,
              ctx: &BehaviorTreeBuildingContext) -> Result<BTNode, BehaviorTreeBuildingError>;

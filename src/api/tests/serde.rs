@@ -3,6 +3,8 @@ use buttercup_conditions::{ConditionExpression, LogicalExpression, RelationalExp
 use buttercup_conditions::relational::EqualsRelationalExpression;
 
 use serde_json;
+use buttercup_api::bts::BehaviorTreeDefinition;
+use buttercup_api::bts::root::OneOffRootBTNodeDefinition;
 
 const FIRST_VALUE_NAME: &str = "first_value_name";
 const FIRST_VALUE: &str = "first_value";
@@ -16,8 +18,8 @@ const THIRD_VALUE: u8 = 2;
 #[test]
 fn test_serde_conditions() {
     let node = ConditionDecoratorNodeDefinition::new(
-        1,
         2,
+        3,
         simple_expression());
 
     let read: ConditionDecoratorNodeDefinition =
