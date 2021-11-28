@@ -8,6 +8,8 @@ use buttercup_bts::node::root::reactive::ReactiveRootBTNode;
 use buttercup_bts::node::root::to_first::ToFirstErrorRootBTNode;
 use buttercup_bts::node::root::until_stopped::UntilStoppedRootBTNode;
 
+use serde::{Serialize, Deserialize};
+
 pub trait RootBTNodeDefinition {
 
     fn build(&self,
@@ -15,6 +17,7 @@ pub trait RootBTNodeDefinition {
 
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub struct OneOffRootBTNodeDefinition {
 
     id: i32,
@@ -42,7 +45,7 @@ impl RootBTNodeDefinition for OneOffRootBTNodeDefinition {
     }
 }
 
-
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub struct ReactiveRootBTNodeDefinition {
 
     id: i32,
@@ -81,6 +84,7 @@ impl RootBTNodeDefinition for ReactiveRootBTNodeDefinition {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub struct ToFirstErrorRootBTNodeDefinition {
 
     id: i32,
@@ -96,6 +100,7 @@ impl RootBTNodeDefinition for ToFirstErrorRootBTNodeDefinition {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub struct UntilStoppedRootBTNodeDefinition {
 
     id: i32,

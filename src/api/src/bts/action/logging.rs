@@ -1,8 +1,11 @@
+use serde::{Deserialize, Serialize};
+
 use buttercup_bts::node::action::logging::PrintLogActionNode;
 use buttercup_bts::node::BTNode;
 
 use crate::bts::{BehaviorTreeBuildingContext, BehaviorTreeBuildingError, BehaviorTreeNodeDefinition};
 
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub struct PrintLogActionNodeDefinition {
 
     id: i32,

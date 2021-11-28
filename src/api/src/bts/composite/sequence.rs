@@ -1,8 +1,11 @@
+use serde::{Deserialize, Serialize};
+
 use buttercup_bts::node::BTNode;
 use buttercup_bts::node::composite::sequence::SequenceCompositeNode;
 
 use crate::bts::{BehaviorTreeBuildingContext, BehaviorTreeBuildingError, BehaviorTreeNodeDefinition};
 
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub struct SequenceCompositeNodeDefinition {
 
     id: i32,

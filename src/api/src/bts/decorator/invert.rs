@@ -1,7 +1,11 @@
-use crate::bts::{BehaviorTreeNodeDefinition, BehaviorTreeBuildingContext, BehaviorTreeBuildingError};
+use serde::{Deserialize, Serialize};
+
 use buttercup_bts::node::BTNode;
 use buttercup_bts::node::decorator::invert::InvertDecoratorNode;
 
+use crate::bts::{BehaviorTreeBuildingContext, BehaviorTreeBuildingError, BehaviorTreeNodeDefinition};
+
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub struct InvertDecoratorNodeDefinition {
 
     id: i32,

@@ -1,9 +1,12 @@
+use serde::{Deserialize, Serialize};
+
 use buttercup_bts::node::{BehaviorTreeNode, BTNode};
 use buttercup_bts::node::decorator::condition::ConditionDecoratorNode;
 use buttercup_conditions::{ConditionExpression, ConditionExpressionWrapper};
 
 use crate::bts::{BehaviorTreeBuildingContext, BehaviorTreeBuildingError, BehaviorTreeNodeDefinition};
 
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub struct ConditionDecoratorNodeDefinition {
 
     id: i32,

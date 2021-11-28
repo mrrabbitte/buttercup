@@ -1,10 +1,13 @@
 use std::collections::HashSet;
 
+use serde::{Deserialize, Serialize};
+
 use buttercup_bts::node::action::subtree::ExecuteSubTreeActionNode;
 use buttercup_bts::node::BTNode;
 
 use crate::bts::{BehaviorTreeBuildingContext, BehaviorTreeBuildingError, BehaviorTreeDefinitionService, BehaviorTreeNodeDefinition};
 
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub struct ExecuteSubTreeActionNodeDefinition {
 
     id: i32,

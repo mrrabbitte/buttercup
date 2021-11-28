@@ -1,4 +1,5 @@
 use std::convert::{TryFrom, TryInto};
+use std::fmt::Debug;
 use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
@@ -40,8 +41,8 @@ pub trait VariableService {
 
 }
 
-#[derive(Serialize, Deserialize, Eq, Hash, PartialEq, PartialOrd, Clone)]
-pub enum VariableSpecification<T: TryFrom<ValueHolder> + Copy> {
+#[derive(Serialize, Deserialize, Debug, Eq, Hash, PartialEq, PartialOrd, Clone)]
+pub enum VariableSpecification<T: TryFrom<ValueHolder> + Copy + Debug> {
 
     Literal(Arc<T>),
     VariableName(VariableName)
@@ -77,19 +78,19 @@ pub enum VariableValueAccessError {
 
 }
 
-impl<T: TryFrom<ValueHolder> + Copy> From<T> for VariableSpecification<T> {
+impl<T: TryFrom<ValueHolder> + Copy + Debug> From<T> for VariableSpecification<T> {
     fn from(value: T) -> Self {
         VariableSpecification::Literal(Arc::new(value))
     }
 }
 
-impl<T: TryFrom<ValueHolder> + Copy> From<VariableName> for VariableSpecification<T> {
+impl<T: TryFrom<ValueHolder> + Copy + Debug> From<VariableName> for VariableSpecification<T> {
     fn from(variable_name: VariableName) -> Self {
         VariableSpecification::VariableName(variable_name)
     }
 }
 
-impl<T: TryFrom<ValueHolder> + Copy> VariableSpecification<T> {
+impl<T: TryFrom<ValueHolder> + Copy + Debug> VariableSpecification<T> {
 
     pub fn get_value<S: VariableService>(&self,
                                          service: &S)

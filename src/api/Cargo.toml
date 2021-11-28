@@ -11,3 +11,7 @@ buttercup_bts = { path = "../bts" }
 buttercup_conditions = { path = "../conditions" }
 buttercup_variables = { path = "../variables" }
 dashmap = "4"
+serde = { version = "1", features = ["derive"] }
+
+[dev-dependencies]
+serde_json = "1"
