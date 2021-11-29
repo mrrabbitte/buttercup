@@ -1,14 +1,41 @@
-use crate::bts::{BehaviorTreeBuildingContext, BehaviorTreeBuildingError};
-use buttercup_bts::node::root::RootBTNode;
-use buttercup_bts::node::root::one_off::OneOffRootBTNode;
-use buttercup_bts::node::{BTNode, BehaviorTreeNode};
-use buttercup_bts::node::decorator::reactive::ReactiveConditionDecoratorNode;
+use serde::{Deserialize, Serialize};
+
+use buttercup_bts::node::{BehaviorTreeNode, BTNode};
 use buttercup_bts::node::decorator::DecoratorBTNode;
+use buttercup_bts::node::decorator::reactive::ReactiveConditionDecoratorNode;
+use buttercup_bts::node::root::one_off::OneOffRootBTNode;
 use buttercup_bts::node::root::reactive::ReactiveRootBTNode;
+use buttercup_bts::node::root::RootBTNode;
 use buttercup_bts::node::root::to_first::ToFirstErrorRootBTNode;
 use buttercup_bts::node::root::until_stopped::UntilStoppedRootBTNode;
 
-use serde::{Serialize, Deserialize};
+use crate::bts::{BehaviorTreeBuildingContext, BehaviorTreeBuildingError};
+
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
+pub enum RootNodeDefinition {
+
+    OneOffRootBTNodeDefinition(OneOffRootBTNodeDefinition),
+    ReactiveRootBTNodeDefinition(ReactiveRootBTNodeDefinition),
+    ToFirstErrorRootBTNodeDefinition(ToFirstErrorRootBTNodeDefinition),
+    UntilStoppedRootBTNodeDefinition(UntilStoppedRootBTNodeDefinition)
+
+}
+
+impl RootBTNodeDefinition for RootNodeDefinition {
+    fn build(&self,
+                        context: &BehaviorTreeBuildingContext) -> Result<RootBTNode, BehaviorTreeBuildingError> {
+        match self {
+            RootNodeDefinition::OneOffRootBTNodeDefinition(def) =>
+                def.build(context),
+            RootNodeDefinition::ReactiveRootBTNodeDefinition(def) =>
+                def.build(context),
+            RootNodeDefinition::ToFirstErrorRootBTNodeDefinition(def) =>
+                def.build(context),
+            RootNodeDefinition::UntilStoppedRootBTNodeDefinition(def) =>
+                def.build(context)
+        }
+    }
+}
 
 pub trait RootBTNodeDefinition {
 
@@ -113,5 +140,29 @@ impl RootBTNodeDefinition for UntilStoppedRootBTNodeDefinition {
              context: &BehaviorTreeBuildingContext) -> Result<RootBTNode, BehaviorTreeBuildingError> {
         Result::Ok(
             UntilStoppedRootBTNode::new(self.id, context.build_child(&self.child_id)?).into())
+    }
+}
+
+impl From<OneOffRootBTNodeDefinition> for RootNodeDefinition {
+    fn from(def: OneOffRootBTNodeDefinition) -> Self {
+        RootNodeDefinition::OneOffRootBTNodeDefinition(def)
+    }
+}
+
+impl From<ReactiveRootBTNodeDefinition> for RootNodeDefinition {
+    fn from(def: ReactiveRootBTNodeDefinition) -> Self {
+        RootNodeDefinition::ReactiveRootBTNodeDefinition(def)
+    }
+}
+
+impl From<ToFirstErrorRootBTNodeDefinition> for RootNodeDefinition {
+    fn from(def: ToFirstErrorRootBTNodeDefinition) -> Self {
+        RootNodeDefinition::ToFirstErrorRootBTNodeDefinition(def)
+    }
+}
+
+impl From<UntilStoppedRootBTNodeDefinition> for RootNodeDefinition {
+    fn from(def: UntilStoppedRootBTNodeDefinition) -> Self {
+        RootNodeDefinition::UntilStoppedRootBTNodeDefinition(def)
     }
 }

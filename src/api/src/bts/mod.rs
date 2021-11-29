@@ -1,23 +1,24 @@
 use std::collections::{HashMap, HashSet};
+use std::fmt::Debug;
+use std::hash::Hash;
 use std::ops::Deref;
 use std::sync::Arc;
 
 use dashmap::DashMap;
 use dashmap::mapref::one::Ref;
+use serde::{Deserialize, Serialize};
 
 use buttercup_bts::node::BTNode;
 use buttercup_bts::tree::{BehaviorTree, BehaviorTreeService};
 
-use crate::bts::root::RootBTNodeDefinition;
+use crate::bts::definitions::BTNodeDefinition;
+use crate::bts::root::{RootNodeDefinition, RootBTNodeDefinition};
 
 pub mod action;
 pub mod composite;
 pub mod decorator;
+pub mod definitions;
 pub mod root;
-
-use serde::{Serialize, Deserialize};
-use std::fmt::Debug;
-use std::hash::Hash;
 
 #[derive(Default)]
 pub struct BehaviorTreeDefinitionService {
@@ -39,15 +40,26 @@ impl BehaviorTreeDefinitionService {
 
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, Eq, PartialEq, PartialOrd)]
 pub struct BehaviorTreeDefinition {
 
     id: i32,
-    definitions: Vec<Arc<dyn BehaviorTreeNodeDefinition>>,
-    root_node: Box<dyn RootBTNodeDefinition>
+    definitions: Vec<Arc<BTNodeDefinition>>,
+    root_node: Box<RootNodeDefinition>
 
 }
 
 impl BehaviorTreeDefinition {
+
+    pub fn new(id: i32,
+               definitions: Vec<Arc<BTNodeDefinition>>,
+               root_node: Box<RootNodeDefinition>) -> BehaviorTreeDefinition {
+        BehaviorTreeDefinition {
+            id,
+            definitions,
+            root_node
+        }
+    }
 
     pub fn build(&self,
                  context: &BehaviorTreeBuildingContext) -> Result<BehaviorTree, BehaviorTreeBuildingError> {
@@ -58,7 +70,7 @@ impl BehaviorTreeDefinition {
         &self.id
     }
 
-    pub fn get_definitions(&self) -> &Vec<Arc<dyn BehaviorTreeNodeDefinition>> {
+    pub fn get_definitions(&self) -> &Vec<Arc<BTNodeDefinition>> {
         &self.definitions
     }
 
@@ -77,20 +89,10 @@ impl BehaviorTreeDefinition {
 
         Result::Ok(ids)
     }
-
-    pub fn new(id: i32,
-               definitions: Vec<Arc<dyn BehaviorTreeNodeDefinition>>,
-               root_node: Box<dyn RootBTNodeDefinition>) -> BehaviorTreeDefinition {
-        BehaviorTreeDefinition {
-            id,
-            definitions,
-            root_node
-        }
-    }
 }
 
 
-pub trait BehaviorTreeNodeDefinition: Serialize + Debug  {
+pub trait BehaviorTreeNodeDefinition {
 
     fn build(&self,
              ctx: &BehaviorTreeBuildingContext) -> Result<BTNode, BehaviorTreeBuildingError>;
@@ -182,14 +184,14 @@ pub enum BehaviorTreeBuildingError {
 
 pub struct BehaviorTreeBuildingContext {
 
-    node_definitions: HashMap<i32, Arc<dyn BehaviorTreeNodeDefinition>>,
+    node_definitions: HashMap<i32, Arc<BTNodeDefinition>>,
     subtrees: HashMap<i32, Arc<BehaviorTree>>
 
 }
 
 impl BehaviorTreeBuildingContext {
 
-    pub fn new(node_definitions: HashMap<i32, Arc<dyn BehaviorTreeNodeDefinition>>,
+    pub fn new(node_definitions: HashMap<i32, Arc<BTNodeDefinition>>,
                subtrees: HashMap<i32, Arc<BehaviorTree>>) -> BehaviorTreeBuildingContext {
         BehaviorTreeBuildingContext {
             node_definitions,

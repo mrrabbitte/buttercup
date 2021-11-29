@@ -15,11 +15,12 @@ fn test_builds_ok_with_single_decorator_node() {
                                           ConditionDecoratorNodeDefinition::new(
                                               1, 2,
                                               ConditionExpression::ConstantExpression(
-                                                  true))),
+                                                  true)).into()),
                                       Arc::new(
                                           PrintLogActionNodeDefinition::new(
                                               2,
-                                              "I'm a decorator child node.".to_owned()))
+                                              "I'm a decorator child node.".to_owned())
+                                              .into())
                                   ]);
 
     common::check_builds_ok(tree_definition);

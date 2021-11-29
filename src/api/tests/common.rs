@@ -5,6 +5,7 @@ use buttercup_api::bts::root::OneOffRootBTNodeDefinition;
 use buttercup_bts::tree::{BehaviorTree, BehaviorTreeService};
 use std::ops::Deref;
 use buttercup_api::bts::composite::sequence::SequenceCompositeNodeDefinition;
+use buttercup_api::bts::definitions::BTNodeDefinition;
 
 pub fn check_builds_ok(definition: BehaviorTreeDefinition) {
     build(definition).expect("Expected result to be OK.");
@@ -19,19 +20,19 @@ pub fn check_build_fails(definition: BehaviorTreeDefinition,
 }
 
 pub fn one_off_root_tree(child_id: i32,
-                         definitions: Vec<Arc<dyn BehaviorTreeNodeDefinition>>)
+                         definitions: Vec<Arc<BTNodeDefinition>>)
                          -> BehaviorTreeDefinition {
     one_off_root_tree_with_id(child_id, definitions, 1)
 }
 
 pub fn one_off_root_tree_with_id(child_id: i32,
-                         definitions: Vec<Arc<dyn BehaviorTreeNodeDefinition>>,
+                                 definitions: Vec<Arc<BTNodeDefinition>>,
                                  id: i32)
                          -> BehaviorTreeDefinition {
     BehaviorTreeDefinition::new(id,
                                 definitions,
                                 Box::new(
-                                    OneOffRootBTNodeDefinition::new(5436, child_id)
+                                    OneOffRootBTNodeDefinition::new(5436, child_id).into()
                                 )
     )
 }
@@ -76,14 +77,14 @@ fn build(definition: BehaviorTreeDefinition) -> Result<BehaviorTree, BehaviorTre
     result
 }
 
-pub fn composite_node<F>(children: Vec<Arc<dyn BehaviorTreeNodeDefinition>>,
+pub fn composite_node<F>(children: Vec<Arc<BTNodeDefinition>>,
                      constructor: F)
-                     -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32)
-    where F: Fn(i32, Vec<i32>) -> Arc<dyn BehaviorTreeNodeDefinition> {
+                     -> (Vec<Arc<BTNodeDefinition>>, i32)
+    where F: Fn(i32, Vec<i32>) -> Arc<BTNodeDefinition> {
     let ids: Vec<i32> = children
         .iter()
         .map(Deref::deref)
-        .map(BehaviorTreeNodeDefinition::get_id)
+        .map(BTNodeDefinition::get_id)
         .map(Clone::clone)
         .collect();
 
@@ -98,10 +99,12 @@ pub fn composite_node<F>(children: Vec<Arc<dyn BehaviorTreeNodeDefinition>>,
     (response, fallback_id)
 }
 
-pub fn sequence_node(children: Vec<Arc<dyn BehaviorTreeNodeDefinition>>)
-                     -> (Vec<Arc<dyn BehaviorTreeNodeDefinition>>, i32) {
+pub fn sequence_node(children: Vec<Arc<BTNodeDefinition>>)
+                     -> (Vec<Arc<BTNodeDefinition>>, i32) {
     composite_node(children,
                            |id, children_ids|
-                               Arc::new(SequenceCompositeNodeDefinition::new(id, children_ids))
+                               Arc::new(
+                                   SequenceCompositeNodeDefinition::new(id, children_ids)
+                                       .into())
     )
 }

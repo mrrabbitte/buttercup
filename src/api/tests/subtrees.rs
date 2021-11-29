@@ -14,7 +14,7 @@ fn test_builds_subtree_node_correctly() {
                                   vec![
                                       Arc::new(
                                           ExecuteSubTreeActionNodeDefinition::new(
-                                              2, subtree_id))
+                                              2, subtree_id).into())
                                   ]);
 
     common::build_with_subtrees(tree_definition,
@@ -24,7 +24,7 @@ fn test_builds_subtree_node_correctly() {
                                         vec![
                                             Arc::new(
                                                 PrintLogActionNodeDefinition::new(
-                                                2, "I'm a subtree!".to_owned())
+                                                2, "I'm a subtree!".to_owned()).into()
                                             )
                                         ],
                                         subtree_id)])
@@ -39,13 +39,13 @@ fn test_builds_multiple_subtree_nodes_correctly() {
         vec![
             Arc::new(
                 ExecuteSubTreeActionNodeDefinition::new(
-                    2, first_subtree_id)),
+                    2, first_subtree_id).into()),
             Arc::new(
                 ExecuteSubTreeActionNodeDefinition::new(
-                    2, second_subtree_id)),
+                    2, second_subtree_id).into()),
             Arc::new(
                 ExecuteSubTreeActionNodeDefinition::new(
-                    2, third_subtree_id))
+                    2, third_subtree_id).into())
         ]
     );
 
@@ -59,7 +59,8 @@ fn test_builds_multiple_subtree_nodes_correctly() {
                                         vec![
                                             Arc::new(
                                                 PrintLogActionNodeDefinition::new(
-                                                    2, "I'm a first subtree!".to_owned())
+                                                    2, "I'm a first subtree!"
+                                                        .to_owned()).into()
                                             )
                                         ],
                                         first_subtree_id),
@@ -68,7 +69,8 @@ fn test_builds_multiple_subtree_nodes_correctly() {
                                         vec![
                                             Arc::new(
                                                 PrintLogActionNodeDefinition::new(
-                                                    2, "I'm a second subtree!".to_owned())
+                                                    2, "I'm a second subtree!"
+                                                        .to_owned()).into()
                                             )
                                         ],
                                         second_subtree_id),
@@ -77,7 +79,8 @@ fn test_builds_multiple_subtree_nodes_correctly() {
                                         vec![
                                             Arc::new(
                                                 PrintLogActionNodeDefinition::new(
-                                                    2, "I'm a third subtree!".to_owned())
+                                                    2, "I'm a third subtree!"
+                                                        .to_owned()).into()
                                             )
                                         ],
                                         third_subtree_id)
