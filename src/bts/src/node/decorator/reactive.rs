@@ -5,7 +5,6 @@ use std::iter::FromIterator;
 use std::ops::Deref;
 use std::sync::Arc;
 
-use actix_web::guard::Guard;
 use async_trait::async_trait;
 use futures::future::{Abortable, Aborted, AbortHandle, AbortRegistration};
 

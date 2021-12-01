@@ -3,7 +3,6 @@ use std::future::Future;
 use std::iter::FromIterator;
 use std::ops::Deref;
 
-use actix_web::guard::Guard;
 use async_trait::async_trait;
 
 use buttercup_blackboards::LocalBlackboardError;

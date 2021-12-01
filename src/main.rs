@@ -19,16 +19,16 @@ use buttercup_values::ValuesPayload;
 pub mod test_utils;
 
 
-#[post("/values/{name}/{value}")]
-async fn add_variable_value(
-    data: Data<Arc<EndpointService>>,
-    web::Path((name, value)): web::Path<(String, String)>) -> impl Responder {
-
-    serde_json::to_string(
-        &data.accept_value_changes(&Uuid::from_u128(1),
-                                   ValuesPayload::singleton(name, value.into())))
-        .unwrap()
-}
+// #[post("/values/{name}/{value}")]
+// async fn add_variable_value(
+//     data: Data<Arc<EndpointService>>,
+//     web::Path((name, value)): web::Path<(String, String)>) -> impl Responder {
+//
+//     serde_json::to_string(
+//         &data.accept_value_changes(&Uuid::from_u128(1),
+//                                    ValuesPayload::singleton(name, value.into())))
+//         .unwrap()
+// }
 
 #[derive(Serialize, Deserialize)]
 struct TreeId {
@@ -49,7 +49,7 @@ async fn build_new_agent(agent_service: Data<Arc<AgentService>>,
 async fn start_agent(agent_service: Data<Arc<AgentService>>,
                      agent_id: web::Path<Uuid>) -> impl Responder {
     format!("{:?}", agent_service
-        .start_agent_by_id(&agent_id.0)
+        .start_agent_by_id(&agent_id.into_inner())
     )
 }
 
@@ -57,7 +57,7 @@ async fn start_agent(agent_service: Data<Arc<AgentService>>,
 async fn stop_agent(agent_service: Data<Arc<AgentService>>,
                     agent_id: web::Path<Uuid>) -> impl Responder {
     format!("{:?}", agent_service
-        .stop_agent_by_id(&agent_id.0)
+        .stop_agent_by_id(&agent_id.into_inner())
     )
 }
 
@@ -89,7 +89,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(endpoints_service_data.clone())
             .app_data(agent_service_data.clone())
-            .service(add_variable_value)
+            //.service(add_variable_value)
             .service(build_new_agent)
             .service(start_agent)
             .service(stop_agent)

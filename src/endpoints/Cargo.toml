@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 actix = "0.12"
-actix-rt = "2"
+actix-rt = "2.2"
 buttercup_blackboards = { path = "../blackboards" }
 buttercup_values = { path = "../values" }
 dashmap = "4"

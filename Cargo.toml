@@ -20,8 +20,8 @@ members = [
 
 [dependencies]
 actix = "0.12"
-actix-rt = "2"
-actix-web = "3.0.0"
+actix-rt = "2.2"
+actix-web = "4.0.0-beta.13"
 buttercup_agents = { path = "src/agents" }
 buttercup_blackboards = { path = "src/blackboards" }
 buttercup_bts = { path = "src/bts" }

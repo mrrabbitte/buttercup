@@ -15,6 +15,7 @@ use buttercup_bts::tree::{BehaviorTree, BehaviorTreeService};
 use buttercup_conditions::{ConditionExpression, ConditionExpressionWrapper, LogicalExpression, RelationalExpression, RelationalExpressionSpecification};
 use buttercup_conditions::relational::{EndsWithRelationalExpression, StartsWithRelationalExpression};
 use buttercup_endpoints::endpoints::EndpointService;
+use buttercup_bts::node::BTNode;
 
 pub fn build_test_agent_service(context_service: Arc<BTNodeContextService>) -> AgentService {
     let tree_service = Arc::new(BehaviorTreeService::default());
@@ -36,9 +37,8 @@ fn build_one_off_tree() -> BehaviorTree {
     BehaviorTree::new(
         1,
         OneOffRootBTNode::new(2,
-                              PrintLogActionNode::new(3,
-                                                      "Alive - one off".to_owned())
-                                  .into())
+                              SequenceCompositeNode::new(
+                                  1, build_many_print_logs()).into())
             .into())
 }
 
@@ -59,6 +59,15 @@ fn build_until_stopped_tree() -> BehaviorTree {
                                     ).into()
         )
             .into())
+
+}
+
+fn build_many_print_logs() -> Vec<BTNode> {
+    (0..2000).into_iter()
+        .map(
+            |i| PrintLogActionNode::new(i,format!("I'm a print node: {}", i)).into()
+        )
+        .collect()
 
 }
 
